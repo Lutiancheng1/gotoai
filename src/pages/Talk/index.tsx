@@ -1,28 +1,14 @@
-import React, { MutableRefObject, ReactNode, useRef, useState } from 'react'
-import { Layout, Menu, Button, theme, ConfigProvider, Slider, Tabs, Tooltip, MenuProps, Popover } from 'antd'
+import React, { MutableRefObject, useRef, useState } from 'react'
+import { Layout, ConfigProvider, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import './index.css'
-import { MenuItemType } from 'antd/es/menu/hooks/useItems'
-import { Footer } from 'antd/es/layout/layout'
 import TextArea from 'antd/es/input/TextArea'
-import logo from '@/assets/images/logo.png'
 import sendIcon from '@/assets/images/send.svg'
 import initLogo from '@/assets/images/test-logo.png'
-import { menuConfig, promptConfig } from '@/utils/constants'
+import { promptConfig } from '@/utils/constants'
 import openai, { OPENAI_MODEL } from '@/utils/openAi'
-import axios from 'axios'
-import { http, request, ssePost } from '@/utils/request'
 import Toast from '@/components/toast'
-import { useNavigate } from 'react-router-dom'
-const { Header, Sider, Content } = Layout
 
-const categoryItems: MenuItemType[] = menuConfig.map((item) => {
-  return {
-    key: item.key,
-    icon: <i className={`iconfont ${item.icon}`}></i>,
-    label: item.label
-  }
-})
 let arr = [
   {
     id: '1',
@@ -42,8 +28,7 @@ let arr = [
 ] as arrT[]
 type arrT = { id: String; title: String; time: String }
 
-const Index: React.FC = () => {
-  const [categoryCollapsed, setCategoryCollapsed] = useState(false)
+const Talk: React.FC = () => {
   const [historyCollapsed, setHistoryCollapsed] = useState(false)
   const [historyList, setHistoryList] = useState(arr)
   const historyDivRef = useRef(null) as unknown as MutableRefObject<HTMLDivElement>
@@ -63,7 +48,6 @@ const Index: React.FC = () => {
   const [respText, setRespText] = useState('')
   const scrollBox = useRef<HTMLDivElement>(null)
   const innerBox = useRef<HTMLDivElement>(null)
-  const navagate = useNavigate()
   const toggleHistory = (flag: Boolean) => {
     if (flag) {
       historyDivRef.current.style.display = 'none'
@@ -121,13 +105,6 @@ const Index: React.FC = () => {
     setSendValue('')
     setLoading(false)
   }
-  const menuGo: MenuProps['onClick'] = ({ key }) => {
-    console.log(key)
-    navagate(`/${key}`)
-  }
-  const logout = () => {
-    navagate('/login', { replace: true })
-  }
   return (
     <ConfigProvider
       theme={{
@@ -154,44 +131,6 @@ const Index: React.FC = () => {
     >
       <Layout>
         <div className="home">
-          <Sider
-            trigger={
-              <div className="logout">
-                <Popover
-                  content={
-                    <button className="btn" onClick={() => logout()}>
-                      logout
-                    </button>
-                  }
-                >
-                  <i onClick={(e) => e.stopPropagation()} style={{ fontSize: categoryCollapsed ? 20 : 30, marginRight: categoryCollapsed ? 10 : 20 }} className="iconfont icon-user"></i>
-                </Popover>
-                {!categoryCollapsed ? (
-                  <Tooltip placement="right" title={'收起'}>
-                    <i className="iconfont icon-zhedie"></i>
-                  </Tooltip>
-                ) : (
-                  <Tooltip placement="right" title={'展开'}>
-                    <i style={{ fontSize: 10 }} className="iconfont icon-zhankai"></i>
-                  </Tooltip>
-                )}
-              </div>
-            }
-            style={{ borderInlineEnd: '1px solid rgba(5, 5, 5, 0.06)' }}
-            width={160}
-            collapsible
-            collapsed={categoryCollapsed}
-            onCollapse={(value) => setCategoryCollapsed(value)}
-          >
-            <div className="category">
-              <div className="logo h-10">
-                <img src={logo} alt="" style={{ height: categoryCollapsed ? 25 : 40 }} />
-              </div>
-              <section className="my-menu">
-                <Menu theme="light" onClick={(e) => menuGo(e)} className="h-full text-sm w-34" mode="inline" defaultSelectedKeys={['talk']} items={categoryItems} />
-              </section>
-            </div>
-          </Sider>
           <div className="history" ref={historyDivRef}>
             <div className="histroy-header">
               <div className="left-header-block-up">
@@ -339,4 +278,4 @@ const Index: React.FC = () => {
     </ConfigProvider>
   )
 }
-export default Index
+export default Talk
