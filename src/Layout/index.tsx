@@ -7,6 +7,7 @@ import { MenuItemType } from 'antd/es/menu/hooks/useItems'
 import { menuConfig } from '@/utils/constants'
 import logo from '@/assets/images/logo.png'
 import './index.css'
+import { removeTokenInfo } from '@/utils/storage'
 
 // 导入子路由
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
@@ -37,11 +38,10 @@ export default function Index() {
     navagate(`/${key}`)
   }
   const logout = () => {
+    removeTokenInfo()
     navagate('/login', { replace: true })
   }
   useEffect(() => {
-    console.log(location)
-
     setCurrentPath(location.pathname.substr(1))
   }, [location])
 
@@ -119,7 +119,7 @@ export default function Index() {
                 <Route path="/drawDesigns" element={<DrawDesigns />} />
                 <Route path="/video" element={<Video />} />
                 <Route path="/application" element={<Application />} />
-                <Route path="/*" element={<NotFound  />} />
+                <Route path="/*" element={<NotFound />} />
               </Routes>
             </Suspense>
           </div>

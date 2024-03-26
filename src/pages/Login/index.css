@@ -22,8 +22,6 @@
   height: 100%;
 }
 
-body {}
-
 #root .login {
   display: grid;
   height: 100vh;
@@ -44,7 +42,7 @@ body {}
 
 .login .my-loading {
   position: absolute;
-  z-index: 999;
+  z-index: 1000;
 }
 
 .form__title {
@@ -56,9 +54,12 @@ body {}
 .login .link {
   color: var(--gray);
   font-size: 0.9rem;
-
   margin-bottom: 1.5rem;
   text-decoration: none;
+}
+
+.login .link:hover {
+  opacity: .8;
 }
 
 .my_container {

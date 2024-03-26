@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import './index.css'
-import { Button, Checkbox, ConfigProvider, Form, type FormProps, Input } from 'antd'
+import { Button, Checkbox, ConfigProvider, Form, type FormProps, Input, message } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import Loading from '@/components/loading'
-import { sleep } from 'openai/core'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import logo from '@/assets/images/logo.png'
 import Toast from '@/components/toast'
-import { getUserInfo, hasUserInfo, removeUserInfo, setUserInfo } from '@/utils/storage'
+import { getUserInfo, hasUserInfo, removeUserInfo, setTokenInfo, setUserInfo } from '@/utils/storage'
+import { ipInCN, sleep } from '@/utils'
+import { login } from '@/api/login'
 type FieldType = {
   username?: string
   password?: string
@@ -18,27 +19,38 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const [form] = Form.useForm()
+  const location = useLocation()
   const onFinish: FormProps<FieldType>['onFinish'] = async ({ username, password, remember }) => {
+    if (!username || !password) return
     setLoading(true)
-    if (remember) {
-      console.log('jizhu')
-
-      setUserInfo({
-        username: username!,
-        password: password!
-      })
+    const res = await login({
+      username,
+      password
+    })
+    console.log(res)
+    if (!res.data) {
+      setLoading(false)
+      return Toast.notify({ type: 'error', message: res.msg })
     } else {
-      removeUserInfo()
+      setTokenInfo({ token: res.data.token })
+      if (remember) {
+        setUserInfo({
+          username: username,
+          password: password
+        })
+      } else {
+        removeUserInfo()
+      }
+      Toast.notify({
+        type: 'success',
+        message: '登陆成功'
+      })
+      if (location.state) {
+        const { from } = location.state
+        return navigate(from)
+      }
+      navigate('/')
     }
-    setTimeout(async () => {
-      navigate('/', { replace: true })
-    }, 1000)
-    console.log(form)
-
-    // Toast({
-    //   type: 'success',
-    //   message: '登陆成功'
-    // })
   }
 
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (err) => {
@@ -54,6 +66,12 @@ export default function Login() {
       form.setFieldsValue(userInfo)
     }
   }, [form])
+  useEffect(() => {
+    // ipInCN()
+    if (location.state) {
+      Toast.notify({ type: 'error', message: '请先登陆' })
+    }
+  }, [location.state])
   return (
     <ConfigProvider
       theme={{
@@ -75,6 +93,7 @@ export default function Login() {
       }}
     >
       <div className="login">
+        {loading && <div id="mask" className="w-full h-full opacity-30" style={{ position: 'absolute', zIndex: 999, backgroundColor: '#fff' }}></div>}
         {loading && <Loading></Loading>}
         <div className="my_container right-panel-active">
           {/* Sign In */}
@@ -109,9 +128,9 @@ export default function Login() {
                 <Checkbox>Remember me</Checkbox>
               </Form.Item>
 
-              <a href={undefined} className="link" onClick={() => restPassword()}>
+              <span className="link" onClick={() => restPassword()}>
                 Forgot your password?
-              </a>
+              </span>
 
               <Form.Item>
                 <Button disabled={loading} className="btn" htmlType="submit">

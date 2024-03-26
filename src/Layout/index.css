@@ -4,7 +4,7 @@
 
 .home {
   display: flex;
-  justify-content: start !important;
+  justify-content: flex-start !important;
   width: 100%;
   height: 100vh;
   background-color: #f6f7f9;

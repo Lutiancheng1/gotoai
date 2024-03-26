@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import { createRoutesFromElements, createBrowserRouter, RouterProvider, Route, redirect } from 'react-router-dom'
 import './App.css'
+import AuthRoute from './components/AuthRoute'
 
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
 const Loading = React.lazy(() => import('@/pages/Loading'))
@@ -19,7 +20,14 @@ const router = createBrowserRouter(
           }}
         />
 
-        <Route path="/*" element={<Layout />} />
+        <Route
+          path="/*"
+          element={
+            <AuthRoute>
+              <Layout />
+            </AuthRoute>
+          }
+        />
       </Route>
     </>
   )
