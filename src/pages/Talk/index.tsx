@@ -1,38 +1,47 @@
-import React, { MutableRefObject, useRef, useState } from 'react'
+import React, { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { Layout, ConfigProvider, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import './index.css'
 import TextArea from 'antd/es/input/TextArea'
+import { promptConfig } from '@/utils/constants'
+import Toast from '@/components/toast'
+import axios from 'axios'
+import { sendMessageToAi } from '@/api/openai'
+import { parsePack } from '@/utils/format'
 import sendIcon from '@/assets/images/send.svg'
 import initLogo from '@/assets/images/test-logo.png'
-import { promptConfig } from '@/utils/constants'
-import openai, { OPENAI_MODEL } from '@/utils/openAi'
-import Toast from '@/components/toast'
+import defaultAvatar from '@/assets/images/default-avatar.jpg'
+import rebotAvatar from '@/assets/images/robot.svg'
 
+import newSessionIcon from '@/assets/images/new_session_icon.svg'
+import History from '@/components/history'
 let arr = [
-  {
-    id: '1',
-    title: ' sdadadas',
-    time: '2024-03-19 17:35:35'
-  },
-  {
-    id: '2',
-    title: ' sdadadas',
-    time: '2024-03-19 17:35:35'
-  },
-  {
-    id: '3',
-    title: ' sdadadas',
-    time: '2024-03-19 17:35:35'
-  }
+  { id: '1', title: 'Sample Title 1', time: '10:00' },
+  { id: '2', title: 'Sample Title 2', time: '10:30' },
+  { id: '3', title: 'Sample Title 3', time: '11:00' },
+  { id: '4', title: 'Sample Title 4', time: '11:30' },
+  { id: '5', title: 'Sample Title 5', time: '12:00' },
+  { id: '6', title: 'Sample Title 6', time: '12:30' },
+  { id: '7', title: 'Sample Title 7', time: '13:00' },
+  { id: '8', title: 'Sample Title 8', time: '13:30' },
+  { id: '9', title: 'Sample Title 9', time: '14:00' },
+  { id: '10', title: 'Sample Title 10', time: '14:30' }
 ] as arrT[]
-type arrT = { id: String; title: String; time: String }
-
+type arrT = { id: string; title: string; time: string }
+type FileInfo = {
+  file_id: string
+  file_name: string
+  file_size: number | string
+  file_url: string
+  height: number
+  width: number
+  type: string
+}
 const Talk: React.FC = () => {
   const [historyCollapsed, setHistoryCollapsed] = useState(false)
   const [historyList, setHistoryList] = useState(arr)
   const historyDivRef = useRef(null) as unknown as MutableRefObject<HTMLDivElement>
-  const [currentId, setCurrentId] = useState(arr[0].id)
+  const [currentId, setCurrentId] = useState('')
   const [sendValue, setSendValue] = useState('')
   const [conversitionDetailList, setConversitionDetailList] = useState(
     [] as {
@@ -48,6 +57,8 @@ const Talk: React.FC = () => {
   const [respText, setRespText] = useState('')
   const scrollBox = useRef<HTMLDivElement>(null)
   const innerBox = useRef<HTMLDivElement>(null)
+  const uploadRef = useRef<HTMLInputElement>(null)
+  const [fileList, setFileList] = useState([] as FileInfo[])
   const toggleHistory = (flag: Boolean) => {
     if (flag) {
       historyDivRef.current.style.display = 'none'
@@ -56,18 +67,29 @@ const Talk: React.FC = () => {
     }
     setHistoryCollapsed(!historyCollapsed)
   }
-  const delHistoryItem = (id: String) => {
+  const createNewConversation = () => {
+    if (isNewConversation) {
+      return Toast.notify({
+        type: 'info',
+        message: '已经是最新对话'
+      })
+    }
+    setIsNewConversation(true)
+    setCurrentId('')
+  }
+  const delHistoryItem = (id: string) => {
     const resultList = historyList.filter((item) => item.id !== id)
     setHistoryList(resultList)
     setIsNewConversation(true)
     console.log(id, resultList)
   }
-  const getHistoryList = (id: String) => {
+  const getHistoryList = (id: string) => {
     setCurrentId(id)
     setIsNewConversation(false)
     setConversitionDetailList([])
   }
   const sendMessage = async () => {
+    let finish = false
     scrollBox.current!.scrollTo(0, 10000000000)
     setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
     if (!sendValue && !sendValue.trim()) {
@@ -86,24 +108,80 @@ const Talk: React.FC = () => {
       }
     ])
     setLoading(true)
-    const completion = await openai.chat.completions.create({
-      messages: [{ role: 'user', content: sendValue }],
-      model: OPENAI_MODEL,
-      temperature: 0.6
-      // stream: true
-    })
-    // for await (const chunk of completion) {
-    //   console.log(chunk.choices[0].delta.content)
-    //   let resultText = (chunk.choices[0].delta.content += respText)
-    //   console.log(resultText)
-
-    //   setRespText(resultText)
-    // }
-    setRespText(completion.choices[0].message.content as string)
-    console.log(completion.choices[0].message.content)
-
+    const res = await sendMessageToAi([
+      {
+        role: 'user',
+        content: sendValue
+      }
+    ])
     setSendValue('')
+    if (!res.body) return
+    const reader = res.body.getReader()
+    const decoder: TextDecoder = new TextDecoder()
+    let msgText = ''
+    while (!finish) {
+      const { done, value } = await reader.read()
+      if (done) {
+        break
+      }
+      const jsonArray = parsePack(decoder.decode(value))
+      // eslint-disable-next-line no-loop-func
+      jsonArray.forEach((json: any) => {
+        if (!json.choices || json.choices.length === 0) {
+          return
+        }
+        const text = json.choices[0].delta.content
+        if (text) {
+          msgText = msgText + text
+        }
+      })
+      setRespText(msgText)
+    }
     setLoading(false)
+  }
+  const enterMessage = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.keyCode === 13) {
+      if (!sendValue.trim()) {
+        setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
+        return Toast.notify({ type: 'info', message: '请输入内容' })
+      } else {
+        sendMessage()
+        setSendValue('')
+      }
+    }
+  }
+  const uploadHandle = (e: React.ChangeEvent<HTMLInputElement> | undefined) => {
+    if (fileList.length > 10) return Toast.notify({ type: 'info', message: '最多上传十个文件' })
+    const files = e!.target.files
+    console.log(files)
+    if (files!.length <= 1) {
+      setFileList([
+        ...fileList,
+        {
+          file_id: 'chatglm4/48efb6d2-6b3e-40ad-ba70-f63b60310844.jpeg' + files![0].lastModified,
+          file_name: files![0].name,
+          file_size: files![0].size / 1024 / 1024 > 1 ? parseInt((files![0].size / 1024 / 1024).toString()) + 'MB' : parseInt((files![0].size / 1024).toString()) + 'KB',
+          file_url: 'https://sfile.chatglm.cn/chatglm4/48efb6d2-6b3e-40ad-ba70-f63b60310844.jpeg',
+          height: 255,
+          width: 198,
+          type: files![0].type.split('/')[1] as string
+        }
+      ])
+    } else {
+      setFileList([
+        ...fileList,
+        {
+          file_id: 'chatglm4/48efb6d2-6b3e-40ad-ba70-f63b60310844.jpeg' + files![0].lastModified,
+          file_name: files![0].name,
+          file_size: files![0].size / 1024 / 1024 > 1 ? parseInt((files![0].size / 1024 / 1024).toString()) + 'MB' : parseInt((files![0].size / 1024).toString()) + 'KB',
+          file_url: 'https://sfile.chatglm.cn/chatglm4/48efb6d2-6b3e-40ad-ba70-f63b60310844.jpeg',
+          height: 255,
+          width: 198,
+          type: files![0].type.split('/')[1] as string
+        },
+        ...(files as unknown as [])
+      ])
+    }
   }
   return (
     <ConfigProvider
@@ -131,46 +209,7 @@ const Talk: React.FC = () => {
     >
       <Layout>
         <div className="home">
-          <div className="history" ref={historyDivRef}>
-            <div className="histroy-header">
-              <div className="left-header-block-up">
-                <p className="text">历史记录</p>
-                <div>
-                  <Tooltip className="cursor-pointer" placement="right" title={'收起历史记录'}>
-                    <i className="iconfont icon-zhedie" onClick={() => toggleHistory(true)}></i>
-                  </Tooltip>
-                </div>
-              </div>
-              <div className="new-session-button-wrap" onClick={() => setIsNewConversation(true)}>
-                <div className="new-session-button">
-                  <span> 新建对话</span>
-                </div>
-              </div>
-            </div>
-            <div className="history-list">
-              {historyList &&
-                historyList.map((item, index) => {
-                  return (
-                    <div onClick={() => getHistoryList(item.id)} className={`history-item ${currentId === item.id ? 'active' : ''}`} key={index}>
-                      <div className="title">{item.title}</div>
-                      <div className="time">
-                        <span>{item.time}</span> <i className="iconfont icon-shanchu" onClick={() => delHistoryItem(item.id)}></i>
-                      </div>
-                    </div>
-                  )
-                })}
-            </div>
-          </div>
-          {historyCollapsed && (
-            <div className="expand-bar">
-              <Tooltip placement="right" title={'新建对话'}>
-                <div className="add-session-icon" onClick={() => setIsNewConversation(true)}></div>
-              </Tooltip>
-              <Tooltip placement="right" title={'展开历史记录'}>
-                <div className="expand-icon" onClick={() => toggleHistory(false)}></div>
-              </Tooltip>
-            </div>
-          )}
+          <History />
           <div className="detail">
             <div className="session-box animate__animated" ref={scrollBox}>
               <div ref={innerBox}>
@@ -214,7 +253,7 @@ const Talk: React.FC = () => {
                         <div className="chat chat-end">
                           <div className="chat-image avatar">
                             <div className="w-10 rounded-full">
-                              <img alt="Tailwind CSS chat bubble component" src="https://demo.gotoai.world/_next/static/media/default-avatar.bda71a7e.jpg" />
+                              <img alt="Tailwind CSS chat bubble component" src={defaultAvatar} />
                             </div>
                           </div>
                           <div className="chat-bubble ">{item.query}</div>
@@ -222,7 +261,7 @@ const Talk: React.FC = () => {
                         <div className="chat chat-start">
                           <div className="chat-image avatar">
                             <div className="w-10 rounded-full">
-                              <img alt="Tailwind CSS chat bubble component" src="https://demo.gotoai.world/_next/static/media/robot.eec9592e.svg" />
+                              <img alt="Tailwind CSS chat bubble component" src={rebotAvatar} />
                             </div>
                           </div>
                           <div className="chat-bubble">
@@ -233,20 +272,49 @@ const Talk: React.FC = () => {
                     )
                   })}
               </div>
-              <div className="last-div"></div>
+              {/* <div className="last-div"></div> */}
             </div>
             <div className="search-box animate__bounceInUp">
               <div className="search-container">
                 <div className="search flex">
                   <div className="search-input-box">
+                    {fileList && fileList.length > 0 && (
+                      <div className="file-list-box">
+                        {fileList.map((item) => {
+                          return (
+                            <div className="file-box" key={item.file_id}>
+                              <div className="file">
+                                <div className="icon icon-img" style={{ backgroundImage: `url("${item.file_url}")` }}></div>
+                                <div className="file-info">
+                                  <p className="name dot">{item.file_name}</p>
+                                  <div className="status">
+                                    <div className="success">
+                                      <p className="type">{item.type}</p> <p className="size">{item.file_size}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <p className="close" onClick={() => setFileList(fileList.filter((i) => i.file_id !== item.file_id))}></p>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+
                     <div className="input-wrap">
                       <div className="input-box-inner">
-                        <TextArea wrap="off" value={sendValue} onPressEnter={() => sendMessage()} onChange={(e) => setSendValue(e.target.value)} placeholder="输入你的问题或需求" autoSize={{ minRows: 1, maxRows: 9 }} />
+                        <TextArea wrap="off" value={sendValue} onKeyUp={(e) => enterMessage(e)} onChange={(e) => setSendValue(e.target.value)} placeholder="输入你的问题或需求" autoSize={{ minRows: 1, maxRows: 9 }} />
                       </div>
                       <div className="search-interactive">
                         <div className="upload-image-wrap">
-                          <Tooltip title={'上传图片'}>
-                            <div className="upload-image-btn" onClick={() => {}}></div>
+                          <Tooltip title={'最多上传10个文件,每个文件不超过20M'}>
+                            <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" style={{ display: 'none' }} multiple />
+                            <div
+                              className="upload-image-btn"
+                              onClick={() => {
+                                uploadRef.current?.click()
+                              }}
+                            ></div>
                           </Tooltip>
                         </div>
                         <div className="search-operation">
