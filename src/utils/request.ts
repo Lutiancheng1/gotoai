@@ -1,7 +1,7 @@
 import Toast from '@/components/toast'
-import axios, { AxiosError } from 'axios'
-const TIME_OUT = 5000
-
+import axios, { AxiosError, AxiosResponse } from 'axios'
+import { getTokenInfo } from './storage'
+const TIME_OUT = 10000
 const ContentType = {
   json: 'application/json',
   stream: 'text/event-stream',
@@ -186,31 +186,31 @@ export const request = <T>(url: string, options = {}, otherOptions?: IOtherOptio
 }
 
 export const http = axios.create({
-  timeout: 5000
-  // baseURL: ''
+  timeout: 10000,
+  baseURL: process.env.REACT_APP_BASE_URL
 })
 
 // 2. 设置请求拦截器和响应拦截器
 http.interceptors.request.use((config) => {
   config.headers!['Access-Control-Allow-Origin'] = '*'
   // 获取缓存中的 Token 信息
-  // const token = getTokenInfo().token
-  // if (token) {
-  //   // 设置请求头的 Authorization 字段
-  //   config.headers!['Authorization'] = `Bearer ${token}`
-  // }
+  const token = getTokenInfo().token
+  if (token) {
+    // 设置请求头的 Authorization 字段
+    config.headers!['Authorization'] = `Bearer ${token}`
+  }
   return config
 })
 
 http.interceptors.response.use(
-  (response) => {
+  (response: AxiosResponse) => {
     return response.data
   },
   async (error: AxiosError<{ message: string }>) => {
     if (!error.response) {
       // 如果因为网络原因 请求超时没有response
       Toast.notify({ type: 'error', message: '网络错误' })
-      return Promise.reject(error)
+      return error
     }
     // 代表网络没问题 有数据
     if (error.response.status !== 401) {
@@ -220,7 +220,7 @@ http.interceptors.response.use(
         message: error.response.data.message,
         duration: 1000
       })
-      return Promise.reject(error)
+      return error
     }
   }
 )

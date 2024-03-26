@@ -8,7 +8,7 @@ declare module '*.tiff'
 
 export interface Token {
   token: string
-  refresh_token: string
+  // refresh_token: string
 }
 
 export interface UserInfo {
