@@ -7,7 +7,10 @@ import { MenuItemType } from 'antd/es/menu/hooks/useItems'
 import { menuConfig } from '@/utils/constants'
 import logo from '@/assets/images/logo.png'
 import './index.css'
-import { removeTokenInfo } from '@/utils/storage'
+import { getAccountInfo, removeTokenInfo } from '@/utils/storage'
+import { useAppDispatch } from '@/store/hooks'
+import { logOut } from '@/store/reducers/login'
+import { getUserProfile } from '@/store/action/profileActions'
 
 // 导入子路由
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
@@ -26,6 +29,7 @@ export default function Index() {
   const [currentPath, setCurrentPath] = useState('')
   const navagate = useNavigate()
   const location = useLocation()
+  const dispatch = useAppDispatch()
   const categoryItems: MenuItemType[] = menuConfig.map((item) => {
     return {
       key: item.key,
@@ -38,13 +42,15 @@ export default function Index() {
     navagate(`/${key}`)
   }
   const logout = () => {
-    removeTokenInfo()
+    dispatch(logOut())
     navagate('/login', { replace: true })
   }
   useEffect(() => {
     setCurrentPath(location.pathname.substr(1))
   }, [location])
-
+  useEffect(() => {
+    dispatch(getUserProfile(getAccountInfo().username))
+  }, [dispatch])
   return (
     <ConfigProvider
       theme={{

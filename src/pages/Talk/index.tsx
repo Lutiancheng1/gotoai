@@ -1,151 +1,204 @@
-import React, { MutableRefObject, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Layout, ConfigProvider, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import './index.css'
 import TextArea from 'antd/es/input/TextArea'
-import { promptConfig } from '@/utils/constants'
+import { menuType, menuWarp, promptConfig } from '@/utils/constants'
 import Toast from '@/components/toast'
-import axios from 'axios'
-import { sendMessageToAi } from '@/api/openai'
-import { parsePack } from '@/utils/format'
+import { sendMessageToAi, StreamGpt } from '@/api/openai'
+import { parsePack, Typewriter } from '@/utils/format'
 import sendIcon from '@/assets/images/send.svg'
 import initLogo from '@/assets/images/test-logo.png'
 import defaultAvatar from '@/assets/images/default-avatar.jpg'
 import rebotAvatar from '@/assets/images/robot.svg'
-
+import { addNewConversition } from '@/api/chat'
 import newSessionIcon from '@/assets/images/new_session_icon.svg'
 import History from '@/components/history'
-let arr = [
-  { id: '1', title: 'Sample Title 1', time: '10:00' },
-  { id: '2', title: 'Sample Title 2', time: '10:30' },
-  { id: '3', title: 'Sample Title 3', time: '11:00' },
-  { id: '4', title: 'Sample Title 4', time: '11:30' },
-  { id: '5', title: 'Sample Title 5', time: '12:00' },
-  { id: '6', title: 'Sample Title 6', time: '12:30' },
-  { id: '7', title: 'Sample Title 7', time: '13:00' },
-  { id: '8', title: 'Sample Title 8', time: '13:30' },
-  { id: '9', title: 'Sample Title 9', time: '14:00' },
-  { id: '10', title: 'Sample Title 10', time: '14:30' }
-] as arrT[]
-type arrT = { id: string; title: string; time: string }
+import chatAPi from '@/api/chat/index'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { useLocation } from 'react-router-dom'
+import { MessageInfo } from '@/store/types'
+import { addMessages, createChat, getHistoryList } from '@/store/action/talkActions'
+import Loading from '@/components/loading'
+import { AppDispatch, RootState } from '@/store'
+import { connect } from 'react-redux'
+import { clearHistoryList, talkInitialState, toggleIsNewChat, updateCurrentId } from '@/store/reducers/talk'
+import { debounce } from 'radash'
+import { getPrologue, getMenuPrologue } from '@/api/prologue'
+// 定义一个文件信息的类型
 type FileInfo = {
+  // 文件的 id
   file_id: string
+  // 文件的名称
   file_name: string
+  // 文件的大小
   file_size: number | string
+  // 文件的 url
   file_url: string
+  // 文件的高度
   height: number
+  // 文件的宽度
   width: number
+  // 文件的头缀
   type: string
 }
-const Talk: React.FC = () => {
-  const [historyCollapsed, setHistoryCollapsed] = useState(false)
-  const [historyList, setHistoryList] = useState(arr)
-  const historyDivRef = useRef(null) as unknown as MutableRefObject<HTMLDivElement>
-  const [currentId, setCurrentId] = useState('')
+
+type Props = {} & Partial<talkInitialState>
+const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat }: Props) => {
+  // 初始化问题Id
+  let questionId = currentId || Date.now()
+  // const location = useLocation()
+  // 获取 dispatch 对象，用于触发 actions
+  const dispatch = useAppDispatch()
+  // 初始化输入框的值
   const [sendValue, setSendValue] = useState('')
-  const [conversitionDetailList, setConversitionDetailList] = useState(
-    [] as {
-      id: string | number
-      answer: string
-      conversation_id: string
-      created_at: string
-      query: string
-    }[]
-  )
-  const [isNewConversation, setIsNewConversation] = useState(true)
-  const [loading, setLoading] = useState(false)
+  // 判断是否在加载消息
+  const [messageLoading, setMessageLoading] = useState(false)
+  // 获取服务器响应的消息
   const [respText, setRespText] = useState('')
+  // 创建一个滚动框
   const scrollBox = useRef<HTMLDivElement>(null)
+  // 创建一个内框
   const innerBox = useRef<HTMLDivElement>(null)
+  // 创建一个上传组件
   const uploadRef = useRef<HTMLInputElement>(null)
+  // 初始化文件列表
   const [fileList, setFileList] = useState([] as FileInfo[])
-  const toggleHistory = (flag: Boolean) => {
-    if (flag) {
-      historyDivRef.current.style.display = 'none'
-    } else {
-      historyDivRef.current.style.display = ''
-    }
-    setHistoryCollapsed(!historyCollapsed)
-  }
-  const createNewConversation = () => {
-    if (isNewConversation) {
-      return Toast.notify({
-        type: 'info',
-        message: '已经是最新对话'
-      })
-    }
-    setIsNewConversation(true)
-    setCurrentId('')
-  }
-  const delHistoryItem = (id: string) => {
-    const resultList = historyList.filter((item) => item.id !== id)
-    setHistoryList(resultList)
-    setIsNewConversation(true)
-    console.log(id, resultList)
-  }
-  const getHistoryList = (id: string) => {
-    setCurrentId(id)
-    setIsNewConversation(false)
-    setConversitionDetailList([])
-  }
+  // 用于处理流式传输的数据
+  const streamingText = useRef('')
+  //  store
+  const user = useAppSelector((state) => state.profileSlice.user)
+  // 存储开场白信息
+  const [prologue, setPrologue] = useState<{
+    content: string
+    example: string
+    id: number
+    menu: number
+    status: number
+  }>()
   const sendMessage = async () => {
-    let finish = false
-    scrollBox.current!.scrollTo(0, 10000000000)
+    // 如果消息正在加载中，则直接返回
+    if (messageLoading) return
+    // 将输入框的内容发送给服务器
     setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
+    // 如果输入框为空，则提示用户输入内容
     if (!sendValue && !sendValue.trim()) {
       return Toast.notify({ type: 'info', message: '请输入内容' })
     }
 
-    setIsNewConversation(false)
-    setConversitionDetailList([
-      ...conversitionDetailList,
-      {
-        id: Date.now(),
-        conversation_id: Date.now().toString(),
-        answer: respText,
-        query: sendValue,
-        created_at: dayjs(Date.now()).format()
+    // 如果是新会话，则创建一个新的会话
+    if (isNewChat) {
+      const { payload } = await dispatch(
+        createChat({
+          id: 0,
+          title: sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
+          userId: user.id,
+          createTime: dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
+          updateTime: dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
+          model: '',
+          menu: 0
+        })
+      )
+      questionId = payload
+      console.log('是新会话,创建一个新会话 ID为:', payload)
+      console.log(questionId, '更新questionId为新会话id')
+    }
+    // 创建一个 Typewriter 实例
+    const typewriter = new Typewriter((str: string) => {
+      // 将输入的内容添加到流中
+      streamingText.current += str
+      console.log('str', str)
+      console.log('+++', streamingText.current)
+    })
+    // 创建一个 StreamGpt 实例
+    const gpt = new StreamGpt({
+      // 开始时，将内容添加到流中
+      async onStart([{ content }]) {
+        dispatch(toggleIsNewChat(false))
+        // 将内容发送给服务器
+        const resp = await dispatch(
+          addMessages([
+            {
+              id: 0,
+              chatId: questionId,
+              content: content.replace(/\r/gi, '').replace(/\n/gi, ''),
+              type: 0,
+              resource: ''
+            }
+          ])
+        )
+        console.log(resp, '开始，user')
+        setMessageLoading(true)
+      },
+      // 创建时，启动 Typewriter
+      onCreated() {
+        typewriter.start()
+        // 获取历史列表
+        dispatch(getHistoryList({ menu: 0, page: 1, pageSize: 10 }))
+        // 更新当前 ID
+        dispatch(updateCurrentId(questionId))
+      },
+      // 更新时，将内容添加到流中
+      onPatch(text, reduceText) {
+        typewriter.add(text)
+        setRespText(reduceText)
+      },
+      // 完成时，将消息加载完成
+      async onDone(text) {
+        setMessageLoading(false)
+        setSendValue('')
+        typewriter.done()
+        if (text === 'Failed to fetch') return Toast.notify({ type: 'error', message: '网络错误' })
+        if (text === '请求频繁，请稍后再试') return Toast.notify({ type: 'error', message: '请求频繁，请稍后再试' })
+        streamingText.current = ''
+        console.log(text, '结束了，AI')
+
+        // 将内容发送给服务器
+        await dispatch(
+          addMessages([
+            {
+              id: 0,
+              chatId: questionId,
+              content: text,
+              type: 1,
+              resource: ''
+            }
+          ])
+        )
+        // 滚动到底部
+        scrollBox.current?.scrollTo({
+          top: scrollBox.current!.scrollTop + 100000000000000000,
+          behavior: 'smooth'
+        })
+        // scrollBox.current!.scrollTop = innerBox.current!.scrollHeight
       }
-    ])
-    setLoading(true)
-    const res = await sendMessageToAi([
+    })
+
+    // 开始与 AI 对话
+    gpt.stream([
       {
         role: 'user',
         content: sendValue
       }
     ])
-    setSendValue('')
-    if (!res.body) return
-    const reader = res.body.getReader()
-    const decoder: TextDecoder = new TextDecoder()
-    let msgText = ''
-    while (!finish) {
-      const { done, value } = await reader.read()
-      if (done) {
-        break
-      }
-      const jsonArray = parsePack(decoder.decode(value))
-      // eslint-disable-next-line no-loop-func
-      jsonArray.forEach((json: any) => {
-        if (!json.choices || json.choices.length === 0) {
-          return
-        }
-        const text = json.choices[0].delta.content
-        if (text) {
-          msgText = msgText + text
-        }
-      })
-      setRespText(msgText)
-    }
-    setLoading(false)
   }
+
+  // 定义enterMessage函数，接收一个React.KeyboardEvent<HTMLTextAreaElement>类型的参数e
   const enterMessage = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // 如果正在加载页面，则返回
+    if (loading) return
+    // 如果按下的是回车键
     if (e.keyCode === 13) {
+      // 如果输入框为空
       if (!sendValue.trim()) {
+        // 去除输入框中的回车和换行符
         setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
+        // 弹出提示框，提示需要输入内容
         return Toast.notify({ type: 'info', message: '请输入内容' })
       } else {
+        // 发送消息
         sendMessage()
+        // 清空输入框
         setSendValue('')
       }
     }
@@ -183,6 +236,28 @@ const Talk: React.FC = () => {
       ])
     }
   }
+  // 获取开场白信息
+  useEffect(() => {
+    const getData = async () => {
+      const res = await getMenuPrologue(0)
+      if (!res.data) return
+      setPrologue(res.data[0])
+    }
+    getData()
+  }, [])
+
+  useEffect(() => {
+    console.log(currentId, 'currentId变化了')
+  }, [currentId])
+  useEffect(() => {
+    // scrollBox.current!.scrollTop = innerBox.current!.scrollHeight
+    scrollBox.current?.scrollTo({
+      top: scrollBox.current!.scrollTop + 100000000000000000,
+      behavior: 'smooth'
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversitionDetailList!?.length > 0])
+
   return (
     <ConfigProvider
       theme={{
@@ -208,13 +283,20 @@ const Talk: React.FC = () => {
       }}
     >
       <Layout>
-        <div className="home">
-          <History />
+        <div className="home relative">
+          {loading && (
+            <div id="mask" className="w-full h-full opacity-30" style={{ position: 'absolute', zIndex: 999, backgroundColor: '#fff' }}>
+              <div className="absolute" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
+                <Loading></Loading>
+              </div>
+            </div>
+          )}
+          <History history_list={[]} />
           <div className="detail">
-            <div className="session-box animate__animated" ref={scrollBox}>
-              <div ref={innerBox}>
-                {isNewConversation && (
-                  <div className="init-page">
+            <div className="session-box" ref={scrollBox}>
+              <div className="" ref={innerBox}>
+                {isNewChat && prologue && (
+                  <div className="init-page animate__animated animate__fadeIn animate__faster">
                     <div className="warp">
                       <div className="inner">
                         <div className="init-header">
@@ -224,12 +306,10 @@ const Talk: React.FC = () => {
                           <div className="init-title">GotoAI 智能助理</div>
                         </div>
                         <div className="init-content">
-                          <p>我是您的AI智能助理，初次见面很开心。我可以回答你的各种问题，给你工作，学习上提供帮助，还能随时陪你聊天，立即开始我们的对话吧。</p> <p>&nbsp;</p>
-                          <p>您可以试一试以下例子：</p>
-                          <p className="cursor-pointer text-blue-500">软件开发专家 请使用联网功能获取相关优秀案例，并为我编写一个自动化邮件回复脚本</p>
+                          <p>{prologue?.content}</p> <p>&nbsp;</p>
                         </div>
                         <div className="init-prompt">
-                          <div className="prompt-title">您可以尝试选择以下的预设角色来开始对话。学习如何设计角色和撰写Prompt提示词？请参考我们的网络课堂。</div>
+                          <div className="prompt-title">{prologue?.example}</div>
                           <div className="prompt-content">
                             {promptConfig &&
                               promptConfig.map((item, index) => {
@@ -245,29 +325,31 @@ const Talk: React.FC = () => {
                     </div>
                   </div>
                 )}
-                {!isNewConversation &&
+                {!isNewChat &&
                   conversitionDetailList &&
                   conversitionDetailList.map((item, index) => {
                     return (
                       <div className="item" key={index}>
-                        <div className="chat chat-end">
-                          <div className="chat-image avatar">
-                            <div className="w-10 rounded-full">
-                              <img alt="Tailwind CSS chat bubble component" src={defaultAvatar} />
+                        {item.type === 0 && (
+                          <div className="chat chat-end">
+                            <div className="chat-image avatar">
+                              <div className="w-10 rounded-full">
+                                <img alt="Tailwind CSS chat bubble component" src={defaultAvatar} />
+                              </div>
                             </div>
+                            <div className="chat-bubble ">{item.content}</div>
                           </div>
-                          <div className="chat-bubble ">{item.query}</div>
-                        </div>
-                        <div className="chat chat-start">
-                          <div className="chat-image avatar">
-                            <div className="w-10 rounded-full">
-                              <img alt="Tailwind CSS chat bubble component" src={rebotAvatar} />
+                        )}
+                        {item.type === 1 && (
+                          <div className="chat chat-start">
+                            <div className="chat-image avatar">
+                              <div className="w-10 rounded-full">
+                                <img alt="Tailwind CSS chat bubble component" src={rebotAvatar} />
+                              </div>
                             </div>
+                            <div className="chat-bubble">{item.content}</div>
                           </div>
-                          <div className="chat-bubble">
-                            <span className={`${loading ? 'loading loading-spinner loading-xs' : ''}`}></span> {respText}
-                          </div>
-                        </div>
+                        )}
                       </div>
                     )
                   })}
@@ -318,7 +400,7 @@ const Talk: React.FC = () => {
                           </Tooltip>
                         </div>
                         <div className="search-operation">
-                          <div className={`enter ${loading ? 'loading loading-spinner loading-xs' : ''}`} onClick={() => sendMessage()}>
+                          <div className={`enter ${messageLoading ? 'loading loading-spinner loading-xs' : ''}`} onClick={() => sendMessage()}>
                             <img src={sendIcon} alt="" />
                           </div>
                         </div>
@@ -346,4 +428,16 @@ const Talk: React.FC = () => {
     </ConfigProvider>
   )
 }
-export default Talk
+// mapStateToProps 函数：将 state 映射到 props
+function mapStateToProps(state: RootState) {
+  return state.talkSlice
+}
+
+// mapDispatchToProps 函数：将 dispatch 映射到 props
+function mapDispatchToProps(dispatch: AppDispatch) {
+  return {}
+}
+// 使用 connect 连接组件和 Redux store
+const ConnectedTalk = connect(mapStateToProps, mapDispatchToProps)(Talk)
+
+export default ConnectedTalk

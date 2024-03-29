@@ -45,7 +45,8 @@
 }
 
 .new-session-button-wrap {
-  padding-top: 16px;
+  width: 100%;
+  padding: 16px 13px 0px 12px;
 }
 
 .new-session-button {
@@ -84,13 +85,17 @@
   padding: 0 2px;
   flex-direction: column;
   height: calc(100% - 108px);
-  overflow: hidden;
-}
-
-.history-list>div {
   overflow: scroll;
   scrollbar-width: none;
 }
+
+/* .history .infinite-scroll-component__outerdiv {
+  height: 100%;
+} */
+
+/* .history-list .infinite-scroll-component {
+  height: 643px !important;
+} */
 
 .history-item .time {
   font-size: 12px;

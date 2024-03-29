@@ -6,9 +6,11 @@ import Loading from '@/components/loading'
 import { useLocation, useNavigate } from 'react-router-dom'
 import logo from '@/assets/images/logo.png'
 import Toast from '@/components/toast'
-import { getUserInfo, hasUserInfo, removeUserInfo, setTokenInfo, setUserInfo } from '@/utils/storage'
 import { ipInCN, sleep } from '@/utils'
-import { login } from '@/api/login'
+import { login } from '@/store/action/loginActions'
+import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
+import { getAccountInfo, hasAccountInfo, removeAccountInfo, setAccountInfo } from '@/utils/storage'
 type FieldType = {
   username?: string
   password?: string
@@ -16,53 +18,74 @@ type FieldType = {
 }
 
 export default function Login() {
+  // 定义一个loading状态
   const [loading, setLoading] = useState(false)
+  // 使用navigate
   const navigate = useNavigate()
+  // 使用Form
   const [form] = Form.useForm()
+  // 使用location
   const location = useLocation()
+  // 使用dispatch
+  const dispatch = useAppDispatch()
+  // 定义onFinish函数
   const onFinish: FormProps<FieldType>['onFinish'] = async ({ username, password, remember }) => {
+    // 如果用户名或密码为空，则返回
     if (!username || !password) return
+    // 设置loading为true
     setLoading(true)
-    const res = await login({
-      username,
-      password
-    })
-    console.log(res)
-    if (!res.data) {
-      setLoading(false)
-      return Toast.notify({ type: 'error', message: res.msg })
-    } else {
-      setTokenInfo({ token: res.data.token })
-      if (remember) {
-        setUserInfo({
-          username: username,
-          password: password
-        })
-      } else {
-        removeUserInfo()
-      }
-      Toast.notify({
-        type: 'success',
-        message: '登陆成功'
+    // 发起登录请求
+    const res = await dispatch(
+      login({
+        name: username,
+        password,
+        type: 1
       })
-      if (location.state) {
-        const { from } = location.state
-        return navigate(from)
-      }
-      navigate('/')
+    )
+    // 设置loading为false
+    setLoading(false)
+    // 如果请求失败，则返回
+    if (res.meta.requestStatus === 'rejected') return
+    // 如果记住密码，则保存用户名和密码
+    if (remember) {
+      setAccountInfo({
+        username: username,
+        password: password
+      })
+    } else {
+      // 否则删除用户名和密码
+      removeAccountInfo()
     }
+    // 提示登录成功
+    Toast.notify({
+      type: 'success',
+      message: '登陆成功'
+    })
+    // 如果location有state，则跳转到from
+    if (location.state) {
+      const { from } = location.state
+      return navigate(from)
+    }
+    // 否则跳转到首页
+    navigate('/')
   }
 
+  // 定义onFinishFailed函数
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (err) => {
     console.log('Failed:', err)
   }
+  // 定义restPassword函数
   const restPassword = () => {
     console.log('goto rest')
   }
 
+  // 使用了React的useEffect钩子，当组件挂载时，会执行下面的代码
   useEffect(() => {
-    if (hasUserInfo()) {
-      const userInfo = getUserInfo()
+    // 如果用户信息存在
+    if (hasAccountInfo()) {
+      // 获取用户信息
+      const userInfo = getAccountInfo()
+      // 将用户信息设置到表单中
       form.setFieldsValue(userInfo)
     }
   }, [form])
