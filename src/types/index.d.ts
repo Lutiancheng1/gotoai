@@ -6,12 +6,8 @@ declare module '*.gif'
 declare module '*.bmp'
 declare module '*.tiff'
 
-export interface Token {
-  token: string
-  // refresh_token: string
-}
-
-export interface UserInfo {
+export interface AccountInfo {
   username: string
   password: string
 }
+

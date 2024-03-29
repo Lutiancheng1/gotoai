@@ -210,7 +210,7 @@ http.interceptors.response.use(
     if (!error.response) {
       // 如果因为网络原因 请求超时没有response
       Toast.notify({ type: 'error', message: '网络错误' })
-      return error
+      return Promise.reject(error)
     }
     // 代表网络没问题 有数据
     if (error.response.status !== 401) {
@@ -220,7 +220,7 @@ http.interceptors.response.use(
         message: error.response.data.message,
         duration: 1000
       })
-      return error
+      return Promise.reject(error)
     }
   }
 )

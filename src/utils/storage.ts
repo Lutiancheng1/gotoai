@@ -1,4 +1,5 @@
-import { Token, UserInfo } from '@/types'
+import { Token } from '@/store/types'
+import { AccountInfo } from '@/types'
 
 // 用户 Token 的本地缓存键名
 const TOKEN_KEY = 'goto-ai-key'
@@ -38,7 +39,7 @@ export const hasToken = (): boolean => {
 /**
  * 从本地缓存中获取 帐号 信息
  */
-export const getUserInfo = (): UserInfo => {
+export const getAccountInfo = (): AccountInfo => {
   // JSON.parse() 参数必须是string
   // localstorage.getItem()  获取到 string | null
   return JSON.parse(localStorage.getItem(USER_INFO) as string) || {}
@@ -48,20 +49,20 @@ export const getUserInfo = (): UserInfo => {
  * 将 Token 信息存入缓存
  * @param {Object} userInfo 从后端获取到的 帐号 信息
  */
-export const setUserInfo = (userInfo: UserInfo) => {
+export const setAccountInfo = (userInfo: AccountInfo) => {
   localStorage.setItem(USER_INFO, JSON.stringify(userInfo))
 }
 
 /**
  * 删除本地缓存中的 帐号 信息
  */
-export const removeUserInfo = () => {
+export const removeAccountInfo = () => {
   localStorage.removeItem(USER_INFO)
 }
 
 /**
  * 判断本地缓存中是否存在 帐号 信息
  */
-export const hasUserInfo = (): boolean => {
-  return !!getUserInfo()
+export const hasAccountInfo = (): boolean => {
+  return !!getAccountInfo()
 }

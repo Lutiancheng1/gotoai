@@ -43,7 +43,23 @@ export const menuConfig = [
     label: '应用'
   }
 ]
-
+/**
+ * @param { 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7}
+ * @returns {对话｜文档｜代码｜知识库｜数据分析｜画图｜视频｜ying y}
+ */
+export type menuType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+export const menuWarp = {
+  '/talk': 0,
+  '/document': 1,
+  '/code': 2,
+  '/knowledgeBase': 3,
+  '/dataAnalysis': 4,
+  '/drawDesigns': 5,
+  '/video': 6,
+  '/application': 7
+} as {
+  [key: string]: number
+}
 export const promptConfig = [
   '软件开发工程师',
   '人力资源分析师',
