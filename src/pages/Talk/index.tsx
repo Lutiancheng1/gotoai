@@ -25,6 +25,7 @@ import { connect } from 'react-redux'
 import { clearHistoryList, talkInitialState, toggleIsNewChat, updateCurrentId } from '@/store/reducers/talk'
 import { debounce } from 'radash'
 import { getPrologue, getMenuPrologue } from '@/api/prologue'
+import { ipInCN } from '@/utils'
 // 定义一个文件信息的类型
 type FileInfo = {
   // 文件的 id
@@ -148,7 +149,10 @@ const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat 
         setMessageLoading(false)
         setSendValue('')
         typewriter.done()
-        if (text === 'Failed to fetch') return Toast.notify({ type: 'error', message: '网络错误' })
+        if (text === 'Failed to fetch') {
+          ipInCN()
+          return Toast.notify({ type: 'error', message: '网络错误' })
+        }
         if (text === '请求频繁，请稍后再试') return Toast.notify({ type: 'error', message: '请求频繁，请稍后再试' })
         streamingText.current = ''
         console.log(text, '结束了，AI')

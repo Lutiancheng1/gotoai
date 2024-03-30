@@ -45,6 +45,7 @@ export default function Login() {
     // 设置loading为false
     setLoading(false)
     // 如果请求失败，则返回
+    if (!res.payload) return
     if (res.meta.requestStatus === 'rejected') return
     // 如果记住密码，则保存用户名和密码
     if (remember) {

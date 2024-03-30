@@ -1,6 +1,6 @@
 import Toast from '@/components/toast'
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import { getTokenInfo } from './storage'
+import { getTokenInfo, removeTokenInfo } from './storage'
 const TIME_OUT = 10000
 const ContentType = {
   json: 'application/json',
@@ -204,6 +204,26 @@ http.interceptors.request.use((config) => {
 
 http.interceptors.response.use(
   (response: AxiosResponse) => {
+    if (response.data.code === -1) {
+      Toast.notify({
+        type: 'error',
+        message: response.data.message,
+        duration: 1000
+      })
+    }
+    if (response.data.code === -401) {
+      Toast.notify({
+        type: 'error',
+        message: '登陆过期,请重新登陆',
+        duration: 1000
+      })
+
+      // 清除token
+      removeTokenInfo()
+      // 跳转到登陆页面
+      window.location.href = '/login'
+      return Promise.reject(response)
+    }
     return response.data
   },
   async (error: AxiosError<{ message: string }>) => {
@@ -212,6 +232,7 @@ http.interceptors.response.use(
       Toast.notify({ type: 'error', message: '网络错误' })
       return Promise.reject(error)
     }
+    // 如果不是401错误
     // 代表网络没问题 有数据
     if (error.response.status !== 401) {
       // 如果不是401错误

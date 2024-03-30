@@ -48,7 +48,7 @@ export const ipInCN = async () => {
     if (await checkIP(res.data as string)) {
       Toast.notify({
         type: 'info',
-        message: '当前ip在国内'
+        message: '当前ip在国内,可能无法正常对话'
       })
       return true
     } else {
