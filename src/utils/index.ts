@@ -1,4 +1,4 @@
-import Toast from '@/components/toast'
+import Toast from '@/components/Toast'
 import { http } from './request'
 import axios, { AxiosResponse } from 'axios'
 
@@ -80,7 +80,8 @@ export const checkIP = async (ip: string) => {
   try {
     const response = (await http.get(`http://ip-api.com/json/${ip}`)) as Ip
     if (response.status === 'success') {
-      if (response.countryCode === 'CN' || response.countryCode === 'HK' || response.countryCode === 'TW' || response.countryCode === 'Macao') {
+      if (response.countryCode === 'CN') {
+        // if (response.countryCode === 'CN' || response.countryCode === 'HK' || response.countryCode === 'TW' || response.countryCode === 'Macao') {
         return true
       } else {
         return false

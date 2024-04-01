@@ -60,7 +60,7 @@ module.exports = {
           // 构建（build）过程中生成压缩版的资源文件。
           new CompressionWebpackPlugin({
             algorithm: 'gzip',
-            test: /\.js$|\.css$/,
+            test: /\.(js|ts|jsx|tsx|css|scss)$/,
             threshold: 1024,
             minRatio: 0.8
           })
