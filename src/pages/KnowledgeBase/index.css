@@ -7,35 +7,26 @@
   position: relative;
   flex: 1;
   flex-shrink: 0;
-  padding: 60px 0;
   background-color: #f9fafb;
   overflow-x: auto;
   display: flex;
   flex-direction: column;
-  align-items: flex-start
+  align-items: flex-start;
+  min-width: calc(100% - 161px - 210px);
 }
 
 .knowledge-box {
-  margin: 0 auto
-}
-
-.title-box {
-  flex-shrink: 0;
-  width: 918px;
-  text-align: left;
-  color: #1a2029;
-  font-family: PingFang SC
-}
-
-.title-box .title {
-  font-size: 28px;
-  font-weight: 600;
-  line-height: 36px
-}
-
-.title-box .sub-title {
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 16px;
-  margin-top: 12px
+  margin: 0 auto;
+  margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-self: flex-start;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 0 auto;
+  background-color: #f6f7f9;
+  flex: auto;
 }

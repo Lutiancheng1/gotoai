@@ -1,5 +1,5 @@
 import History from '@/components/history'
-import React from 'react'
+import React, { useRef } from 'react'
 import './index.css'
 import pdfIcon from '@/assets/images/pdf-session.svg'
 import { InboxOutlined } from '@ant-design/icons'
@@ -148,6 +148,12 @@ export default function Document() {
             </div>
           </div>
         </div>
+      </div>
+      <div className="upload-dialog-container split-pane" style={{ display: 'none' }}>
+        {/* pdfjs预览 */}
+        <div className="left" style={{ width: '50%' }}></div>
+        {/* 对话框 */}
+        <div className="right" style={{ width: '50%' }}></div>
       </div>
     </div>
   )

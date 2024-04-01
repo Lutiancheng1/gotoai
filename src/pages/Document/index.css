@@ -622,3 +622,37 @@
   -moz-transition: width 2s linear;
   transition: width 2s linear
 }
+
+.upload-dialog-container {
+  width: 100%;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -moz-box-flex: 1;
+  flex: 1;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 100vh;
+  background: #f6f7f9;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: flex;
+  position: relative
+}
+
+.upload-dialog-container .preview-container {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto
+}
+
+.upload-dialog-container.split-pane .left,
+.upload-dialog-container.split-pane .right {
+  position: relative;
+  height: 100%
+}
+
+.upload-dialog-container.split-pane .left {
+  min-width: 450px
+}

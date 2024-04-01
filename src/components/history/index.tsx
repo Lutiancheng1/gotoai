@@ -1,7 +1,7 @@
 import React, { MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react'
 import './index.css'
 import newSessionIcon from '@/assets/images/new_session_icon.svg'
-import Toast from '../toast'
+import Toast from '../Toast'
 import { Skeleton, Tooltip } from 'antd'
 import { menuType, menuWarp } from '@/utils/constants'
 import { useLocation } from 'react-router-dom'

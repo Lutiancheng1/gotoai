@@ -1,4 +1,4 @@
-import Toast from '@/components/toast'
+import Toast from '@/components/Toast'
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { getTokenInfo, removeTokenInfo } from './storage'
 const TIME_OUT = 10000

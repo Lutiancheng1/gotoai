@@ -1,0 +1,31 @@
+.init_page {
+  margin: 0 auto;
+  padding-top: 60px;
+}
+
+.init_page .title-box {
+  flex-shrink: 0;
+  width: 918px;
+  /* width: 800px; */
+  text-align: left;
+  color: #1a2029;
+  font-family: PingFang SC;
+  margin-bottom: 50px;
+}
+
+.title-box .title {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 36px
+}
+
+.title-box .sub-title {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 16px;
+  margin-top: 12px
+}
+
+.init_page .example p {
+  cursor: pointer;
+}

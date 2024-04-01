@@ -45,7 +45,7 @@ export const menuConfig = [
 ]
 /**
  * @param { 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7}
- * @returns {对话｜文档｜代码｜知识库｜数据分析｜画图｜视频｜ying y}
+ * @returns {对话｜文档｜代码｜知识库｜数据分析｜画图｜视频｜应用}
  */
 export type menuType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
 export const menuWarp = {
@@ -60,6 +60,7 @@ export const menuWarp = {
 } as {
   [key: string]: number
 }
+
 export const promptConfig = [
   '软件开发工程师',
   '人力资源分析师',

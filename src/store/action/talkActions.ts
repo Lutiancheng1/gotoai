@@ -1,6 +1,6 @@
 import { http } from '@/utils/request'
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import Toast from '@/components/toast'
+import Toast from '@/components/Toast'
 import { GetHistoryFroMenu, HistoryList, MessageInfo, NewQuestion } from '../types'
 import { delHistory, saveHistoryList, updateConversitionDetailList, updateCurrentId, updateHistoryList } from '../reducers/talk'
 import { RootState } from '..'

@@ -2,7 +2,7 @@ import { http } from '@/utils/request'
 import { setTokenInfo } from '@/utils/storage'
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { saveToken } from '../reducers/login'
-import Toast from '@/components/toast'
+import Toast from '@/components/Toast'
 
 /**
  * 登录

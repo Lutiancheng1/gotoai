@@ -1,0 +1,38 @@
+* {
+  box-sizing: border-box;
+}
+
+.dialogue-detail {
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-self: flex-start;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 0 auto;
+  background-color: #f6f7f9;
+  flex: auto
+}
+
+.dialogue-detail .session-box {
+  width: 100%;
+  overflow: scroll;
+  scrollbar-width: none;
+  padding: 16px 36px 0 36px;
+  height: 100%;
+}
+
+.session-box>div .item:last-child .chat {
+  margin-bottom: 47px;
+}
+
+/* .session-box>div>.item {
+  min-height: 555px;
+} */
+
+.dialogue-detail .session-box .last-div {
+  height: 47px;
+  background: transparent
+}

@@ -54,7 +54,7 @@ export interface MessageInfo {
 }
 
 // 开场白的基本信息
-export interface PrologueDto {
+export interface PrologueInfo {
   id: number
   menu: number
   content: string //开场白

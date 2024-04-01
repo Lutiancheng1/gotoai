@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import './index.css'
 import TextArea from 'antd/es/input/TextArea'
 import { menuType, menuWarp, promptConfig } from '@/utils/constants'
-import Toast from '@/components/toast'
+import Toast from '@/components/Toast'
 import { sendMessageToAi, StreamGpt } from '@/api/openai'
 import { parsePack, Typewriter } from '@/utils/format'
 import sendIcon from '@/assets/images/send.svg'
@@ -17,7 +17,7 @@ import History from '@/components/history'
 import chatAPi from '@/api/chat/index'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { useLocation } from 'react-router-dom'
-import { MessageInfo } from '@/store/types'
+import { MessageInfo, PrologueInfo } from '@/store/types'
 import { addMessages, createChat, getHistoryList } from '@/store/action/talkActions'
 import Loading from '@/components/loading'
 import { AppDispatch, RootState } from '@/store'
@@ -26,6 +26,7 @@ import { clearHistoryList, talkInitialState, toggleIsNewChat, updateCurrentId } 
 import { debounce } from 'radash'
 import { getPrologue, getMenuPrologue } from '@/api/prologue'
 import { ipInCN } from '@/utils'
+import Footer from '@/components/Footer'
 // 定义一个文件信息的类型
 type FileInfo = {
   // 文件的 id
@@ -70,13 +71,7 @@ const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat 
   //  store
   const user = useAppSelector((state) => state.profileSlice.user)
   // 存储开场白信息
-  const [prologue, setPrologue] = useState<{
-    content: string
-    example: string
-    id: number
-    menu: number
-    status: number
-  }>()
+  const [prologue, setPrologue] = useState<PrologueInfo>()
   const sendMessage = async () => {
     // 如果消息正在加载中，则直接返回
     if (messageLoading) return
@@ -149,8 +144,7 @@ const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat 
         setMessageLoading(false)
         setSendValue('')
         typewriter.done()
-        if (text === 'Failed to fetch') {
-          ipInCN()
+        if (text === 'Failed to fetch' || text === 'Load failed' || text === 'Network Error' || text === '请求超时。') {
           return Toast.notify({ type: 'error', message: '网络错误' })
         }
         if (text === '请求频繁，请稍后再试') return Toast.notify({ type: 'error', message: '请求频繁，请稍后再试' })
@@ -261,7 +255,9 @@ const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat 
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversitionDetailList!?.length > 0])
-
+  useEffect(() => {
+    // ipInCN()
+  }, [])
   return (
     <ConfigProvider
       theme={{
@@ -412,18 +408,8 @@ const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat 
                     </div>
                   </div>
                 </div>
-                <div className="policy-wrap">
-                  <a href="javscript:;" className="link ">
-                    用户协议
-                  </a>
-                  &nbsp;
-                  <span>&nbsp;|&nbsp;</span>&nbsp;
-                  <a href="javscript:;" className="link">
-                    隐私政策
-                  </a>
-                  &nbsp;
-                  <span>© 2024 GotoAi 京公网安备111111111111号 </span>
-                </div>
+                {/* 底部copyright */}
+                <Footer />
               </div>
             </div>
           </div>
