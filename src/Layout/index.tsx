@@ -7,11 +7,14 @@ import { MenuItemType } from 'antd/es/menu/hooks/useItems'
 import { menuConfig } from '@/utils/constants'
 import logo from '@/assets/images/logo.png'
 import './index.css'
-import { getAccountInfo, removeTokenInfo } from '@/utils/storage'
+import { getAccountInfo } from '@/utils/storage'
 import { useAppDispatch } from '@/store/hooks'
 import { logOut } from '@/store/reducers/login'
 import { getUserProfile } from '@/store/action/profileActions'
-
+import { AppDispatch, RootState } from '@/store'
+import { connect } from 'react-redux'
+import { talkInitialState } from '@/store/reducers/talk'
+import GlobalLoading from '@/components/loading'
 // 导入子路由
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
 const Home = React.lazy(() => import('@/pages/Talk'))
@@ -23,8 +26,8 @@ const DataAnalysis = React.lazy(() => import('@/pages/DataAnalysis'))
 const DrawDesigns = React.lazy(() => import('@/pages/DrawDesigns'))
 const Video = React.lazy(() => import('@/pages/Video'))
 const Application = React.lazy(() => import('@/pages/Application'))
-
-export default function Index() {
+type Props = {} & Partial<talkInitialState>
+const Index = ({ loading }: Props) => {
   const [categoryCollapsed, setCategoryCollapsed] = useState(false)
   const [currentPath, setCurrentPath] = useState('')
   const navagate = useNavigate()
@@ -114,7 +117,14 @@ export default function Index() {
             </div>
           </Sider>
           {/* 右侧需要变化的区域 */}
-          <div className="home-content w-full h-full">
+          <div className="home-content w-full h-full relative">
+            {loading && (
+              <div id="mask" className="w-full h-full opacity-30" style={{ position: 'absolute', zIndex: 999, backgroundColor: '#fff' }}>
+                <div className="absolute" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
+                  <GlobalLoading></GlobalLoading>
+                </div>
+              </div>
+            )}
             <Suspense fallback={<Loading />}>
               <Routes>
                 <Route path="/talk" element={<Home />} />
@@ -134,3 +144,17 @@ export default function Index() {
     </ConfigProvider>
   )
 }
+
+// mapStateToProps 函数：将 state 映射到 props
+function mapStateToProps(state: RootState) {
+  return state.talkSlice
+}
+
+// mapDispatchToProps 函数：将 dispatch 映射到 props
+function mapDispatchToProps(dispatch: AppDispatch) {
+  return {}
+}
+// 使用 connect 连接组件和 Redux store
+const ConnectedIndex = connect(mapStateToProps, mapDispatchToProps)(Index)
+
+export default ConnectedIndex

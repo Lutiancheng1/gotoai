@@ -2,7 +2,12 @@
 module.exports = {
   content: ['./src/**/*.{html,js,tsx}'],
   theme: {
-    extend: {}
+    extend: {
+      colors: {
+        'bubble-bg': '#fff', // 自定义背景颜色
+        'bubble-text': '#1f2328' // 自定义字体颜色
+      }
+    }
   },
   // add daisyUI plugin
   plugins: [require('daisyui')],

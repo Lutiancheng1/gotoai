@@ -10,7 +10,7 @@ export default function Video() {
       <div className="video-container">
         <div className="video-box">
           <InitPage />
-          <Dialogue isNewChat={true} conversitionDetailList={[]} />
+          <Dialogue />
         </div>
       </div>
     </div>

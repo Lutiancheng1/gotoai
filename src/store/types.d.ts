@@ -42,6 +42,7 @@ export interface NewQuestion {
   updateTime: string
   model: string
   menu: number
+  conversationid: string
 }
 
 // 对话消息

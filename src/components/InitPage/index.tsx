@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './index.css'
 import { useLocation } from 'react-router-dom'
-import { menuType, menuWarp } from '@/utils/constants'
+import { menuWarp } from '@/utils/constants'
 import { getMenuPrologue } from '@/api/prologue'
 import { PrologueInfo } from '@/store/types'
 const titleWarp = {

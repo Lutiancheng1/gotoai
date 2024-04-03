@@ -1,22 +1,37 @@
 import { Tooltip } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { useRef } from 'react'
 import sendIcon from '@/assets/images/send.svg'
 import Footer from '../Footer'
 import './index.css'
+import { FileInfo } from '../Dialogue'
+/**
+ * Renders the search component.
+ *
+ * @param {Props} props - The component props.
+ * @param {Array} props.fileList - The list of files.
+ * @param {Function} props.setFileList - The function to set the file list.
+ * @param {string} props.sendValue - The value to send.
+ * @param {Function} props.setSendValue - The function to set the send value.
+ * @param {Function} props.uploadHandle - The function to handle file upload.
+ * @param {Function} props.sendMessage - The function to send a message.
+ * @param {boolean} props.messageLoading - Indicates if a message is loading.
+ * @param {Function} props.enterMessage - The function to handle enter key press.
+ * @return {JSX.Element} The rendered search component.
+ */
+
 type Props = {
-  fileList: any[]
-  setFileList: (value: any[]) => void
+  fileList: FileInfo[]
+  setFileList: (value: FileInfo[]) => void
   sendValue: string
   setSendValue: (value: string) => void
-  uploadHandle: (e: any) => void
+  uploadHandle: (e: React.ChangeEvent<HTMLInputElement> | undefined) => void
   sendMessage: () => void
   messageLoading: boolean
-  enterMessage: (e: any) => void
+  enterMessage: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
+  uploadRef: React.RefObject<HTMLInputElement>
 }
 
-export default function Search({ fileList, setFileList, sendValue, setSendValue, uploadHandle, sendMessage, messageLoading, enterMessage }: Props) {
-  const uploadRef = useRef<HTMLInputElement>(null)
+export default function Search({ fileList, setFileList, sendValue, setSendValue, uploadHandle, sendMessage, messageLoading, enterMessage, uploadRef }: Props) {
   return (
     <div className="search-box animate__bounceInUp">
       <div className="search-container">
@@ -51,8 +66,8 @@ export default function Search({ fileList, setFileList, sendValue, setSendValue,
               </div>
               <div className="search-interactive">
                 <div className="upload-image-wrap">
-                  <Tooltip title={'最多上传10个文件,每个文件不超过20M'}>
-                    <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" style={{ display: 'none' }} multiple />
+                  <Tooltip title={'上传图片'}>
+                    <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" accept="image/gif,image/jpeg,image/jpg,image/png" style={{ display: 'none' }} multiple />
                     <div
                       className="upload-image-btn"
                       onClick={() => {

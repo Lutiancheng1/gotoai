@@ -1,4 +1,4 @@
-import Toast from '@/components/toast'
+import Toast from '@/components/Toast'
 import { parsePack } from '@/utils/format'
 import { OPENAI_API_KEY, TEMPERATURE } from '@/utils/openAi'
 import { tryit } from 'radash'
@@ -34,7 +34,7 @@ export class StreamGpt {
     this.onPatch = onPatch
     this.onDone = onDone
   }
-  async stream(prompt: messages[]) {
+  async stream(prompt: messages[], history: messages[] = []) {
     let finish = false
     let count = 0
     let resultText = ''
@@ -42,7 +42,7 @@ export class StreamGpt {
     this.onStart(prompt)
     // 发起请求
 
-    const [err, res] = await tryit(sendMessageToAi)([...prompt])
+    const [err, res] = await tryit(sendMessageStreamToAi)([...history, ...prompt])
     // 国内ip无法请求 openai
     if (err) return this.onDone(err.message)
     // 429 请求频繁
@@ -82,11 +82,17 @@ export class StreamGpt {
   }
 }
 
-export const sendMessageToAi = async (messages: Array<messages>) => {
+/**
+ * Sends a stream of messages to the OpenAI API for chat completion.
+ *
+ * @param {Array<messages>} messages - An array of messages to be sent to the API.
+ * @return {Promise<Response>} - A promise that resolves to the response from the API.
+ */
+export const sendMessageStreamToAi = async (messages: Array<messages>) => {
   return await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-3.5-turbo', // gpt-4, gpt-4-0314, gpt-4-32k, gpt-4-32k-0314, gpt-3.5-turbo, gpt-3.5-turbo-0301
       messages: [...messages],
       stream: true,
       temperature: TEMPERATURE

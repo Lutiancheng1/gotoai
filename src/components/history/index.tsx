@@ -1,20 +1,18 @@
-import React, { MutableRefObject, ReactNode, useEffect, useRef, useState } from 'react'
+import React, { MutableRefObject, useEffect, useRef, useState } from 'react'
 import './index.css'
 import newSessionIcon from '@/assets/images/new_session_icon.svg'
 import Toast from '../Toast'
-import { Skeleton, Tooltip } from 'antd'
+import { Tooltip } from 'antd'
 import { menuType, menuWarp } from '@/utils/constants'
 import { useLocation } from 'react-router-dom'
-import chatAPi from '@/api/chat/index'
-import { HistoryList, MessageInfo } from '@/store/types'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { HistoryList } from '@/store/types'
+import { useAppDispatch } from '@/store/hooks'
 import { getHistoryList, delHistoryItem, getConversitionDetail } from '@/store/action/talkActions'
 import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
 import { clearConversitionDetailList, clearHistoryList, initState, talkInitialState, toggleIsNewChat, updateCurrentId, updateLoading } from '@/store/reducers/talk'
-import { debounce } from 'radash'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import Loading from '@/pages/Loading'
+import { useBoolean } from 'ahooks'
 
 /**
  * @description: history 历史记录组件
@@ -41,14 +39,11 @@ const History = ({ className = '', title = '对话', title_Icon = false, item_Ic
   const location = useLocation()
   const dispatch = useAppDispatch()
   // 记录历史折叠状态
-  const [historyCollapsed, setHistoryCollapsed] = useState(false)
+  const [historyCollapsed, { toggle: setHistoryCollapsed }] = useBoolean(false)
   // 创建历史折叠按钮的ref
   const historyDivRef = useRef(null) as unknown as MutableRefObject<HTMLDivElement>
   // 记录当前菜单的key
   const currentMenuKey = useRef<menuType>(0)
-
-  // 记住当前loading状态 未结束不许加载
-  const [isLoading, setIsLoading] = useState(false)
   // 切换历史折叠状态
   const toggleHistory = (flag: Boolean) => {
     if (flag) {
@@ -56,7 +51,7 @@ const History = ({ className = '', title = '对话', title_Icon = false, item_Ic
     } else {
       historyDivRef.current.style.display = ''
     }
-    setHistoryCollapsed(!historyCollapsed)
+    setHistoryCollapsed()
   }
   // 创建新的会话
   const createNewConversation = () => {
@@ -74,7 +69,8 @@ const History = ({ className = '', title = '对话', title_Icon = false, item_Ic
   }
 
   // 删除历史记录某条
-  const delHistory = async (id: string) => {
+  const delHistory = async (e: React.MouseEvent<HTMLElement, MouseEvent>, id: string) => {
+    e.stopPropagation()
     if (!id) return
     // loading
     dispatch(updateLoading(true))
@@ -84,6 +80,8 @@ const History = ({ className = '', title = '对话', title_Icon = false, item_Ic
     dispatch(toggleIsNewChat(true))
     // 删除成功
     Toast.notify({ type: 'success', message: '删除成功' })
+    // 加载第一页
+    await loadMore(1)
     // 关闭loading
     dispatch(updateLoading(false))
   }
@@ -107,7 +105,7 @@ const History = ({ className = '', title = '对话', title_Icon = false, item_Ic
     const pathname = location.pathname
     currentMenuKey.current = menuWarp[pathname] as menuType
     dispatch(initState())
-    console.log('当前menu:', menuWarp[pathname])
+    // console.log('当前menu:', menuWarp[pathname])
   }, [dispatch, location.pathname])
 
   const loadMore = (page?: number) => {
@@ -170,12 +168,12 @@ const History = ({ className = '', title = '对话', title_Icon = false, item_Ic
               {historyList.rows.map((item, index) => {
                 return (
                   <div onClick={() => getConversationList(item.id)} className={`history-item ${currentId === item.id ? 'active' : ''}`} key={index}>
-                    <div className="title">
+                    <div className="title text-ellipsis overflow-hidden" title={item.title}>
                       {item_Icon}
                       {item.title}
                     </div>
                     <div className="time">
-                      <span>{item.createTime.replace('T', '  ')}</span> <i style={{ display: 'none' }} className="iconfont icon-shanchu" onClick={() => delHistory(item.id)}></i>
+                      <span>{item.createTime.replace('T', '  ')}</span> <i style={{ display: 'none' }} className="iconfont icon-shanchu" onClick={(e) => delHistory(e, item.id)}></i>
                     </div>
                   </div>
                 )

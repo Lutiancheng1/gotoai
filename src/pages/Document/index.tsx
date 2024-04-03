@@ -1,11 +1,9 @@
 import History from '@/components/history'
-import React, { useRef } from 'react'
 import './index.css'
 import pdfIcon from '@/assets/images/pdf-session.svg'
-import { InboxOutlined } from '@ant-design/icons'
 import type { UploadProps } from 'antd'
-import { Input, message, Tooltip, Upload } from 'antd'
-import { InfoCircleOutlined, UserOutlined } from '@ant-design/icons'
+import { Input, message, Upload } from 'antd'
+import { InfoCircleOutlined } from '@ant-design/icons'
 const { Dragger } = Upload
 const props: UploadProps = {
   name: 'file',
