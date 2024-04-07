@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Layout, ConfigProvider } from 'antd'
 import './index.css'
 import { promptConfig } from '@/utils/constants'
@@ -12,6 +12,7 @@ import { talkInitialState } from '@/store/reducers/talk'
 import { getPrologue, getMenuPrologue } from '@/api/prologue'
 import { ipInCN } from '@/utils'
 import Dialogue from '@/components/Dialogue'
+import { getUserPrompts } from '@/api/prompt'
 // 定义一个文件信息的类型
 type FileInfo = {
   // 文件的 id
@@ -29,6 +30,16 @@ type FileInfo = {
   // 文件的头缀
   type: string
 }
+
+export type UserPrompt = {
+  id: number
+  categoryid?: number
+  title: string
+  prologue: string
+  status: number
+  example?: any
+  content: string
+}
 /**
  * Renders the talk component with chat history, input box, and file upload feature.
  *
@@ -43,12 +54,20 @@ type Props = {} & Partial<talkInitialState>
 const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat }: Props) => {
   // 存储开场白信息
   const [prologue, setPrologue] = useState<PrologueInfo>()
+  // 当前用户推荐提词
+  const [userPrompt, setUserPrompt] = useState<UserPrompt[]>([])
+  // 获取子组件实例
+  const dialogueRef = useRef<{ sendBeta: (fromPrompt?: boolean, prompt?: UserPrompt) => Promise<void> }>()
   // 获取开场白信息
   useEffect(() => {
+    /**
+     * Retrieve data asynchronously, set prologue, and user prompts.
+     */
     const getData = async () => {
       const res = await getMenuPrologue(0)
-      if (!res.data) return
-      setPrologue(res.data[0])
+      res.data && setPrologue(res.data[0])
+      const resp = await getUserPrompts()
+      resp.data && setUserPrompt(resp.data)
     }
     getData()
   }, [])
@@ -56,6 +75,12 @@ const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat 
   useEffect(() => {
     console.log(currentId, 'currentId变化了')
   }, [currentId])
+
+  // 点击提词
+  const onPrompt = (item: UserPrompt) => {
+    console.log(item)
+    dialogueRef.current?.sendBeta(true, item)
+  }
 
   useEffect(() => {
     // ipInCN()
@@ -95,7 +120,7 @@ const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat 
           )}
           <History history_list={[]} />
           <div className="detail">
-            {isNewChat && prologue && (
+            {isNewChat && prologue && userPrompt && (
               <div className="init-page animate__animated animate__fadeIn animate__faster">
                 <div className="warp">
                   <div className="inner">
@@ -111,21 +136,20 @@ const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat 
                     <div className="init-prompt">
                       <div className="prompt-title">{prologue?.example}</div>
                       <div className="prompt-content">
-                        {promptConfig &&
-                          promptConfig.map((item, index) => {
-                            return (
-                              <span key={index}>
-                                {item} {index !== promptConfig.length - 1 ? <span className="shuxian">|</span> : ''}
-                              </span>
-                            )
-                          })}
+                        {userPrompt.map((item, index) => {
+                          return (
+                            <span key={item.id} onClick={() => onPrompt(item)} title={item.prologue}>
+                              {item.title} {index !== userPrompt.length - 1 ? <span className="shuxian">|</span> : ''}
+                            </span>
+                          )
+                        })}
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             )}
-            <Dialogue />
+            <Dialogue ref={dialogueRef} />
           </div>
         </div>
       </Layout>

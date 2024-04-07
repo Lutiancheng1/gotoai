@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import Search from '../Search'
@@ -24,6 +24,8 @@ import 'highlight.js/styles/atom-one-dark.css'
 import defaultAvatar from '@/assets/images/default-avatar.jpg'
 import rebotAvatar from '@/assets/images/robot.svg'
 import { MessageInfo } from '@/store/types'
+import azureAi, { AZURE_OPENAI_MODEL } from '@/utils/azureAi'
+import { UserPrompt } from '@/pages/Talk'
 // 定义一个文件信息的类型
 export type FileInfo = {
   // 文件的 id
@@ -51,17 +53,18 @@ type ChatError = {
 export const generateHistoryList = (conversationDetailList: MessageInfo[]) => {
   if (!conversationDetailList) return []
   return conversationDetailList.map(({ type, content }) => ({
-    role: type === 0 ? 'user' : 'assistant',
+    role: type === 0 ? 'user' : type === 1 ? 'assistant' : 'system',
     content
   })) as unknown as {
     role: 'user' | 'assistant'
     content: string
   }[]
 }
+type Props = {
+  onSendMessage?: (prompt: string, message: string) => void
+} & Partial<talkInitialState>
 
-type Props = {} & Partial<talkInitialState>
-
-const Dialogue = ({ isNewChat, conversitionDetailList, loading, currentId }: Props) => {
+const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, loading, currentId, onSendMessage }: Props, ref) => {
   // 初始化问题Id
   let questionId = currentId || Date.now()
   const location = useLocation()
@@ -95,6 +98,7 @@ const Dialogue = ({ isNewChat, conversitionDetailList, loading, currentId }: Pro
       behavior: 'smooth'
     })
   }
+
   const sendMessage = async () => {
     // 如果消息正在加载中，则直接返回
     if (messageLoading) return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
@@ -105,24 +109,6 @@ const Dialogue = ({ isNewChat, conversitionDetailList, loading, currentId }: Pro
       return Toast.notify({ type: 'info', message: '请输入内容' })
     }
 
-    // 如果是新会话，则创建一个新的会话
-    if (isNewChat) {
-      const { payload } = await dispatch(
-        createChat({
-          id: 0,
-          title: sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
-          userId: user.id,
-          createTime: dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
-          updateTime: dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
-          model: '',
-          menu: currentMenuKey.current,
-          conversationid: ''
-        })
-      )
-      questionId = payload
-      console.log('是新会话,创建一个新会话 ID为:', payload)
-      console.log(questionId, '更新questionId为新会话id')
-    }
     sendBeta()
     // // 创建一个 Typewriter 实例
     // const typewriter = new Typewriter((str: string) => {
@@ -228,7 +214,27 @@ const Dialogue = ({ isNewChat, conversitionDetailList, loading, currentId }: Pro
     // ])
   }
   // 不使用 stream流 来发消息
-  const sendBeta = async () => {
+  const sendBeta = async (fromPrompt?: boolean, prompt?: UserPrompt, needResponse?: boolean) => {
+    // fromPrompt 为 true 代表是从 prompt过来的 只需要 传递prompt提词 不用发送用户消息
+    // 如果是新会话，则创建一个新的会话
+    setMessageLoading(true)
+    if (isNewChat) {
+      const { payload } = await dispatch(
+        createChat({
+          id: 0,
+          title: fromPrompt ? prompt!.title : sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
+          userId: user.id,
+          createTime: dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
+          updateTime: dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
+          model: '',
+          menu: currentMenuKey.current,
+          conversationid: ''
+        })
+      )
+      questionId = payload
+      console.log('是新会话,创建一个新会话 ID为:', payload)
+      console.log(questionId, '更新questionId为新会话id')
+    }
     // 获取历史列表
     dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: 10 }))
     // 更新当前 ID
@@ -236,59 +242,128 @@ const Dialogue = ({ isNewChat, conversitionDetailList, loading, currentId }: Pro
     console.log('更新当前id', questionId)
     dispatch(toggleIsNewChat(false))
     // 将内容发送给服务器
-    await dispatch(
-      addMessages([
-        {
-          id: 0,
-          chatId: questionId,
-          content: sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
-          type: 0,
-          resource: ''
-        }
-      ])
-    )
-    setMessageLoading(true)
-    // 滚动到底部
-    scrollBottom()
-    try {
-      // 将对话历史一并发给gpt
-      const historyArray = generateHistoryList(conversitionDetailList as MessageInfo[])
-      console.log(historyArray)
-
-      const completion = await openai.chat.completions.create({
-        messages: [
-          ...historyArray,
-          {
-            role: 'user',
-            content: sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
-          }
-        ],
-        model: 'gpt-3.5-turbo'
-      })
-      const text = completion.choices[0].message.content as string
-
-      setMessageLoading(false)
-      // 将内容发送给服务器
+    // 正常对话
+    if (!fromPrompt) {
       await dispatch(
         addMessages([
           {
             id: 0,
             chatId: questionId,
-            content: text,
-            type: 1,
+            content: needResponse ? prompt!.title : sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
+            type: 0,
             resource: ''
           }
         ])
       )
+      setMessageLoading(true)
+      // 滚动到底部
+      scrollBottom()
+    } else if (needResponse) {
+      // 需要返回内容
+      // 每个页面的例子点击
+      await dispatch(
+        addMessages([
+          {
+            id: 0,
+            chatId: questionId,
+            content: prompt!.title,
+            type: 0,
+            resource: ''
+          }
+        ])
+      )
+    }
+    try {
+      if (!fromPrompt) {
+        // 将对话历史一并发给gpt
+        const historyArray = generateHistoryList(conversitionDetailList as MessageInfo[])
+        console.log(historyArray)
+        // openAI
+        // const completion = await openai.chat.completions.create({
+        //   messages: [
+        //     ...historyArray,
+        //     {
+        //       role: 'user',
+        //       content: sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
+        //     }
+        //   ],
+        //   model: 'gpt-3.5-turbo'
+        // })
+
+        // azureAi
+        const completion = await azureAi.getChatCompletions(AZURE_OPENAI_MODEL, [
+          ...historyArray,
+          {
+            role: 'user',
+            content: sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
+          }
+        ])
+        const text = completion.choices[0].message!.content as string
+        // 将内容发送给服务器
+        await dispatch(
+          addMessages([
+            {
+              id: 0,
+              chatId: questionId,
+              content: text,
+              type: 1,
+              resource: ''
+            }
+          ])
+        )
+        setMessageLoading(false)
+      } else {
+        // 从提词按钮过来的
+        // openAI
+        // const completion = await openai.chat.completions.create({
+        //   messages: [
+        //     {
+        //       role: 'system',
+        //       content: prompt?.content as string
+        //     }
+        //   ],
+        //   model: 'gpt-3.5-turbo'
+        // })
+        // azureAi
+        const completion = await azureAi.getChatCompletions(AZURE_OPENAI_MODEL, [
+          {
+            role: 'system',
+            content: prompt?.content
+          }
+        ])
+        const text = completion.choices[0].message!.content as string
+        console.log(text, 'text')
+        // 将内容发送给服务器
+        await dispatch(
+          addMessages([
+            {
+              id: 0,
+              chatId: questionId,
+              content: needResponse ? text : prompt?.prologue || text,
+              type: 1,
+              resource: ''
+            }
+          ])
+        )
+      }
+      setMessageLoading(false)
+      setSendValue('')
       // 滚动到底部
       scrollBottom()
     } catch (error) {
       setMessageLoading(false)
+      setSendValue('')
       const err = error as ChatError
       if (err.code === 'rate_limit_exceeded') {
         return Toast.notify({
           type: 'error',
           message: '请勿频繁发送'
+        })
+      }
+      if (err.code === 'insufficient_quota') {
+        return Toast.notify({
+          type: 'error',
+          message: '配额不足'
         })
       }
       Toast.notify({
@@ -308,13 +383,6 @@ const Dialogue = ({ isNewChat, conversitionDetailList, loading, currentId }: Pro
     currentMenuKey.current = menuWarp[pathname] as menuType
     dispatch(initState())
     console.log('当前menu:', menuWarp[pathname])
-    const getData = async () => {
-      // const prompt = await getMenuPrompts(currentMenuKey.current)
-      // console.log(prompt, 'prompt')
-      const userPrompt = await getUserPrompts()
-      console.log(userPrompt)
-    }
-    getData()
   }, [dispatch, location.pathname])
 
   // 定义enterMessage函数，接收一个React.KeyboardEvent<HTMLTextAreaElement>类型的参数e
@@ -412,6 +480,11 @@ const Dialogue = ({ isNewChat, conversitionDetailList, loading, currentId }: Pro
     }
   }
 
+  useImperativeHandle(ref, () => ({
+    // 暴露给父组件的方法
+    sendBeta
+  }))
+
   // useEffect(() => {
   //   ipInCN()
   // }, [])
@@ -489,8 +562,7 @@ const Dialogue = ({ isNewChat, conversitionDetailList, loading, currentId }: Pro
       <Search fileList={fileList} setFileList={setFileList} sendMessage={sendMessage} sendValue={sendValue} setSendValue={setSendValue} uploadHandle={uploadHandle} enterMessage={enterMessage} messageLoading={messageLoading} uploadRef={uploadRef} />
     </div>
   )
-}
-
+})
 // mapStateToProps 函数：将 state 映射到 props
 function mapStateToProps(state: RootState) {
   return state.talkSlice
@@ -501,6 +573,5 @@ function mapDispatchToProps(dispatch: AppDispatch) {
   return {}
 }
 // 使用 connect 连接组件和 Redux store
-const ConnectedDialogue = connect(mapStateToProps, mapDispatchToProps)(Dialogue)
-
+const ConnectedDialogue = connect(mapStateToProps, mapDispatchToProps, null, { forwardRef: true })(Dialogue)
 export default ConnectedDialogue

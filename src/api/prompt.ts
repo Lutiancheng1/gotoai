@@ -18,3 +18,15 @@ export const getUserPrompts = async () => {
   let uri = '/Prompt/UserPrompts'
   return http.get(uri)
 }
+
+// 获取提词分类
+export const getPromptTypes = async () => {
+  let uri = '/PromptCategory/CategoryList'
+  return http.get(uri)
+}
+
+// 根据提词分类 获取详细提词列表
+export const getPromptList = (id: number) => {
+  let uri = 'Prompt/GetPrompts?i=' + id
+  return http.get(uri)
+}

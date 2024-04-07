@@ -1,20 +1,28 @@
 import History from '@/components/history'
-import React from 'react'
+import React, { useRef } from 'react'
 import './index.css'
 import InitPage from '@/components/InitPage'
 import Dialogue from '@/components/Dialogue'
 import { AppDispatch, RootState } from '@/store'
 import { connect } from 'react-redux'
 import { talkInitialState } from '@/store/reducers/talk'
+import { UserPrompt } from '../Talk'
+import { PrologueInfo } from '@/store/types'
 type Props = {} & Partial<talkInitialState>
 const Code = ({ isNewChat, loading }: Props) => {
+  // 获取子组件实例
+  const dialogueRef = useRef<{ sendBeta: (fromPrompt?: boolean, prompt?: UserPrompt, needResponse?: boolean) => Promise<void> }>()
+  const onPrompt = (item: UserPrompt) => {
+    console.log(item)
+    dialogueRef.current?.sendBeta(true, item, true)
+  }
   return (
     <div className="code relative">
-      <History title="代码沙盒" title_Icon={true} />
+      <History title="代码沙盒" title_icon={true} />
       <div className="code-container">
         <div className="code-box">
-          {isNewChat && <InitPage />}
-          <Dialogue />
+          {isNewChat && <InitPage onPromptClick={onPrompt} />}
+          <Dialogue ref={dialogueRef} />
         </div>
       </div>
     </div>

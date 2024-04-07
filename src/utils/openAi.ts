@@ -1,7 +1,8 @@
 //  openAi
 import OpenAI from 'openai'
 export const OPENAI_MODEL = 'gpt-3.5-turbo'
-export const OPENAI_API_KEY = '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'
+// export const OPENAI_API_KEY = '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'
+export const OPENAI_API_KEY = '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'
 export const TEMPERATURE = 0.6
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,

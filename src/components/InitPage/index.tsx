@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { menuWarp } from '@/utils/constants'
 import { getMenuPrologue } from '@/api/prologue'
 import { PrologueInfo } from '@/store/types'
+import { UserPrompt } from '@/pages/Talk'
 const titleWarp = {
   2: '代码编程助手',
   3: '知识库助手',
@@ -12,7 +13,7 @@ const titleWarp = {
 } as {
   [key: number]: string
 }
-export default function InitPage() {
+export default function InitPage({ onPromptClick }: { onPromptClick: (item: UserPrompt) => void }) {
   const location = useLocation()
   const [initPrologue, setInitPrologue] = useState<PrologueInfo>()
   // 获取开场白信息
@@ -35,8 +36,9 @@ export default function InitPage() {
         <h5>试试以下例子：</h5>
         <p
           dangerouslySetInnerHTML={{
-            __html: initPrologue?.example.substr(9).replaceAll('\n', '<br/>') as string
+            __html: initPrologue?.example.substr(8).replaceAll('\n', '<br/>') as string
           }}
+          onClick={() => onPromptClick({ ...initPrologue, title: initPrologue?.example.substr(8), prologue: initPrologue?.content, content: initPrologue.example })}
         ></p>
       </div>
     </div>

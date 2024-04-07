@@ -27,7 +27,7 @@ const props: UploadProps = {
 export default function Document() {
   return (
     <div className="document">
-      <History title="文档对话" title_Icon={true} item_Icon={<img src={pdfIcon} alt="" />} />
+      <History title="文档对话" title_icon={true} item_Icon={<img src={pdfIcon} alt="" />} />
       <div className="upload-container">
         <div className="upload-box">
           <div className="title-box">

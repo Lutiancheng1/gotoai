@@ -8,7 +8,7 @@
   flex: 1;
   flex-shrink: 0;
   padding: 60px 0;
-  background-color: #f9fafb;
+  /* background-color: #f9fafb; */
   overflow-x: auto;
   display: flex;
   flex-direction: column;

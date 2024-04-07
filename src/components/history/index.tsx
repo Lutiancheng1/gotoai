@@ -20,22 +20,22 @@ import { useBoolean } from 'ahooks'
  * @param {JSX.Element} title_Icon 是否需要标题左侧图标
  * @param {string} title 标题
  * @param {React.ReactNode} item_Icon 历史记录item 标题左侧图标
- * @param {boolean} isNewConversation 是否是新对话
- * @param {(arg0:boolean)=>any} setIsNewConversation 控制是否是新对话
  * @param {}
  * @return {*}
  */
 
 type Props = {
   className?: string
-  title_Icon?: boolean
+  title_icon?: boolean
+  header_title?: string
   title?: string
   history_list?: HistoryList
   item_Icon?: React.ReactNode
+  addButton?: boolean
   rest?: any
 } & Partial<talkInitialState>
 
-const History = ({ className = '', title = '对话', title_Icon = false, item_Icon, history_list, isNewChat, historyList, currentId, ...rest }: Props) => {
+const History = ({ className = '', title = '对话', title_icon = false, item_Icon, history_list, isNewChat, historyList, currentId, addButton = true, header_title = '历史记录', ...rest }: Props) => {
   const location = useLocation()
   const dispatch = useAppDispatch()
   // 记录历史折叠状态
@@ -84,6 +84,7 @@ const History = ({ className = '', title = '对话', title_Icon = false, item_Ic
     await loadMore(1)
     // 关闭loading
     dispatch(updateLoading(false))
+    dispatch(clearConversitionDetailList())
   }
   // 获取
   const getConversationList = async (id: string) => {
@@ -114,7 +115,7 @@ const History = ({ className = '', title = '对话', title_Icon = false, item_Ic
       getHistoryList({
         menu: currentMenuKey.current,
         page: page ? page : historyList.pageIndex + 1,
-        pageSize: 10
+        pageSize: parseInt(window.innerHeight / 80 + '') + 1
       })
     )
   }
@@ -123,26 +124,27 @@ const History = ({ className = '', title = '对话', title_Icon = false, item_Ic
     dispatch(clearHistoryList())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [historyList?.empty])
-
   return (
     <>
       <div className={`history ${className}`} ref={historyDivRef}>
         <div className="histroy-header">
           <div className="left-header-block-up">
-            <p className="text">历史记录</p>
+            <p className="text">{header_title}</p>
             <div className="fold">
-              <Tooltip className="cursor-pointer" placement="right" title={'收起历史记录'}>
+              <Tooltip className="cursor-pointer" placement="right" title={'收起' + header_title}>
                 <i className="iconfont icon-zhedie" onClick={() => toggleHistory(true)}></i>
               </Tooltip>
             </div>
           </div>
-          <div className="new-session-button-wrap" onClick={() => createNewConversation()}>
-            <div className="new-session-button">
-              <span>
-                {title_Icon && <img src={newSessionIcon} alt="" />} 新建{title}
-              </span>
+          {addButton && (
+            <div className="new-session-button-wrap" onClick={() => createNewConversation()}>
+              <div className="new-session-button">
+                <span>
+                  {title_icon && <img src={newSessionIcon} alt="" />} 新建{title}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <div className="history-list animate__animated animate__fadeInUp animate__faster" id="scrollableDiv">
           {historyList?.empty && (
@@ -184,11 +186,14 @@ const History = ({ className = '', title = '对话', title_Icon = false, item_Ic
       </div>
       {historyCollapsed && (
         <div className="expand-bar">
-          <Tooltip placement="right" title={'新建' + title}>
-            <div className="add-session-icon" onClick={() => createNewConversation()}></div>
-          </Tooltip>
-          <Tooltip placement="right" title={'展开历史记录'}>
-            <div className="expand-icon" onClick={() => toggleHistory(false)}></div>
+          {addButton && (
+            <Tooltip placement="right" title={'新建' + title}>
+              <div className="add-session-icon" onClick={() => createNewConversation()}></div>
+            </Tooltip>
+          )}
+
+          <Tooltip placement="right" title={'展开' + header_title}>
+            <div className="expand-icon" onClick={() => toggleHistory(false)} style={{ top: addButton ? '' : '16px' }}></div>
           </Tooltip>
         </div>
       )}
