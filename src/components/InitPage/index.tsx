@@ -22,7 +22,7 @@ export default function InitPage({ onPromptClick }: { onPromptClick: (item: User
     const getData = async () => {
       const res = await getMenuPrologue(menuWarp[pathname])
       if (!res.data) return
-      setInitPrologue(res.data[0])
+      setInitPrologue(res.data)
     }
     getData()
   }, [location.pathname])
@@ -34,12 +34,19 @@ export default function InitPage({ onPromptClick }: { onPromptClick: (item: User
       </div>
       <div className="example">
         <h5>试试以下例子：</h5>
-        <p
-          dangerouslySetInnerHTML={{
-            __html: initPrologue?.example.substr(8).replaceAll('\n', '<br/>') as string
-          }}
-          onClick={() => onPromptClick({ ...initPrologue, title: initPrologue?.example.substr(8), prologue: initPrologue?.content, content: initPrologue.example })}
-        ></p>
+        {initPrologue &&
+          initPrologue.examples.map((item) => {
+            return (
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: item.replaceAll('\n', '<br/>')
+                }}
+                onClick={() => onPromptClick({ ...initPrologue, title: item, prologue: initPrologue?.content, content: item })}
+                key={item}
+                title={item}
+              ></p>
+            )
+          })}
       </div>
     </div>
   ) : null

@@ -62,9 +62,10 @@ export const generateHistoryList = (conversationDetailList: MessageInfo[]) => {
 }
 type Props = {
   onSendMessage?: (prompt: string, message: string) => void
+  style?: React.CSSProperties
 } & Partial<talkInitialState>
 
-const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, loading, currentId, onSendMessage }: Props, ref) => {
+const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentId, style }: Props, ref) => {
   // 初始化问题Id
   let questionId = currentId || Date.now()
   const location = useLocation()
@@ -489,7 +490,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, loading, curre
   //   ipInCN()
   // }, [])
   return (
-    <div className="dialogue-detail">
+    <div className="dialogue-detail" style={style}>
       <div className="session-box" ref={scrollBox}>
         <div className="" ref={innerBox}>
           {!isNewChat &&

@@ -60,5 +60,5 @@ export interface PrologueInfo {
   menu: number
   content: string //开场白
   status: number
-  example: string //例子
+  examples: string[] //例子
 }

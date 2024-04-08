@@ -26,7 +26,7 @@ export const getPromptTypes = async () => {
 }
 
 // 根据提词分类 获取详细提词列表
-export const getPromptList = (id: number) => {
-  let uri = 'Prompt/GetPrompts?i=' + id
+export const getPromptList = (categoryId: number) => {
+  let uri = 'Prompt/GetPrompts?categoryId=' + categoryId
   return http.get(uri)
 }

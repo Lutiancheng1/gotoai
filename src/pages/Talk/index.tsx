@@ -51,7 +51,7 @@ export type UserPrompt = {
  */
 
 type Props = {} & Partial<talkInitialState>
-const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat }: Props) => {
+const Talk: React.FC = ({ currentId, isNewChat }: Props) => {
   // 存储开场白信息
   const [prologue, setPrologue] = useState<PrologueInfo>()
   // 当前用户推荐提词
@@ -65,7 +65,7 @@ const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat 
      */
     const getData = async () => {
       const res = await getMenuPrologue(0)
-      res.data && setPrologue(res.data[0])
+      res.data && setPrologue(res.data)
       const resp = await getUserPrompts()
       resp.data && setUserPrompt(resp.data)
     }
@@ -111,14 +111,7 @@ const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat 
     >
       <Layout>
         <div className="home relative">
-          {loading && (
-            <div id="mask" className="w-full h-full opacity-30" style={{ position: 'absolute', zIndex: 999, backgroundColor: '#fff' }}>
-              <div className="absolute" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
-                <Loading></Loading>
-              </div>
-            </div>
-          )}
-          <History history_list={[]} />
+          <History />
           <div className="detail">
             {isNewChat && prologue && userPrompt && (
               <div className="init-page animate__animated animate__fadeIn animate__faster">
@@ -134,7 +127,7 @@ const Talk: React.FC = ({ loading, currentId, conversitionDetailList, isNewChat 
                       <p>{prologue?.content}</p> <p>&nbsp;</p>
                     </div>
                     <div className="init-prompt">
-                      <div className="prompt-title">{prologue?.example}</div>
+                      <div className="prompt-title">{prologue?.examples[0]}</div>
                       <div className="prompt-content">
                         {userPrompt.map((item, index) => {
                           return (
