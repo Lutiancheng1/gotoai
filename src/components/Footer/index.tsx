@@ -11,7 +11,7 @@ export default function Footer() {
         隐私政策
       </a>
       &nbsp;
-      <span>© 2024 GotoAi 京公网安备111111111111号 </span>
+      <span>© 2020 深圳市云展信息技术有限公司 | GotoAI 版权所有 粤ICP备15077337号 </span>
     </div>
   )
 }

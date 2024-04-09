@@ -220,6 +220,12 @@
   width: 100%;
 }
 
+.login .copyright {
+  position: fixed;
+  bottom: 10px;
+  color: #999;
+}
+
 @keyframes show {
 
   0%,

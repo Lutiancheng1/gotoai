@@ -49,22 +49,16 @@
 .inner .init-header {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   margin-bottom: 10px;
   align-items: center;
 }
 
-.init-header .init-logo {
-  margin-right: 40px;
-}
-
-.init-header .init-logo img {
-  height: 60px;
-  width: 60px;
-}
 
 .init-header .init-title {
-  font-size: 16px;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 36px
 }
 
 .init-content {

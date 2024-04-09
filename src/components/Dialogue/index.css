@@ -129,6 +129,91 @@
   /* don't forget to set a duration! */
 }
 
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+
+code.hljs {
+  padding: 3px 5px
+}
+
+.hljs {
+  color: #383a42;
+  background: #fafafa
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #a0a1a7;
+  font-style: italic
+}
+
+.hljs-doctag,
+.hljs-formula,
+.hljs-keyword {
+  color: #a626a4
+}
+
+.hljs-deletion,
+.hljs-name,
+.hljs-section,
+.hljs-selector-tag,
+.hljs-subst {
+  color: #e45649
+}
+
+.hljs-literal {
+  color: #0184bb
+}
+
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string,
+.hljs-regexp,
+.hljs-string {
+  color: #50a14f
+}
+
+.hljs-attr,
+.hljs-number,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-pseudo,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable {
+  color: #986801
+}
+
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-symbol,
+.hljs-title {
+  color: #4078f2
+}
+
+.hljs-built_in,
+.hljs-class .hljs-title,
+.hljs-title.class_ {
+  color: #c18401
+}
+
+.hljs-emphasis {
+  font-style: italic
+}
+
+.hljs-strong {
+  font-weight: 700
+}
+
+.hljs-link {
+  text-decoration: underline
+}
+
 .markdown-body .top {
   background-color: rgba(62, 111, 251, .1);
   position: relative;
@@ -156,7 +241,7 @@
   -moz-border-radius: 6px;
   border-radius: 6px;
   background: hsla(0, 0%, 100%, .6);
-  color: var(--b-1, #1a2029);
+  color: #1a2029;
   font-family: PingFang SC;
   font-size: 12px;
   font-style: normal;
@@ -165,7 +250,7 @@
 }
 
 .markdown-body .top .copy-button:hover {
-  color: var(--blue, #2454ff);
+  color: #2454ff;
   cursor: pointer
 }
 
@@ -269,6 +354,14 @@
 .markdown-body b,
 .markdown-body strong {
   font-weight: 600;
+}
+
+.markdown-body ol {
+  list-style-type: decimal !important;
+}
+
+.markdown-body ul {
+  list-style-type: disc !important
 }
 
 .markdown-body dfn {
@@ -480,14 +573,6 @@
   padding-left: 2em
 }
 
-.markdown-body ol {
-  list-style: decimal
-}
-
-.markdown-body ul {
-  list-style: disc
-}
-
 .markdown-body ol ol,
 .markdown-body ul ol {
   list-style-type: lower-roman
@@ -687,6 +772,15 @@
 .markdown-body ul ul {
   margin-top: 0;
   margin-bottom: 0
+}
+
+.markdown-body ul li {
+  unicode-bidi: isolate;
+  font-variant-numeric: tabular-nums;
+  text-transform: none;
+  text-indent: 0px !important;
+  text-align: start !important;
+  text-align-last: start !important;
 }
 
 .markdown-body li>p {

@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
 import './index.css'
-import { Button, Checkbox, ConfigProvider, Form, type FormProps, Input, message } from 'antd'
+import { Button, Checkbox, ConfigProvider, Form, type FormProps, Input } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import Loading from '@/components/loading'
 import { useLocation, useNavigate } from 'react-router-dom'
 import logo from '@/assets/images/logo.png'
 import Toast from '@/components/Toast'
-import { ipInCN, sleep } from '@/utils'
 import { login } from '@/store/action/loginActions'
-import { useDispatch } from 'react-redux'
 import { useAppDispatch } from '@/store/hooks'
 import { getAccountInfo, hasAccountInfo, removeAccountInfo, setAccountInfo } from '@/utils/storage'
 type FieldType = {
@@ -76,9 +74,13 @@ export default function Login() {
     console.log('Failed:', err)
   }
   // 定义restPassword函数
-  const restPassword = () => {
-    console.log('goto rest')
-  }
+  // const restPassword = () => {
+  //   console.log('goto rest')
+  //   Toast.notify({
+  //     type: 'info',
+  //     message: '请与管理员联系'
+  //   })
+  // }
 
   // 使用了React的useEffect钩子，当组件挂载时，会执行下面的代码
   useEffect(() => {
@@ -90,12 +92,6 @@ export default function Login() {
       form.setFieldsValue(userInfo)
     }
   }, [form])
-  useEffect(() => {
-    // ipInCN()
-    if (location.state) {
-      Toast.notify({ type: 'error', message: '请先登陆' })
-    }
-  }, [location.state])
   return (
     <ConfigProvider
       theme={{
@@ -126,7 +122,7 @@ export default function Login() {
               <div className="logo w-20">
                 <img src={logo} alt="" />
               </div>
-              <h2 className="form__title">Sign In</h2>
+              <h2 className="form__title">企业一站式AI应用平台</h2>
               <Form.Item<FieldType> labelAlign="left" name="username" rules={[{ required: true, message: '请输入用户名!' }]}>
                 <Input
                   style={{
@@ -148,13 +144,13 @@ export default function Login() {
                 />
               </Form.Item>
 
-              <Form.Item<FieldType> name="remember" valuePropName="checked" style={{ marginBottom: 0 }}>
-                <Checkbox>Remember me</Checkbox>
+              <Form.Item<FieldType> name="remember" valuePropName="checked" style={{ margin: 10 }}>
+                <Checkbox>记住密码</Checkbox>
               </Form.Item>
 
-              <span className="link" onClick={() => restPassword()}>
-                Forgot your password?
-              </span>
+              {/* <span className="link" onClick={() => restPassword()}>
+                忘记密码?
+              </span> */}
 
               <Form.Item>
                 <Button disabled={loading} className="btn" htmlType="submit">
@@ -168,10 +164,15 @@ export default function Login() {
           <div className="container__overlay">
             <div className="overlay"></div>
           </div>
+        </div>
 
-          <div className="copyright">
-            <p></p>
-          </div>
+        <div className="copyright">
+          <p>
+            ©2020 深圳市云展信息技术有限公司 | GotoAI 版权所有 粤ICP备15077337号 热线：400-862-1600 官网：
+            <a target="_blank" rel="noreferrer" href="https://www.gotoai.world">
+              www.gotoai.world
+            </a>
+          </p>
         </div>
       </div>
     </ConfigProvider>

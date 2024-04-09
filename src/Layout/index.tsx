@@ -86,11 +86,11 @@ const Index = ({ loading }: Props) => {
                 <Popover
                   content={
                     <button className="btn" onClick={() => logout()}>
-                      logout
+                      退出
                     </button>
                   }
                 >
-                  <i onClick={(e) => e.stopPropagation()} style={{ fontSize: categoryCollapsed ? 20 : 30, marginRight: categoryCollapsed ? 10 : 20 }} className="iconfont icon-user"></i>
+                  <i onClick={(e) => e.stopPropagation()} style={{ fontSize: categoryCollapsed ? 20 : 30, marginRight: categoryCollapsed ? 10 : 20 }} className="iconfont icon-user cursor-pointer"></i>
                 </Popover>
                 {!categoryCollapsed ? (
                   <Tooltip placement="right" title={'收起'}>

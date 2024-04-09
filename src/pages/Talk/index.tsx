@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Layout, ConfigProvider } from 'antd'
 import './index.css'
 import { promptConfig } from '@/utils/constants'
-import initLogo from '@/assets/images/test-logo.png'
 import History from '@/components/history'
 import { PrologueInfo } from '@/store/types'
 import Loading from '@/components/loading'
@@ -118,9 +117,6 @@ const Talk: React.FC = ({ currentId, isNewChat }: Props) => {
                 <div className="warp">
                   <div className="inner">
                     <div className="init-header">
-                      <div className="init-logo">
-                        <img src={initLogo} alt="" />
-                      </div>
                       <div className="init-title">GotoAI 智能助理</div>
                     </div>
                     <div className="init-content">
@@ -131,7 +127,7 @@ const Talk: React.FC = ({ currentId, isNewChat }: Props) => {
                       <div className="prompt-content">
                         {userPrompt.map((item, index) => {
                           return (
-                            <span key={item.id} onClick={() => onPrompt(item)} title={item.prologue}>
+                            <span key={item.id} onClick={() => onPrompt(item)} title={item.prologue} className="hover:text-blue-500">
                               {item.title} {index !== userPrompt.length - 1 ? <span className="shuxian">|</span> : ''}
                             </span>
                           )

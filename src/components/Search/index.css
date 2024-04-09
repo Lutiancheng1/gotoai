@@ -164,7 +164,7 @@
 .file-list-box .file-box .file .file-info .status .loading .text {
   color: #1a2029;
   font-size: 12px;
-  line-height: 20px
+  line-height: 20px;
 }
 
 .file-list-box .file-box .file .file-info .status .success {

@@ -129,7 +129,7 @@ const History = ({ className = '', title = '对话', title_icon = false, item_Ic
       <div className={`history ${className}`} ref={historyDivRef}>
         <div className="histroy-header">
           <div className="left-header-block-up">
-            <p className="text">{header_title}</p>
+            <p className="text font-semibold">{header_title}</p>
             <div className="fold">
               <Tooltip className="cursor-pointer" placement="right" title={'收起' + header_title}>
                 <i className="iconfont icon-zhedie" onClick={() => toggleHistory(true)}></i>

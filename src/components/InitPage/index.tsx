@@ -44,6 +44,7 @@ export default function InitPage({ onPromptClick }: { onPromptClick: (item: User
                 onClick={() => onPromptClick({ ...initPrologue, title: item, prologue: initPrologue?.content, content: item })}
                 key={item}
                 title={item}
+                className="mb-2 hover:text-blue-500"
               ></p>
             )
           })}

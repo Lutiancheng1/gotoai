@@ -116,7 +116,7 @@ const Application: React.FC = ({ isNewChat }: Props) => {
                             title={item.prologue}
                           >
                             <img src={itemIcon} alt="" />
-                            <p>{item.title}</p>
+                            <p className="hover:text-blue-500">{item.title}</p>
                           </div>
                         )
                       })}
