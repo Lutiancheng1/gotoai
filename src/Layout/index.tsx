@@ -13,7 +13,7 @@ import { logOut } from '@/store/reducers/login'
 import { getUserProfile } from '@/store/action/profileActions'
 import { AppDispatch, RootState } from '@/store'
 import { connect } from 'react-redux'
-import { talkInitialState } from '@/store/reducers/talk'
+import { initState, talkInitialState } from '@/store/reducers/talk'
 import GlobalLoading from '@/components/loading'
 // 导入子路由
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
@@ -41,7 +41,7 @@ const Index = ({ loading }: Props) => {
     }
   })
 
-  const menuGo: MenuProps['onClick'] = ({ key }) => {
+  const menuGo: MenuProps['onClick'] = async ({ key }) => {
     navagate(`/${key}`)
   }
   const logout = () => {

@@ -18,14 +18,16 @@ export type User = {
 }
 // 对话模块
 export type HistoryList = {
-  createTime: string
-  id: string
-  menu: menuType
-  model: string
+  id: number
   title: string
+  userId: number
+  createTime: string
   updateTime: string
-  userId: number | string
-}[]
+  model: string
+  menu: number
+  conversationid: string
+  provider: string
+}
 // 对话历史查询条件
 export interface GetHistoryFroMenu {
   menu: number //页面，0.对话，1.文档，2.代码，3.知识库，4.数据分析，5.画图，6.视频，7.应用
@@ -50,6 +52,7 @@ export interface MessageInfo {
   id: number | string
   chatId: number | string
   content: string
+  createtime: string
   type: 0 | 1 //类型，0.user,1.ai
   resource: string
 }
@@ -61,4 +64,15 @@ export interface PrologueInfo {
   content: string //开场白
   status: number
   examples: string[] //例子
+}
+// 对话
+export interface ChatMessages {
+  query: string
+  inputs?: {
+    additionalProp1: string
+    additionalProp2: string
+    additionalProp3: string
+  }
+  conversationId: string
+  menu: number
 }

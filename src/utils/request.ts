@@ -186,7 +186,7 @@ export const request = <T>(url: string, options = {}, otherOptions?: IOtherOptio
 }
 
 export const http = axios.create({
-  timeout: 10000,
+  timeout: 1000000000,
   baseURL: process.env.REACT_APP_BASE_URL
 })
 

@@ -2,3 +2,29 @@
   height: 100%;
   display: flex;
 }
+
+.drawDesigns .draw-controller {}
+
+.draw-controller .draw-controller-tab {
+  width: 100%;
+  display: flex;
+}
+
+.draw-controller-tab li {
+  flex: 1;
+}
+
+.draw-controller-tab>li {
+  margin-right: 4px;
+}
+
+.draw-controller-tab li button {
+  /* color: inherit !important; */
+  display: flex;
+  justify-content: center;
+}
+
+.draw-controller-tab li button:focus,
+.draw-controller-tab li button:active {
+  /* background-color: #dcddde !important; */
+}

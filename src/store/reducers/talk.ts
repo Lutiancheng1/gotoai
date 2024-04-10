@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { HistoryList, MessageInfo } from '../types'
-import { createChat, getConversitionDetail, getHistoryList } from '../action/talkActions'
+import { createChat, getConversitionDetail, getHistoryList, startChat } from '../action/talkActions'
+import { ShartChatResp } from '@/types'
 export type HistoryState = {
-  rows: HistoryList
+  rows: HistoryList[]
   recordCount: number
   pageCount: number
   pageIndex: number
@@ -10,10 +11,16 @@ export type HistoryState = {
 }
 export type talkInitialState = {
   historyList: HistoryState
-  currentId: string | number
+  // 当前会话id
+  currentConversation: {
+    conversationId: string
+    chatId: number
+  }
   conversitionDetailList: MessageInfo[]
   loading: boolean
   isNewChat: boolean
+  // 记录是否第一次发送
+  firstSend: boolean
 }
 const initialState = {
   // 历史记录list
@@ -25,12 +32,16 @@ const initialState = {
     empty: true
   },
   // 当前会话id
-  currentId: '',
+  currentConversation: {
+    conversationId: '',
+    chatId: 0
+  },
   //当前回话历史消息
   conversitionDetailList: [],
   loading: false,
   // 是否是新对话
-  isNewChat: false
+  isNewChat: false,
+  firstSend: true
 } as talkInitialState
 
 const talkSlice = createSlice({
@@ -43,8 +54,8 @@ const talkSlice = createSlice({
       state.loading = payload
     },
     // 更新currentId
-    updateCurrentId(state, { payload }: PayloadAction<string | number>) {
-      state.currentId = payload
+    updateCurrentId(state, { payload }: PayloadAction<ShartChatResp>) {
+      state.currentConversation = payload
     },
     // 更新当前会话历史
     updateConversitionDetailList(state, { payload }: PayloadAction<MessageInfo[]>) {
@@ -82,6 +93,11 @@ const talkSlice = createSlice({
       state.historyList.pageIndex = payload.pageIndex
       state.historyList.empty = false
     },
+    // 重置是否第一次发送
+    toggleFirstSend(state, { payload }: PayloadAction<boolean>) {
+      state.firstSend = payload
+    },
+
     //初始化state
     initState(state) {
       state.historyList = {
@@ -91,10 +107,14 @@ const talkSlice = createSlice({
         rows: [],
         empty: true
       }
-      state.currentId = ''
+      state.currentConversation = {
+        conversationId: '',
+        chatId: 0
+      }
       state.conversitionDetailList = []
       state.loading = false
       state.isNewChat = true
+      state.firstSend = true
     }
   },
 
@@ -108,10 +128,7 @@ const talkSlice = createSlice({
     //     pageIndex: number
     //   }
     // })
-    // 更新会话ID
-    builder.addCase(createChat.fulfilled, (state, { payload }: PayloadAction<string | number>) => {
-      state.currentId = payload
-    })
+
     // 获取会话详情
     builder.addCase(getConversitionDetail.fulfilled, (state, { payload }) => {
       state.conversitionDetailList = payload as unknown as MessageInfo[]
@@ -119,5 +136,5 @@ const talkSlice = createSlice({
   }
 })
 
-export const { updateCurrentId, updateConversitionDetailList, delHistory, updateLoading, clearConversitionDetailList, initState, toggleIsNewChat, updateHistoryList, clearHistoryList, saveHistoryList } = talkSlice.actions
+export const { updateCurrentId, updateConversitionDetailList, delHistory, updateLoading, clearConversitionDetailList, initState, toggleIsNewChat, updateHistoryList, clearHistoryList, saveHistoryList, toggleFirstSend } = talkSlice.actions
 export default talkSlice.reducer

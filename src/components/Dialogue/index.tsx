@@ -1,13 +1,12 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
-
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import Search from '../Search'
 import './index.css'
 import Toast from '../Toast'
 import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
-import { initState, talkInitialState, toggleIsNewChat, updateCurrentId } from '@/store/reducers/talk'
-import { addMessages, createChat, getHistoryList } from '@/store/action/talkActions'
+import { initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateConversitionDetailList, updateCurrentId } from '@/store/reducers/talk'
+import { addChatMessages, addMessages, createChat, getHistoryList, startChat } from '@/store/action/talkActions'
 import dayjs from 'dayjs'
 import { useLocation } from 'react-router-dom'
 import { Typewriter } from '@/utils/format'
@@ -26,6 +25,7 @@ import rebotAvatar from '@/assets/images/robot.svg'
 import { MessageInfo } from '@/store/types'
 import azureAi, { AZURE_OPENAI_MODEL } from '@/utils/azureAi'
 import { UserPrompt } from '@/pages/Talk'
+import { ShartChatResp } from '@/types'
 // 定义一个文件信息的类型
 export type FileInfo = {
   // 文件的 id
@@ -65,9 +65,9 @@ type Props = {
   style?: React.CSSProperties
 } & Partial<talkInitialState>
 
-const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentId, style }: Props, ref) => {
+const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend }: Props, ref) => {
   // 初始化问题Id
-  let questionId = currentId || Date.now()
+  let currentQuestion = currentConversation
   const location = useLocation()
   // 获取 dispatch 对象，用于触发 actions
   const dispatch = useAppDispatch()
@@ -91,7 +91,6 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentId, sty
   const [fileList, setFileList] = useState([] as FileInfo[])
   // 记录当前菜单的key
   const currentMenuKey = useRef<menuType>(0)
-
   const scrollBottom = () => {
     // 滚动到底部
     scrollBox.current?.scrollTo({
@@ -215,162 +214,100 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentId, sty
     // ])
   }
   // 不使用 stream流 来发消息
-  const sendBeta = async (fromPrompt?: boolean, prompt?: UserPrompt, needResponse?: boolean) => {
-    // fromPrompt 为 true 代表是从 prompt过来的 只需要 传递prompt提词 不用发送用户消息
+  const sendBeta = async (defaultRule?: boolean, prompt?: UserPrompt) => {
+    console.log(defaultRule, prompt, 'defaultRule', 'prompt')
+    // defaultRule 为 true 代表是从 首页预设角色过来的 只需要 传递prompt提词 不用发送用户消息
     // 如果是新会话，则创建一个新的会话
-    setMessageLoading(true)
     if (isNewChat) {
-      const { payload } = await dispatch(
-        createChat({
-          id: 0,
-          title: fromPrompt ? prompt!.title : sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
-          userId: user.id,
-          createTime: dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
-          updateTime: dayjs(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
-          model: '',
+      // 创建一个新的会话
+      const { payload } = (await dispatch(
+        startChat({
           menu: currentMenuKey.current,
-          conversationid: ''
+          prompt: '',
+          promptId: defaultRule ? prompt!.id : 0
         })
-      )
-      questionId = payload
+      )) as { payload: ShartChatResp }
+      currentQuestion = payload
       console.log('是新会话,创建一个新会话 ID为:', payload)
-      console.log(questionId, '更新questionId为新会话id')
+      console.log(currentQuestion, '更新questionId为新会话id')
+      // 获取历史列表
+      dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: 10 }))
+      // 更新当前 ID
+      dispatch(updateCurrentId(currentQuestion as ShartChatResp))
+      console.log('更新当前id', currentQuestion)
+      dispatch(toggleIsNewChat(false))
     }
-    // 获取历史列表
-    dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: 10 }))
-    // 更新当前 ID
-    dispatch(updateCurrentId(questionId))
-    console.log('更新当前id', questionId)
-    dispatch(toggleIsNewChat(false))
+
     // 将内容发送给服务器
     // 正常对话
-    if (!fromPrompt) {
-      await dispatch(
-        addMessages([
-          {
-            id: 0,
-            chatId: questionId,
-            content: needResponse ? prompt!.title : sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
-            type: 0,
-            resource: ''
-          }
-        ])
-      )
+    if (!defaultRule) {
+      // 预设角色不需要发送消息
       setMessageLoading(true)
-      // 滚动到底部
-      scrollBottom()
-    } else if (needResponse) {
-      // 需要返回内容
-      // 每个页面的例子点击
+      // 更新发送次数
       await dispatch(
-        addMessages([
+        updateConversitionDetailList([
           {
             id: 0,
-            chatId: questionId,
-            content: prompt!.title,
+            chatId: currentConversation!.chatId,
+            content: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
             type: 0,
-            resource: ''
+            resource: '',
+            createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
           }
         ])
       )
-    }
-    try {
-      if (!fromPrompt) {
-        // 将对话历史一并发给gpt
-        const historyArray = generateHistoryList(conversitionDetailList as MessageInfo[])
-        console.log(historyArray)
-        // openAI
-        // const completion = await openai.chat.completions.create({
-        //   messages: [
-        //     ...historyArray,
-        //     {
-        //       role: 'user',
-        //       content: sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
-        //     }
-        //   ],
-        //   model: 'gpt-3.5-turbo'
-        // })
 
-        // azureAi
-        const completion = await azureAi.getChatCompletions(AZURE_OPENAI_MODEL, [
-          ...historyArray,
-          {
-            role: 'user',
-            content: sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
-          }
-        ])
-        const text = completion.choices[0].message!.content as string
-        // 将内容发送给服务器
-        await dispatch(
-          addMessages([
-            {
-              id: 0,
-              chatId: questionId,
-              content: text,
-              type: 1,
-              resource: ''
-            }
-          ])
-        )
-        setMessageLoading(false)
-      } else {
-        // 从提词按钮过来的
-        // openAI
-        // const completion = await openai.chat.completions.create({
-        //   messages: [
-        //     {
-        //       role: 'system',
-        //       content: prompt?.content as string
-        //     }
-        //   ],
-        //   model: 'gpt-3.5-turbo'
-        // })
-        // azureAi
-        const completion = await azureAi.getChatCompletions(AZURE_OPENAI_MODEL, [
-          {
-            role: 'system',
-            content: prompt?.content
-          }
-        ])
-        const text = completion.choices[0].message!.content as string
-        console.log(text, 'text')
-        // 将内容发送给服务器
-        await dispatch(
-          addMessages([
-            {
-              id: 0,
-              chatId: questionId,
-              content: needResponse ? text : prompt?.prologue || text,
-              type: 1,
-              resource: ''
-            }
-          ])
-        )
-      }
-      setMessageLoading(false)
-      setSendValue('')
       // 滚动到底部
       scrollBottom()
-    } catch (error) {
-      setMessageLoading(false)
-      setSendValue('')
-      const err = error as ChatError
-      if (err.code === 'rate_limit_exceeded') {
-        return Toast.notify({
+      try {
+        const { payload } = await dispatch(
+          addChatMessages({
+            conversationId: currentQuestion!.conversationId,
+            menu: currentMenuKey.current,
+            query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
+          })
+        )
+        if (payload) {
+          if (isNewChat) {
+            // 刷新当前历史记录
+            // 获取历史列表
+            await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: 10 }))
+          }
+          //第一次发送 更新左侧历史title
+          if (firstSend) {
+            await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: 10 }))
+          }
+          // 当前发送完成后 不是第一次发送
+          dispatch(toggleFirstSend(false))
+          await dispatch(
+            updateConversitionDetailList([
+              {
+                id: 0,
+                chatId: currentConversation!.chatId,
+                content: payload,
+                type: 1,
+                resource: '',
+                createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
+              }
+            ])
+          )
+          setMessageLoading(false)
+          setSendValue('')
+          // 滚动到底部
+          scrollBottom()
+        } else {
+          setMessageLoading(false)
+          setSendValue('')
+          return Toast.notify({ type: 'error', message: '接口暂未实现继续对话' })
+        }
+      } catch (error) {
+        setMessageLoading(false)
+        setSendValue('')
+        Toast.notify({
           type: 'error',
-          message: '请勿频繁发送'
+          message: '网络错误'
         })
       }
-      if (err.code === 'insufficient_quota') {
-        return Toast.notify({
-          type: 'error',
-          message: '配额不足'
-        })
-      }
-      Toast.notify({
-        type: 'error',
-        message: '网络错误'
-      })
     }
   }
   useEffect(() => {
@@ -430,7 +367,9 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentId, sty
     const langClass = token.info ? `language-${token.info}` : ''
     const lines = token.content.split('\n').slice(0, -1)
     const lineNumbers = lines.map((line, i) => `<span>${i + 1}</span>`).join('\n')
-    const content = hljs.highlight(token.content, { language: token.info || '', ignoreIllegals: true }).value
+    console.log(token.info, 'token.info')
+
+    const content = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true }).value
     // 为每个代码块创建一个唯一的ID
     const uniqueId = `copy-button-${Date.now()}-${Math.random()}`
     // 创建一个复制按钮 在makedown 渲染完成之后在插入
@@ -446,6 +385,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentId, sty
       <pre class="hljs"><code><span class="line-numbers-rows">${lineNumbers}</span>${content}</code></pre>
     </div>
     `
+    // return `<div></div>`
   }
   const uploadHandle = (e: React.ChangeEvent<HTMLInputElement> | undefined) => {
     if (fileList.length > 10) return Toast.notify({ type: 'info', message: '最多上传十个文件' })

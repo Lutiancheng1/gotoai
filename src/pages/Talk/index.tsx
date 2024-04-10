@@ -50,13 +50,13 @@ export type UserPrompt = {
  */
 
 type Props = {} & Partial<talkInitialState>
-const Talk: React.FC = ({ currentId, isNewChat }: Props) => {
+const Talk: React.FC = ({ isNewChat, currentConversation }: Props) => {
   // 存储开场白信息
   const [prologue, setPrologue] = useState<PrologueInfo>()
   // 当前用户推荐提词
   const [userPrompt, setUserPrompt] = useState<UserPrompt[]>([])
   // 获取子组件实例
-  const dialogueRef = useRef<{ sendBeta: (fromPrompt?: boolean, prompt?: UserPrompt) => Promise<void> }>()
+  const dialogueRef = useRef<{ sendBeta: (defaultRule?: boolean, prompt?: UserPrompt) => Promise<void> }>()
   // 获取开场白信息
   useEffect(() => {
     /**
@@ -72,8 +72,8 @@ const Talk: React.FC = ({ currentId, isNewChat }: Props) => {
   }, [])
 
   useEffect(() => {
-    console.log(currentId, 'currentId变化了')
-  }, [currentId])
+    console.log(currentConversation, 'currentId变化了')
+  }, [currentConversation])
 
   // 点击提词
   const onPrompt = (item: UserPrompt) => {

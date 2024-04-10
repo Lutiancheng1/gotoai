@@ -11,10 +11,10 @@ import { PrologueInfo } from '@/store/types'
 type Props = {} & Partial<talkInitialState>
 const KnowledgeBase = ({ isNewChat }: Props) => {
   // 获取子组件实例
-  const dialogueRef = useRef<{ sendBeta: (fromPrompt?: boolean, prompt?: UserPrompt, needResponse?: boolean) => Promise<void> }>()
+  const dialogueRef = useRef<{ sendBeta: (defaultRule?: boolean, prompt?: UserPrompt) => Promise<void> }>()
   const onPrompt = (item: UserPrompt) => {
     console.log(item)
-    dialogueRef.current?.sendBeta(true, item, true)
+    dialogueRef.current?.sendBeta(false, item)
   }
   return (
     <div className="knowledge_base">

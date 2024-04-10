@@ -10,7 +10,7 @@ import { useAppDispatch } from '@/store/hooks'
 import { getHistoryList, delHistoryItem, getConversitionDetail } from '@/store/action/talkActions'
 import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
-import { clearConversitionDetailList, clearHistoryList, initState, talkInitialState, toggleIsNewChat, updateCurrentId, updateLoading } from '@/store/reducers/talk'
+import { clearConversitionDetailList, clearHistoryList, initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateCurrentId, updateLoading } from '@/store/reducers/talk'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useBoolean } from 'ahooks'
 
@@ -35,7 +35,7 @@ type Props = {
   rest?: any
 } & Partial<talkInitialState>
 
-const History = ({ className = '', title = '对话', title_icon = false, item_Icon, history_list, isNewChat, historyList, currentId, addButton = true, header_title = '历史记录', ...rest }: Props) => {
+const History = ({ className = '', title = '对话', title_icon = false, item_Icon, history_list, currentConversation, isNewChat, historyList, addButton = true, header_title = '历史记录', ...rest }: Props) => {
   const location = useLocation()
   const dispatch = useAppDispatch()
   // 记录历史折叠状态
@@ -62,14 +62,20 @@ const History = ({ className = '', title = '对话', title_icon = false, item_Ic
       })
     }
     // 置空
-    dispatch(updateCurrentId(''))
+    dispatch(
+      updateCurrentId({
+        chatId: 0,
+        conversationId: ''
+      })
+    )
     // 清空历史记录
     dispatch(clearConversitionDetailList())
     dispatch(toggleIsNewChat(true))
+    dispatch(toggleFirstSend(true))
   }
 
   // 删除历史记录某条
-  const delHistory = async (e: React.MouseEvent<HTMLElement, MouseEvent>, id: string) => {
+  const delHistory = async (e: React.MouseEvent<HTMLElement, MouseEvent>, id: number) => {
     e.stopPropagation()
     if (!id) return
     // loading
@@ -87,18 +93,23 @@ const History = ({ className = '', title = '对话', title_icon = false, item_Ic
     dispatch(clearConversitionDetailList())
   }
   // 获取
-  const getConversationList = async (id: string) => {
+  const getConversationList = async (item: HistoryList) => {
     // 如果当前id 等于传过来的id 直接return
-    if (currentId === id) return
+    if (currentConversation!.chatId === item.id) return
     dispatch(toggleIsNewChat!(false))
     // 切换当前会话id
-    dispatch(updateCurrentId(id))
+    dispatch(
+      updateCurrentId({
+        conversationId: item.conversationid,
+        chatId: item.id
+      })
+    )
     // loading
     dispatch(updateLoading(true))
     // 清空之前的会话详情
     dispatch(clearConversitionDetailList())
     // 获取会话详情
-    await dispatch(getConversitionDetail(id))
+    await dispatch(getConversitionDetail(item.id))
     // 关闭 loading
     dispatch(updateLoading(false))
   }
@@ -121,7 +132,6 @@ const History = ({ className = '', title = '对话', title_icon = false, item_Ic
   }
   useEffect(() => {
     loadMore(1)
-    dispatch(clearHistoryList())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [historyList?.empty])
   return (
@@ -169,7 +179,7 @@ const History = ({ className = '', title = '对话', title_icon = false, item_Ic
             >
               {historyList.rows.map((item, index) => {
                 return (
-                  <div onClick={() => getConversationList(item.id)} className={`history-item ${currentId === item.id ? 'active' : ''}`} key={index}>
+                  <div onClick={() => getConversationList(item)} className={`history-item ${currentConversation?.chatId === item.id ? 'active' : ''}`} key={index}>
                     <div className="title text-ellipsis overflow-hidden" title={item.title}>
                       {item_Icon}
                       {item.title}

@@ -10,3 +10,7 @@ export interface AccountInfo {
   username: string
   password: string
 }
+export type ShartChatResp = {
+  conversationId: string
+  chatId: number
+}

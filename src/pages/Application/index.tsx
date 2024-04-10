@@ -33,7 +33,7 @@ const Application: React.FC = ({ isNewChat }: Props) => {
   // 当前提词分类列表下的提词list
   const [currentPromptList, setCurrentPromptList] = useState<UserPrompt[]>([])
   // 获取子组件实例
-  const dialogueRef = useRef<{ sendBeta: (fromPrompt?: boolean, prompt?: UserPrompt) => Promise<void> }>()
+  const dialogueRef = useRef<{ sendBeta: (defaultRule?: boolean, prompt?: UserPrompt) => Promise<void> }>()
   // 获取应用分类列表
   // 获取应用分类详细数据
   useEffect(() => {
@@ -50,10 +50,10 @@ const Application: React.FC = ({ isNewChat }: Props) => {
   }, [])
 
   // 点击提词
+
   const onPrompt = (item: UserPrompt) => {
     console.log(item)
-    dispatch(toggleIsNewChat(false))
-    dialogueRef.current?.sendBeta(true, item)
+    dialogueRef.current?.sendBeta(false, item)
   }
   const menuClick = async (id: number) => {
     if (id === currentPromptType) return
@@ -66,7 +66,12 @@ const Application: React.FC = ({ isNewChat }: Props) => {
   const back = () => {
     dispatch(toggleIsNewChat(true))
     dispatch(clearConversitionDetailList())
-    dispatch(updateCurrentId(''))
+    dispatch(
+      updateCurrentId({
+        chatId: 0,
+        conversationId: ''
+      })
+    )
   }
   return (
     <div className="application">

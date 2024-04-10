@@ -1,10 +1,11 @@
 import { http } from '@/utils/request'
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { GetHistoryFroMenu, HistoryList, MessageInfo, NewQuestion } from '../types'
+import { ChatMessages, GetHistoryFroMenu, HistoryList, MessageInfo, NewQuestion } from '../types'
 import { delHistory, saveHistoryList, updateConversitionDetailList, updateCurrentId, updateHistoryList } from '../reducers/talk'
+import { ShartChatResp } from '@/types'
 
 export type HisResponse = {
-  rows: HistoryList
+  rows: HistoryList[]
   recordCount: number
   pageCount: number
   pageIndex: number
@@ -43,11 +44,23 @@ export const delHistoryItem = createAsyncThunk('talk/delHistoryItem', async (id:
 })
 
 /**
- * 创建新会话ID
+ * 创建新会话ID 旧版
  * @returns thunk
  */
 export const createChat = createAsyncThunk('talk/createChat', async (params: NewQuestion, { dispatch }) => {
   const res = await http.post('/Chat/Add', params)
+  if (!res.data) return
+  dispatch(updateCurrentId(res.data))
+  return res.data
+})
+
+/**
+ * 创建新会话ID 新版
+ * @returns thunk
+ */
+export const startChat = createAsyncThunk('talk/startChat', async (params: { menu: number; prompt: string; promptId: number }, { dispatch }) => {
+  const res = (await http.post('/Chat/StartChat', params)) as { data: ShartChatResp }
+  console.log(res, 'startChat')
   if (!res.data) return
   dispatch(updateCurrentId(res.data))
   return res.data
@@ -73,5 +86,28 @@ export const addMessages = createAsyncThunk('talk/addMessages', async (params: M
   console.log(res, 'addMessages')
   if (!res.data) return
   dispatch(updateConversitionDetailList(params))
+  return res.data
+})
+
+/**
+ * 更新对话标题
+ * @returns thunk
+ */
+export const updateConversitionTitle = createAsyncThunk('talk/updateConversitionTitle', async (params: { conversationId: string; chatId: string; title: string }, { dispatch }) => {
+  const res = await http.post('/Chat/UpdateChatTitle', params)
+  console.log(res, 'updateConversitionTitle')
+  if (!res.data) return
+  return res.data
+})
+
+/**
+ * 发送对话消息 new
+ * @param {ChatMessages} params
+ * @returns thunk
+ */
+export const addChatMessages = createAsyncThunk('talk/addChatMessages', async (params: ChatMessages, { dispatch }) => {
+  const res = await http.post('/Chat/ChatMessages', params)
+  console.log(res, 'addChatMessages')
+  if (!res.data) return
   return res.data
 })
