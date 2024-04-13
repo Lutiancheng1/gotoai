@@ -1,4 +1,5 @@
-import { http } from '@/utils/request'
+import { http } from "@/utils/axios"
+
 
 /**
  * 取得开场白信息

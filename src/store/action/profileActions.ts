@@ -1,4 +1,4 @@
-import { http } from '@/utils/request'
+import { http } from '@/utils/axios'
 import { createAsyncThunk } from '@reduxjs/toolkit'
 /**
  * 获取用户基本信息

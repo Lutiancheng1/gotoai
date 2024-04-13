@@ -1,4 +1,4 @@
-import { http } from '@/utils/request'
+import { http } from '@/utils/axios'
 import { setTokenInfo } from '@/utils/storage'
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { saveToken } from '../reducers/login'

@@ -7,7 +7,7 @@ import { MenuItemType } from 'antd/es/menu/hooks/useItems'
 import { menuConfig } from '@/utils/constants'
 import logo from '@/assets/images/logo.png'
 import './index.css'
-import { getAccountInfo } from '@/utils/storage'
+import { getAccountInfo, removeDifyInfo } from '@/utils/storage'
 import { useAppDispatch } from '@/store/hooks'
 import { logOut } from '@/store/reducers/login'
 import { getUserProfile } from '@/store/action/profileActions'
@@ -46,6 +46,7 @@ const Index = ({ loading }: Props) => {
   }
   const logout = () => {
     dispatch(logOut())
+    removeDifyInfo()
     navagate('/login', { replace: true })
   }
   useEffect(() => {
@@ -103,7 +104,7 @@ const Index = ({ loading }: Props) => {
                 )}
               </div>
             }
-            style={{ borderInlineEnd: '1px solid rgba(5, 5, 5, 0.06)' }}
+            style={{ borderInlineEnd: '1px solid rgba(5, 5, 5, 0.06)', position: 'relative', zIndex: 99 }}
             width={160}
             collapsible
             collapsed={categoryCollapsed}

@@ -53,7 +53,7 @@ const Application: React.FC = ({ isNewChat }: Props) => {
 
   const onPrompt = (item: UserPrompt) => {
     console.log(item)
-    dialogueRef.current?.sendBeta(false, item)
+    dialogueRef.current?.sendBeta(true, item)
   }
   const menuClick = async (id: number) => {
     if (id === currentPromptType) return

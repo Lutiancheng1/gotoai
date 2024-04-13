@@ -1,77 +1,47 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import Search from '../Search'
-import './index.css'
-import Toast from '../Toast'
-import { connect } from 'react-redux'
+import InitPage from '@/components/InitPage'
+import Dialogue, { FileInfo } from '@/components/Dialogue'
 import { AppDispatch, RootState } from '@/store'
-import { initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateConversitionDetailList, updateCurrentId } from '@/store/reducers/talk'
-import { addChatMessages, addMessages, createChat, getHistoryList, startChat } from '@/store/action/talkActions'
-import dayjs from 'dayjs'
-import { useLocation } from 'react-router-dom'
-import { Typewriter } from '@/utils/format'
-import { StreamGpt } from '@/api/openai'
-import { menuType, menuWarp } from '@/utils/constants'
-import { getMenuPrompts, getUserPrompts } from '@/api/prompt'
-import { ipInCN } from '@/utils'
-import openai from '@/utils/openAi'
+import { connect } from 'react-redux'
+import { UserPrompt } from '../Talk'
+import { getDifyInfo } from '@/utils/storage'
+import React, { MutableRefObject, useEffect, useRef, useState } from 'react'
+import newSessionIcon from '@/assets/images/new_session_icon.svg'
 import { Tooltip } from 'antd'
-import copy from 'copy-to-clipboard'
+import { menuType, menuWarp } from '@/utils/constants'
+import { useLocation } from 'react-router-dom'
+import { HistoryList } from '@/store/types'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { getHistoryList, delHistoryItem, getConversitionDetail, startChat, addChatMessages } from '@/store/action/talkActions'
+import { clearConversitionDetailList, clearHistoryList, initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateConversitionDetailList, updateCurrentId, updateLoading } from '@/store/reducers/talk'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useAsyncEffect, useBoolean, useMount, useUnmount } from 'ahooks'
+import Toast, { ToastContext } from '@/components/Toast'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
-import 'highlight.js/styles/atom-one-dark.css'
+import copy from 'copy-to-clipboard'
+import { ShartChatResp } from '@/types/app'
+import dayjs from 'dayjs'
 import defaultAvatar from '@/assets/images/default-avatar.jpg'
 import rebotAvatar from '@/assets/images/robot.svg'
-import { MessageInfo } from '@/store/types'
-import azureAi, { AZURE_OPENAI_MODEL } from '@/utils/azureAi'
-import { UserPrompt } from '@/pages/Talk'
-import { useMount } from 'ahooks'
-import { ShartChatResp } from '@/types/app'
-// 定义一个文件信息的类型
-export type FileInfo = {
-  // 文件的 id
-  file_id: string
-  // 文件的名称
-  file_name: string
-  // 文件的大小
-  file_size: number | string
-  // 文件的 url
-  file_url: string
-  // 文件的高度
-  height: number
-  // 文件的宽度
-  width: number
-  // 文件的头缀
-  type: string
-}
-type ChatError = {
-  message: string
-  type: string
-  code: string
-  param: string | null
-}
-// 接受一个conversitionDetailList 返回一个 gpt对话格式的历史记录列表 生成历史记录列表
-export const generateHistoryList = (conversationDetailList: MessageInfo[]) => {
-  if (!conversationDetailList) return []
-  return conversationDetailList.map(({ type, content }) => ({
-    role: type === 0 ? 'user' : type === 1 ? 'assistant' : 'system',
-    content
-  })) as unknown as {
-    role: 'user' | 'assistant'
-    content: string
-  }[]
-}
-type Props = {
-  onSendMessage?: (prompt: string, message: string) => void
-  style?: React.CSSProperties
-} & Partial<talkInitialState>
-
-const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend }: Props, ref) => {
+import Search from '@/components/Search'
+import './index.css'
+import '@/components/Dialogue/index.css'
+import { sendChatMessage } from '@/api/knowledge'
+import { useContext } from 'use-context-selector'
+import { IOnFile } from '@/utils/request'
+type Props = {} & Partial<talkInitialState>
+const KnowledgeBase = ({ isNewChat, historyList, currentConversation, conversitionDetailList, firstSend }: Props) => {
+  const location = useLocation()
+  const dispatch = useAppDispatch()
+  const appInfo = getDifyInfo()
+  // 记录历史折叠状态
+  const [historyCollapsed, { toggle: setHistoryCollapsed }] = useBoolean(false)
+  // 创建历史折叠按钮的ref
+  const historyDivRef = useRef(null) as unknown as MutableRefObject<HTMLDivElement>
+  // 记录当前菜单的key
+  const currentMenuKey = useRef<menuType>(0)
   // 初始化问题Id
   let currentQuestion = currentConversation
-  const location = useLocation()
-  // 获取 dispatch 对象，用于触发 actions
-  const dispatch = useAppDispatch()
   // 初始化输入框的值
   const [sendValue, setSendValue] = useState('')
   // 判断是否在加载消息
@@ -90,8 +60,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   const streamingText = useRef('')
   // 初始化文件列表
   const [fileList, setFileList] = useState([] as FileInfo[])
-  // 记录当前菜单的key
-  const currentMenuKey = useRef<menuType>(0)
+  const [abortController, setAbortController] = useState<AbortController | null>(null)
+  const { notify } = useContext(ToastContext)
   const scrollBottom = () => {
     // 滚动到底部
     scrollBox.current?.scrollTo({
@@ -100,6 +70,13 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     })
   }
 
+  const onPrompt = (item: UserPrompt) => {
+    console.log(item)
+    sendBeta(false, item)
+  }
+  useMount(() => {
+    console.log(getDifyInfo())
+  })
   const sendMessage = async () => {
     // 如果消息正在加载中，则直接返回
     if (messageLoading) return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
@@ -109,8 +86,39 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     if (!sendValue && !sendValue.trim()) {
       return Toast.notify({ type: 'info', message: '请输入内容' })
     }
-
-    sendBeta()
+    const data: Record<string, any> = {
+      inputs: {},
+      query: sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
+      conversation_id: isNewChat ? null : currentConversation?.conversationId
+    }
+    sendChatMessage(
+      data,
+      {
+        getAbortController: (abortController: React.SetStateAction<AbortController | null>) => {
+          setAbortController(abortController)
+        },
+        onData: (message: string, isFirstMessage: boolean, { conversationId: newConversationId, messageId, taskId }: any) => {
+          console.log(message, isFirstMessage, newConversationId, messageId, taskId)
+        },
+        async onCompleted(hasError?: boolean) {
+          console.log(hasError)
+        },
+        onFile(file: any) {
+          console.log(file)
+        },
+        onThought(thought: any) {
+          console.log(thought)
+        },
+        onMessageEnd: (messageEnd: any) => {
+          console.log(messageEnd)
+        },
+        onMessageReplace: (messageReplace: any) => {
+          console.log(messageReplace)
+        },
+        onError() {}
+      },
+      appInfo.appId
+    )
     // // 创建一个 Typewriter 实例
     // const typewriter = new Typewriter((str: string) => {
     //   // 将输入的内容添加到流中
@@ -436,89 +444,246 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     }
   }
 
-  useImperativeHandle(ref, () => ({
-    // 暴露给父组件的方法
-    sendBeta
-  }))
+  // 切换历史折叠状态
+  const toggleHistory = (flag: Boolean) => {
+    if (flag) {
+      historyDivRef.current.style.display = 'none'
+    } else {
+      historyDivRef.current.style.display = ''
+    }
+    setHistoryCollapsed()
+  }
+  // 创建新的会话
+  const createNewConversation = () => {
+    if (isNewChat) {
+      return Toast.notify({
+        type: 'info',
+        message: '已经是最新对话'
+      })
+    }
+    // 置空
+    dispatch(
+      updateCurrentId({
+        chatId: 0,
+        conversationId: ''
+      })
+    )
+    // 清空历史记录
+    dispatch(clearConversitionDetailList())
+    dispatch(toggleIsNewChat(true))
+    dispatch(toggleFirstSend(true))
+  }
 
-  // useEffect(() => {
-  //   ipInCN()
-  // }, [])
+  // 删除历史记录某条
+  const delHistory = async (e: React.MouseEvent<HTMLElement, MouseEvent>, id: number) => {
+    e.stopPropagation()
+    if (!id) return
+    // loading
+    dispatch(updateLoading(true))
+    // 删除历史记录
+    const isdelete = await dispatch(delHistoryItem(id))
+    if (!isdelete) return dispatch(updateLoading(false))
+    dispatch(toggleIsNewChat(true))
+    // 删除成功
+    Toast.notify({ type: 'success', message: '删除成功' })
+    // 加载第一页
+    await loadMore(1)
+    // 关闭loading
+    dispatch(updateLoading(false))
+    dispatch(clearConversitionDetailList())
+  }
+  // 获取
+  const getConversationList = async (item: HistoryList) => {
+    // 如果当前id 等于传过来的id 直接return
+    if (currentConversation!.chatId === item.id) return
+    dispatch(toggleIsNewChat!(false))
+    // 切换当前会话id
+    dispatch(
+      updateCurrentId({
+        conversationId: item.conversationid,
+        chatId: item.id
+      })
+    )
+    // loading
+    dispatch(updateLoading(true))
+    // 清空之前的会话详情
+    dispatch(clearConversitionDetailList())
+    // 获取会话详情
+    await dispatch(getConversitionDetail(item.id))
+    // 关闭 loading
+    dispatch(updateLoading(false))
+  }
+  useEffect(() => {
+    const pathname = location.pathname
+    currentMenuKey.current = menuWarp[pathname] as menuType
+  }, [dispatch, location.pathname])
+
+  const loadMore = (page?: number) => {
+    if (!historyList) return
+    dispatch(
+      getHistoryList({
+        menu: currentMenuKey.current,
+        page: page ? page : historyList.pageIndex + 1,
+        pageSize: parseInt(window.innerHeight / 80 + '') + 1
+      })
+    )
+  }
+  // 页面初始化加载第一页
+  useMount(() => {
+    loadMore(1)
+  })
+  // 页面卸载 清空
+  useUnmount(() => {
+    dispatch(initState())
+  })
   return (
-    <div className="dialogue-detail" style={style}>
-      <div className="session-box" ref={scrollBox}>
-        <div className="" ref={innerBox}>
-          {!isNewChat &&
-            conversitionDetailList &&
-            conversitionDetailList.map((item, index) => {
-              return (
-                <div className="item" key={index}>
-                  {item.type === 0 && (
-                    <div className="chat chat-end">
-                      <div className="chat-image avatar">
-                        <div className="w-10 rounded-full">
-                          <img alt="Tailwind CSS chat bubble component" src={defaultAvatar} />
-                        </div>
-                      </div>
-                      <Tooltip title={'点击复制到输入框'} placement="bottom">
-                        <div className="chat-bubble answer copy_content cursor-pointer" onClick={() => setSendValue(item.content)}>
-                          {item.content}
-                        </div>
-                      </Tooltip>
+    <div className="knowledge_base">
+      <div className={`history`} ref={historyDivRef}>
+        <div className="histroy-header">
+          <div className="left-header-block-up">
+            <p className="text font-semibold">历史记录</p>
+            <div className="fold">
+              <Tooltip className="cursor-pointer" placement="right" title={'收起历史记录'}>
+                <i className="iconfont icon-zhedie" onClick={() => toggleHistory(true)}></i>
+              </Tooltip>
+            </div>
+          </div>
+          <div className="new-session-button-wrap" onClick={() => createNewConversation()}>
+            <div className="new-session-button">
+              <span>{<img src={newSessionIcon} alt="" />} 新建对话</span>
+            </div>
+          </div>
+        </div>
+        <div className="history-list animate__animated animate__fadeInUp animate__faster" id="scrollableDiv">
+          {historyList?.empty && (
+            <div className=" w-full h-full flex justify-center" style={{ alignItems: 'center' }}>
+              <span className="loading loading-dots loading-lg"></span>
+            </div>
+          )}
+          {historyList && historyList.rows.length > 0 && (
+            <InfiniteScroll
+              dataLength={historyList.recordCount}
+              next={loadMore}
+              hasMore={historyList.pageCount >= historyList.pageIndex}
+              loader={
+                <div className="flex justify-center mt-3" style={{ alignItems: 'center' }}>
+                  <span className="loading loading-dots loading-lg"></span>
+                </div>
+              }
+              key={Date.now()}
+              scrollableTarget="scrollableDiv"
+              endMessage={<p className=" flex justify-center items-center pl-3 pr-3 pt-3 pb-3 text-gray-500">没有更多了</p>}
+              style={{ scrollbarWidth: 'none' }}
+            >
+              {historyList.rows.map((item, index) => {
+                return (
+                  <div onClick={() => getConversationList(item)} className={`history-item ${currentConversation?.chatId === item.id ? 'active' : ''}`} key={index}>
+                    <div className="title text-ellipsis overflow-hidden" title={item.title}>
+                      {item.title}
                     </div>
-                  )}
-                  {item.type === 1 && (
-                    <div className="chat chat-start">
-                      <div className="chat-image avatar">
-                        <div className="w-10 rounded-full">
-                          <img alt="Tailwind CSS chat bubble component" src={rebotAvatar} />
-                        </div>
-                      </div>
+                    <div className="time">
+                      <span>{item.createTime.replace('T', '  ')}</span> <i style={{ display: 'none' }} className="iconfont icon-shanchu" onClick={(e) => delHistory(e, item.id)}></i>
+                    </div>
+                  </div>
+                )
+              })}
+            </InfiniteScroll>
+          )}
+        </div>
+      </div>
+      {historyCollapsed && (
+        <div className="expand-bar">
+          <Tooltip placement="right" title={'新建对话'}>
+            <div className="add-session-icon" onClick={() => createNewConversation()}></div>
+          </Tooltip>
 
-                      <div className="chat-bubble answer">
-                        <div className="markdown-body" dangerouslySetInnerHTML={{ __html: md.render(item.content) }}></div>
-                        <div className="interact">
-                          <div className="interact-operate">
-                            <Tooltip title={'收藏'} placement="top">
-                              <i className="shim">
-                                <div className="collect"></div>
-                              </i>
-                            </Tooltip>
-                            <Tooltip title={'答的不错'} placement="top">
-                              <i className="shim">
-                                <div className="thumbs-up"></div>
-                              </i>
-                            </Tooltip>
-                            <Tooltip title={'还不够好'} placement="top">
-                              <i className="shim">
-                                <div className="thumbs-down"></div>
-                              </i>
-                            </Tooltip>
-                            <Tooltip title={'点击可复制'} placement="top">
-                              <i className="shim">
-                                <div className="copy" onClick={() => handleCopyClick(item.content)}></div>
-                              </i>
-                            </Tooltip>
-                            <Tooltip title={'分享'} placement="top">
-                              <i className="shim">
-                                <div className="share"></div>
-                              </i>
+          <Tooltip placement="right" title={'展开历史记录'}>
+            <div className="expand-icon" onClick={() => toggleHistory(false)}></div>
+          </Tooltip>
+        </div>
+      )}
+
+      <div className="knowledge-container">
+        <div className="knowledge-box">
+          {isNewChat && <InitPage onPromptClick={onPrompt} />}
+          <div className="dialogue-detail">
+            <div className="session-box" ref={scrollBox}>
+              <div className="" ref={innerBox}>
+                {!isNewChat &&
+                  conversitionDetailList &&
+                  conversitionDetailList.map((item, index) => {
+                    return (
+                      <div className="item" key={index}>
+                        {item.type === 0 && (
+                          <div className="chat chat-end">
+                            <div className="chat-image avatar">
+                              <div className="w-10 rounded-full">
+                                <img alt="Tailwind CSS chat bubble component" src={defaultAvatar} />
+                              </div>
+                            </div>
+                            <Tooltip title={'点击复制到输入框'} placement="bottom">
+                              <div className="chat-bubble answer copy_content cursor-pointer" onClick={() => setSendValue(item.content)}>
+                                {item.content}
+                              </div>
                             </Tooltip>
                           </div>
-                        </div>
+                        )}
+                        {item.type === 1 && (
+                          <div className="chat chat-start">
+                            <div className="chat-image avatar">
+                              <div className="w-10 rounded-full">
+                                <img alt="Tailwind CSS chat bubble component" src={rebotAvatar} />
+                              </div>
+                            </div>
+
+                            <div className="chat-bubble answer">
+                              <div className="markdown-body" dangerouslySetInnerHTML={{ __html: md.render(item.content) }}></div>
+                              <div className="interact">
+                                <div className="interact-operate">
+                                  <Tooltip title={'收藏'} placement="top">
+                                    <i className="shim">
+                                      <div className="collect"></div>
+                                    </i>
+                                  </Tooltip>
+                                  <Tooltip title={'答的不错'} placement="top">
+                                    <i className="shim">
+                                      <div className="thumbs-up"></div>
+                                    </i>
+                                  </Tooltip>
+                                  <Tooltip title={'还不够好'} placement="top">
+                                    <i className="shim">
+                                      <div className="thumbs-down"></div>
+                                    </i>
+                                  </Tooltip>
+                                  <Tooltip title={'点击可复制'} placement="top">
+                                    <i className="shim">
+                                      <div className="copy" onClick={() => handleCopyClick(item.content)}></div>
+                                    </i>
+                                  </Tooltip>
+                                  <Tooltip title={'分享'} placement="top">
+                                    <i className="shim">
+                                      <div className="share"></div>
+                                    </i>
+                                  </Tooltip>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
+                    )
+                  })}
+              </div>
+              {/* <div className="last-div"></div> */}
+            </div>
+            <Search fileList={fileList} setFileList={setFileList} sendMessage={sendMessage} sendValue={sendValue} setSendValue={setSendValue} uploadHandle={uploadHandle} enterMessage={enterMessage} messageLoading={messageLoading} uploadRef={uploadRef} />
+          </div>
         </div>
-        {/* <div className="last-div"></div> */}
       </div>
-      <Search fileList={fileList} setFileList={setFileList} sendMessage={sendMessage} sendValue={sendValue} setSendValue={setSendValue} uploadHandle={uploadHandle} enterMessage={enterMessage} messageLoading={messageLoading} uploadRef={uploadRef} />
     </div>
   )
-})
+}
+
 // mapStateToProps 函数：将 state 映射到 props
 function mapStateToProps(state: RootState) {
   return state.talkSlice
@@ -529,5 +694,6 @@ function mapDispatchToProps(dispatch: AppDispatch) {
   return {}
 }
 // 使用 connect 连接组件和 Redux store
-const ConnectedDialogue = connect(mapStateToProps, mapDispatchToProps, null, { forwardRef: true })(Dialogue)
-export default ConnectedDialogue
+const ConnectedKnowledgeBase = connect(mapStateToProps, mapDispatchToProps)(KnowledgeBase)
+
+export default ConnectedKnowledgeBase

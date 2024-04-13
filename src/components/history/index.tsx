@@ -12,7 +12,7 @@ import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
 import { clearConversitionDetailList, clearHistoryList, initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateCurrentId, updateLoading } from '@/store/reducers/talk'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { useBoolean } from 'ahooks'
+import { useAsyncEffect, useBoolean, useMount, useUnmount } from 'ahooks'
 
 /**
  * @description: history 历史记录组件
@@ -116,8 +116,8 @@ const History = ({ className = '', title = '对话', title_icon = false, item_Ic
   useEffect(() => {
     const pathname = location.pathname
     currentMenuKey.current = menuWarp[pathname] as menuType
-    dispatch(initState())
-    // console.log('当前menu:', menuWarp[pathname])
+    // await dispatch(initState())
+    console.log('当前menu:', menuWarp[pathname])
   }, [dispatch, location.pathname])
 
   const loadMore = (page?: number) => {
@@ -130,10 +130,14 @@ const History = ({ className = '', title = '对话', title_icon = false, item_Ic
       })
     )
   }
-  useEffect(() => {
+  // 页面初始化加载第一页
+  useMount(() => {
     loadMore(1)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [historyList?.empty])
+  })
+  // 页面卸载 清空
+  useUnmount(() => {
+    dispatch(initState())
+  })
   return (
     <>
       <div className={`history ${className}`} ref={historyDivRef}>

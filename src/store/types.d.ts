@@ -76,3 +76,9 @@ export interface ChatMessages {
   conversationId: string
   menu: number
 }
+
+export interface DifyInfo {
+  appId: string
+  apiUrl: string
+  apikey: string
+}

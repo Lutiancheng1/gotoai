@@ -1,6 +1,6 @@
 import Toast from '@/components/Toast'
-import { http } from './request'
-import axios, { AxiosResponse } from 'axios'
+
+import axios from 'axios'
 
 export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -78,7 +78,7 @@ type Ip = {
 }
 export const checkIP = async (ip: string) => {
   try {
-    const response = (await http.get(`http://ip-api.com/json/${ip}`)) as Ip
+    const response = (await axios.get(`http://ip-api.com/json/${ip}`)) as Ip
     if (response.status === 'success') {
       if (response.countryCode === 'CN') {
         // if (response.countryCode === 'CN' || response.countryCode === 'HK' || response.countryCode === 'TW' || response.countryCode === 'Macao') {

@@ -1,7 +1,11 @@
 import Toast from '@/components/Toast'
-import axios, { AxiosError, AxiosResponse } from 'axios'
-import { getTokenInfo, removeTokenInfo } from './storage'
+import { AnnotationReply, MessageEnd, MessageReplace, ThoughtItem, VisionFile } from '@/types/app'
+import { getDifyInfo, hasDifyInfo } from './storage'
 const TIME_OUT = 10000
+const BASE_URL = getDifyInfo().apiUrl || 'http://admin.gotoai.world/v1'
+// const BASE_URL = '/dify'
+
+let token = hasDifyInfo() && getDifyInfo().apikey
 const ContentType = {
   json: 'application/json',
   stream: 'text/event-stream',
@@ -23,12 +27,20 @@ type FetchOptionType = Omit<RequestInit, 'body'> & {
   params?: Record<string, any>
   body?: BodyInit | Record<string, any> | null
 }
-// export type IOnData = (message: string, isFirstMessage: boolean, moreInfo: IOnDataMoreInfo) => void
-// export type IOnThought = (though: ThoughtItem) => void
-// export type IOnFile = (file: VisionFile) => void
-// export type IOnMessageEnd = (messageEnd: MessageEnd) => void
-// export type IOnMessageReplace = (messageReplace: MessageReplace) => void
-// export type IOnAnnotationReply = (messageReplace: AnnotationReply) => void
+export type IOnDataMoreInfo = {
+  conversationId?: string
+  taskId?: string
+  messageId: string
+  errorMessage?: string
+  errorCode?: string
+}
+
+export type IOnData = (message: string, isFirstMessage: boolean, moreInfo: IOnDataMoreInfo) => void
+export type IOnThought = (though: ThoughtItem) => void
+export type IOnFile = (file: VisionFile) => void
+export type IOnMessageEnd = (messageEnd: MessageEnd) => void
+export type IOnMessageReplace = (messageReplace: MessageReplace) => void
+export type IOnAnnotationReply = (messageReplace: AnnotationReply) => void
 export type IOnCompleted = (hasError?: boolean) => void
 export type IOnError = (msg: string, code?: string) => void
 
@@ -37,31 +49,123 @@ type ResponseError = {
   message: string
   status: number
 }
+
 type IOtherOptions = {
+  // isPublicAPI?: boolean
   bodyStringify?: boolean
   needAllResponseContent?: boolean
   deleteContentType?: boolean
-  // onData?: IOnData // for stream
-  // onThought?: IOnThought
-  // onFile?: IOnFile
-  // onMessageEnd?: IOnMessageEnd
-  // onMessageReplace?: IOnMessageReplace
+  onData?: IOnData // for stream
+  onThought?: IOnThought
+  onFile?: IOnFile
+  onMessageEnd?: IOnMessageEnd
+  onMessageReplace?: IOnMessageReplace
   onError?: IOnError
   onCompleted?: IOnCompleted // for stream
   getAbortController?: (abortController: AbortController) => void
 }
+function unicodeToChar(text: string) {
+  if (!text) return ''
 
+  return text.replace(/\\u[0-9a-f]{4}/g, (_match, p1) => {
+    return String.fromCharCode(parseInt(p1, 16))
+  })
+}
+
+export function format(text: string) {
+  let res = text.trim()
+  if (res.startsWith('\n')) res = res.replace('\n', '')
+
+  return res.replaceAll('\n', '<br/>').replaceAll('```', '')
+}
+
+const handleStream = (response: Response, onData: IOnData, onCompleted?: IOnCompleted, onThought?: IOnThought, onMessageEnd?: IOnMessageEnd, onMessageReplace?: IOnMessageReplace, onFile?: IOnFile) => {
+  if (!response.ok) throw new Error('Network response was not ok')
+
+  const reader = response.body?.getReader()
+  const decoder = new TextDecoder('utf-8')
+  let buffer = ''
+  let bufferObj: Record<string, any>
+  let isFirstMessage = true
+  function read() {
+    let hasError = false
+    reader?.read().then((result: any) => {
+      if (result.done) {
+        onCompleted && onCompleted()
+        return
+      }
+      buffer += decoder.decode(result.value, { stream: true })
+      const lines = buffer.split('\n')
+      try {
+        lines.forEach((message) => {
+          if (message.startsWith('data: ')) {
+            // check if it starts with data:
+            try {
+              bufferObj = JSON.parse(message.substring(6)) as Record<string, any> // remove data: and parse as json
+            } catch (e) {
+              // mute handle message cut off
+              onData('', isFirstMessage, {
+                conversationId: bufferObj?.conversation_id,
+                messageId: bufferObj?.message_id
+              })
+              return
+            }
+            if (bufferObj.status === 400 || !bufferObj.event) {
+              onData('', false, {
+                conversationId: undefined,
+                messageId: '',
+                errorMessage: bufferObj?.message,
+                errorCode: bufferObj?.code
+              })
+              hasError = true
+              onCompleted?.(true)
+              return
+            }
+            if (bufferObj.event === 'message' || bufferObj.event === 'agent_message') {
+              // can not use format here. Because message is splited.
+              onData(unicodeToChar(bufferObj.answer), isFirstMessage, {
+                conversationId: bufferObj.conversation_id,
+                taskId: bufferObj.task_id,
+                messageId: bufferObj.id
+              })
+              isFirstMessage = false
+            } else if (bufferObj.event === 'agent_thought') {
+              onThought?.(bufferObj as ThoughtItem)
+            } else if (bufferObj.event === 'message_file') {
+              onFile?.(bufferObj as VisionFile)
+            } else if (bufferObj.event === 'message_end') {
+              onMessageEnd?.(bufferObj as MessageEnd)
+            } else if (bufferObj.event === 'message_replace') {
+              onMessageReplace?.(bufferObj as MessageReplace)
+            }
+          }
+        })
+        buffer = lines[lines.length - 1]
+      } catch (e) {
+        onData('', false, {
+          conversationId: undefined,
+          messageId: '',
+          errorMessage: `${e}`
+        })
+        hasError = true
+        onCompleted?.(true)
+        return
+      }
+      if (!hasError) read()
+    })
+  }
+  read()
+}
 const baseFetch = <T>(url: string, fetchOptions: FetchOptionType, { bodyStringify = true, needAllResponseContent, deleteContentType, getAbortController }: IOtherOptions): Promise<T> => {
   const options: typeof baseOptions & FetchOptionType = Object.assign({}, baseOptions, fetchOptions)
-  console.log(options)
-
   if (getAbortController) {
     const abortController = new AbortController()
     getAbortController(abortController)
     options.signal = abortController.signal
   }
-  const accessToken = localStorage.getItem('console_token') || ''
-  options.headers.set('Authorization', `Bearer ${accessToken}`)
+  if (hasDifyInfo()) {
+    options.headers.set('Authorization', `Bearer ${token}`)
+  }
 
   if (deleteContentType) {
     options.headers.delete('Content-Type')
@@ -70,11 +174,16 @@ const baseFetch = <T>(url: string, fetchOptions: FetchOptionType, { bodyStringif
     if (!contentType) options.headers.set('Content-Type', ContentType.json)
   }
 
+  const urlPrefix = BASE_URL
+  let urlWithPrefix = `${urlPrefix}${url.startsWith('/') ? url : `/${url}`}`
+
   const { method, params, body } = options
   // handle query
   if (method === 'GET' && params) {
     const paramsArray: string[] = []
     Object.keys(params).forEach((key) => paramsArray.push(`${key}=${encodeURIComponent(params[key])}`))
+    if (urlWithPrefix.search(/\?/) === -1) urlWithPrefix += `?${paramsArray.join('&')}`
+    else urlWithPrefix += `&${paramsArray.join('&')}`
 
     delete options.params
   }
@@ -85,12 +194,12 @@ const baseFetch = <T>(url: string, fetchOptions: FetchOptionType, { bodyStringif
   return Promise.race([
     new Promise((resolve, reject) => {
       setTimeout(() => {
-        reject(Toast.notify({ type: 'error', message: '超时' }))
+        reject(new Error('request timeout'))
       }, TIME_OUT)
     }),
     new Promise((resolve, reject) => {
       globalThis
-        .fetch(url, options as RequestInit)
+        .fetch(urlWithPrefix, options as RequestInit)
         .then((res) => {
           const resClone = res.clone()
           // Error handler
@@ -98,22 +207,15 @@ const baseFetch = <T>(url: string, fetchOptions: FetchOptionType, { bodyStringif
             const bodyJson = res.json()
             switch (res.status) {
               case 401: {
-                const loginUrl = `${globalThis.location.origin}/login`
-                bodyJson
-                  .then((data: ResponseError) => {
-                    Toast.notify({ type: 'error', message: data.message })
-                  })
-                  .catch(() => {
-                    // Handle any other errors
-                    globalThis.location.href = loginUrl
-                  })
-
-                break
+                return bodyJson.then((data: ResponseError) => {
+                  Toast.notify({ type: 'error', message: data.message })
+                  return Promise.reject(data)
+                })
               }
               case 403:
                 bodyJson.then((data: ResponseError) => {
                   Toast.notify({ type: 'error', message: data.message })
-                  if (data.code === 'already_setup') globalThis.location.href = `${globalThis.location.origin}/signin`
+                  if (data.code === 'already_setup') globalThis.location.href = `${globalThis.location.origin}/login`
                 })
                 break
               // fall through
@@ -138,14 +240,45 @@ const baseFetch = <T>(url: string, fetchOptions: FetchOptionType, { bodyStringif
         })
         .catch((err) => {
           Toast.notify({ type: 'error', message: err })
-
           reject(err)
         })
     })
   ]) as Promise<T>
 }
+export const upload = (options: any, url?: string, searchParams?: string): Promise<any> => {
+  const urlPrefix = BASE_URL
 
-export const ssePost = (url: string, fetchOptions: FetchOptionType) => {
+  const defaultOptions = {
+    method: 'POST',
+    url: (url ? `${urlPrefix}${url}` : `${urlPrefix}/files/upload`) + (searchParams || ''),
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    data: {}
+  }
+  options = {
+    ...defaultOptions,
+    ...options,
+    headers: { ...defaultOptions.headers, ...options.headers }
+  }
+  return new Promise((resolve, reject) => {
+    const xhr = options.xhr
+    xhr.open(options.method, options.url)
+    for (const key in options.headers) xhr.setRequestHeader(key, options.headers[key])
+
+    xhr.withCredentials = true
+    xhr.responseType = 'json'
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 201) resolve(xhr.response)
+        else reject(xhr)
+      }
+    }
+    xhr.upload.onprogress = options.onprogress
+    xhr.send(options.data)
+  })
+}
+export const ssePost = (url: string, fetchOptions: FetchOptionType, { onData, onCompleted, onThought, onFile, onMessageEnd, onMessageReplace, onError, getAbortController }: IOtherOptions) => {
   const abortController = new AbortController()
 
   const options = Object.assign(
@@ -155,93 +288,75 @@ export const ssePost = (url: string, fetchOptions: FetchOptionType) => {
       method: 'POST',
       signal: abortController.signal
     },
-    fetchOptions
+    fetchOptions,
   )
 
   const contentType = options.headers.get('Content-Type')
   if (!contentType) options.headers.set('Content-Type', ContentType.json)
 
-  // getAbortController?.(abortController)
+  getAbortController?.(abortController)
+
+  const urlPrefix = BASE_URL
+  const urlWithPrefix = `${urlPrefix}${url.startsWith('/') ? url : `/${url}`}`
 
   const { body } = options
   if (body) options.body = JSON.stringify(body)
 
   globalThis
-    .fetch(url, options as RequestInit)
+    .fetch(urlWithPrefix, options as RequestInit)
     .then((res) => {
       if (!/^(2|3)\d{2}$/.test(String(res.status))) {
         res.json().then((data: any) => {
           Toast.notify({ type: 'error', message: data.message || 'Server Error' })
         })
+        onError?.('Server Error')
         return
       }
+      return handleStream(
+        res,
+        (str: string, isFirstMessage: boolean, moreInfo: IOnDataMoreInfo) => {
+          if (moreInfo.errorMessage) {
+            onError?.(moreInfo.errorMessage, moreInfo.errorCode)
+            if (moreInfo.errorMessage !== 'AbortError: The user aborted a request.') Toast.notify({ type: 'error', message: moreInfo.errorMessage })
+            return
+          }
+          onData?.(str, isFirstMessage, moreInfo)
+        },
+        onCompleted,
+        onThought,
+        onMessageEnd,
+        onMessageReplace,
+        onFile
+      )
     })
     .catch((e) => {
-      if (e) Toast.notify({ type: 'error', message: e })
+      if (e.toString() !== 'AbortError: The user aborted a request.') Toast.notify({ type: 'error', message: e })
+      onError?.(e)
     })
 }
+
 // base request
 export const request = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
   return baseFetch<T>(url, options, otherOptions || {})
 }
 
-export const http = axios.create({
-  timeout: 1000000000,
-  baseURL: process.env.REACT_APP_BASE_URL
-})
+// request methods
+export const get = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
+  return request<T>(url, Object.assign({}, options, { method: 'GET' }), otherOptions)
+}
 
-// 2. 设置请求拦截器和响应拦截器
-http.interceptors.request.use((config) => {
-  config.headers!['Access-Control-Allow-Origin'] = '*'
-  // 获取缓存中的 Token 信息
-  const token = getTokenInfo().token
-  if (token) {
-    // 设置请求头的 Authorization 字段
-    config.headers!['Authorization'] = `Bearer ${token}`
-  }
-  return config
-})
+export const post = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
+  return request<T>(url, Object.assign({}, options, { method: 'POST' }), otherOptions)
+}
 
-http.interceptors.response.use(
-  (response: AxiosResponse) => {
-    if (response.data.code === -1) {
-      Toast.notify({
-        type: 'error',
-        message: response.data.message,
-        duration: 1000
-      })
-    }
-    if (response.data.code === -401) {
-      Toast.notify({
-        type: 'error',
-        message: '登陆过期,请重新登陆',
-        duration: 1000
-      })
+export const put = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
+  return request<T>(url, Object.assign({}, options, { method: 'PUT' }), otherOptions)
+}
 
-      // 清除token
-      removeTokenInfo()
-      // 跳转到登陆页面
-      window.location.href = '/login'
-      return Promise.reject(response)
-    }
-    return response.data
-  },
-  async (error: AxiosError<{ message: string }>) => {
-    if (!error.response) {
-      // 如果因为网络原因 请求超时没有response
-      Toast.notify({ type: 'error', message: '网络错误' })
-      return Promise.reject(error)
-    }
-    // 如果不是401错误
-    // 代表网络没问题 有数据
-    if (error.response.status !== 401) {
-      // 如果不是401错误
-      Toast.notify({
-        type: 'error',
-        message: error.response.data.message,
-        duration: 1000
-      })
-      return Promise.reject(error)
-    }
-  }
-)
+export const del = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
+  return request<T>(url, Object.assign({}, options, { method: 'DELETE' }), otherOptions)
+}
+
+export const patch = <T>(url: string, options = {}, otherOptions?: IOtherOptions) => {
+  return request<T>(url, Object.assign({}, options, { method: 'PATCH' }), otherOptions)
+}

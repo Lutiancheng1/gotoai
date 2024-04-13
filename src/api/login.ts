@@ -1,5 +1,5 @@
 // 登陆
-import { http } from '@/utils/request'
+import { http } from '@/utils/axios'
 type LoginRes = {
   data: {
     token: string
@@ -12,4 +12,9 @@ type LoginRes = {
 }
 export const login = async ({ username, password }: { username: string; password: string }) => {
   return (await http.post('/User/Login', { name: username, password, type: 1 })) as LoginRes
+}
+
+// 获取当前用户App信息
+export const getAppInfo = async () => {
+  return await http.get('/Dify/UserAppInfo')
 }

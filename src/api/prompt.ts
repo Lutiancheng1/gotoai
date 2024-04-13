@@ -1,4 +1,4 @@
-import { http } from '@/utils/request'
+import { http } from '@/utils/axios'
 
 // 获取页面提词列表
 

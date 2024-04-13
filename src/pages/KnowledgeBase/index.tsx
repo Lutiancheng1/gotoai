@@ -7,7 +7,6 @@ import { talkInitialState } from '@/store/reducers/talk'
 import { AppDispatch, RootState } from '@/store'
 import { connect } from 'react-redux'
 import { UserPrompt } from '../Talk'
-import { PrologueInfo } from '@/store/types'
 type Props = {} & Partial<talkInitialState>
 const KnowledgeBase = ({ isNewChat }: Props) => {
   // 获取子组件实例

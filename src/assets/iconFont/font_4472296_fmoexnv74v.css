@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4472296 */
-  src: url('//at.alicdn.com/t/c/font_4472296_hczzaxd9dye.woff2?t=1711425708120') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4472296_hczzaxd9dye.woff?t=1711425708120') format('woff'),
-       url('//at.alicdn.com/t/c/font_4472296_hczzaxd9dye.ttf?t=1711425708120') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4472296_r4xty2l89i.woff2?t=1712753690958') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4472296_r4xty2l89i.woff?t=1712753690958') format('woff'),
+       url('//at.alicdn.com/t/c/font_4472296_r4xty2l89i.ttf?t=1712753690958') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,22 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-shuaxin:before {
+  content: "\ec08";
+}
+
+.icon-a-Group3802:before {
+  content: "\e61d";
+}
+
+.icon-kaishishengcheng4:before {
+  content: "\e6b8";
+}
+
+.icon-chajiantubiao_zhongyingfanyi:before {
+  content: "\e783";
 }
 
 .icon-jiahao:before {

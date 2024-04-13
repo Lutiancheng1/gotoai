@@ -8,7 +8,8 @@ import logo from '@/assets/images/logo.png'
 import Toast from '@/components/Toast'
 import { login } from '@/store/action/loginActions'
 import { useAppDispatch } from '@/store/hooks'
-import { getAccountInfo, hasAccountInfo, removeAccountInfo, setAccountInfo } from '@/utils/storage'
+import { getAccountInfo, hasAccountInfo, removeAccountInfo, setAccountInfo, setDifyInfo } from '@/utils/storage'
+import { getAppInfo } from '@/api/login'
 type FieldType = {
   username?: string
   password?: string
@@ -55,6 +56,11 @@ export default function Login() {
       // 否则删除用户名和密码
       removeAccountInfo()
     }
+    // 获取Dify 配置
+    const resp = await getAppInfo()
+    if (!resp) return Toast.notify({ type: 'error', message: '获取知识库配置失败' })
+    // 保存Dify 配置
+    setDifyInfo(resp.data)
     // 提示登录成功
     Toast.notify({
       type: 'success',
@@ -92,6 +98,7 @@ export default function Login() {
       form.setFieldsValue(userInfo)
     }
   }, [form])
+
   return (
     <ConfigProvider
       theme={{
@@ -169,7 +176,7 @@ export default function Login() {
         <div className="copyright">
           <p>
             ©2020 深圳市云展信息技术有限公司 | GotoAI 版权所有 粤ICP备15077337号 热线：400-862-1600 官网：
-            <a target="_blank" rel="noreferrer" href="https://www.gotoai.world">
+            <a target="_blank" rel="noopener noreferrer" href="https://www.gotoai.world">
               www.gotoai.world
             </a>
           </p>

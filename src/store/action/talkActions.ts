@@ -1,8 +1,8 @@
-import { http } from '@/utils/request'
+import { http } from '@/utils/axios'
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { ChatMessages, GetHistoryFroMenu, HistoryList, MessageInfo, NewQuestion } from '../types'
 import { delHistory, saveHistoryList, updateConversitionDetailList, updateCurrentId, updateHistoryList } from '../reducers/talk'
-import { ShartChatResp } from '@/types'
+import { ShartChatResp } from '@/types/app'
 
 export type HisResponse = {
   rows: HistoryList[]

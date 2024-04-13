@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { HistoryList, MessageInfo } from '../types'
 import { createChat, getConversitionDetail, getHistoryList, startChat } from '../action/talkActions'
-import { ShartChatResp } from '@/types'
+import { ShartChatResp } from '@/types/app'
 export type HistoryState = {
   rows: HistoryList[]
   recordCount: number
