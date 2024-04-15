@@ -2,8 +2,8 @@ import Toast from '@/components/Toast'
 import { AnnotationReply, MessageEnd, MessageReplace, ThoughtItem, VisionFile } from '@/types/app'
 import { getDifyInfo, hasDifyInfo } from './storage'
 const TIME_OUT = 10000
-const BASE_URL = getDifyInfo().apiUrl || 'http://admin.gotoai.world/v1'
-// const BASE_URL = '/dify'
+// const BASE_URL = getDifyInfo().apiUrl || 'http://admin.gotoai.world/v1'
+const BASE_URL = '/dify'
 
 let token = hasDifyInfo() && getDifyInfo().apikey
 const ContentType = {
@@ -288,7 +288,7 @@ export const ssePost = (url: string, fetchOptions: FetchOptionType, { onData, on
       method: 'POST',
       signal: abortController.signal
     },
-    fetchOptions,
+    fetchOptions
   )
 
   const contentType = options.headers.get('Content-Type')

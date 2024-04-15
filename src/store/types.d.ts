@@ -55,6 +55,13 @@ export interface MessageInfo {
   createtime: string
   type: 0 | 1 //类型，0.user,1.ai
   resource: string
+  files?: {
+    id: number
+    chatMessageId: number
+    type: string
+    url: string
+    mimetype: string
+  }[]
 }
 
 // 开场白的基本信息

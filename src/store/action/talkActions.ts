@@ -100,6 +100,20 @@ export const updateConversitionTitle = createAsyncThunk('talk/updateConversition
   return res.data
 })
 
+export interface AddChatMessagesData {
+  conversationId: string
+  message: string
+  isCompleted: boolean
+  thridChatId?: any
+  files: {
+    id: number
+    chatMessageId: number
+    type: string
+    url: string
+    mimetype: string
+  }[]
+}
+
 /**
  * 发送对话消息 new
  * @param {ChatMessages} params
@@ -109,5 +123,5 @@ export const addChatMessages = createAsyncThunk('talk/addChatMessages', async (p
   const res = await http.post('/Chat/ChatMessages', params)
   console.log(res, 'addChatMessages')
   if (!res.data) return
-  return res.data
+  return res.data as AddChatMessagesData
 })

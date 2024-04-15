@@ -33,3 +33,13 @@
 .init_page .example p {
   cursor: pointer;
 }
+
+.init_page .example p::before {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 2px;
+  background-color: #3e6ffb;
+  bottom: 0;
+  left: -10px;
+}

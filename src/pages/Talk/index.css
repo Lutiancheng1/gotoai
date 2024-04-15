@@ -69,6 +69,10 @@
 
 .init-prompt .prompt-title {
   margin-bottom: 30px;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 27px;
+  color: #1a2029;
 }
 
 .init-prompt .prompt-content {

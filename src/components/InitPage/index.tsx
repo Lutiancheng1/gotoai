@@ -32,8 +32,8 @@ export default function InitPage({ onPromptClick }: { onPromptClick: (item: User
         <p className="title">{titleWarp[initPrologue?.menu]}</p>
         <p className="sub-title"> {initPrologue?.content} </p>
       </div>
-      <div className="example">
-        <h5>试试以下例子：</h5>
+      <div className="example relative">
+        <h3 className=" font-semibold text-base mb-5">试试以下例子：</h3>
         {initPrologue &&
           initPrologue.examples.map((item) => {
             return (

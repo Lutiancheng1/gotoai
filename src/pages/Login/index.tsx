@@ -126,10 +126,11 @@ export default function Login() {
           {/* Sign In */}
           <div className="container__form container--signin">
             <Form form={form} className="form" id="form2" initialValues={{ remember: true }} onFinish={onFinish} onFinishFailed={onFinishFailed} autoComplete="off">
-              <div className="logo w-20">
+              <div className="logo w-28">
                 <img src={logo} alt="" />
               </div>
-              <h2 className="form__title">企业一站式AI应用平台</h2>
+              <h2 className="form__title text-lg text-slate-500 mb-0">OneAsk 企业一站式AI应用平台</h2>
+              <p className="text-slate-500 mb-3 "> Version 2.1.0</p>
               <Form.Item<FieldType> labelAlign="left" name="username" rules={[{ required: true, message: '请输入用户名!' }]}>
                 <Input
                   style={{
@@ -174,12 +175,24 @@ export default function Login() {
         </div>
 
         <div className="copyright">
-          <p>
-            ©2020 深圳市云展信息技术有限公司 | GotoAI 版权所有 粤ICP备15077337号 热线：400-862-1600 官网：
-            <a target="_blank" rel="noopener noreferrer" href="https://www.gotoai.world">
-              www.gotoai.world
-            </a>
-          </p>
+          <ul className=" mb-3">
+            <li>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.gotoai.world/h-col-128.html">
+                联系我们
+              </a>
+            </li>
+            <li>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.gotoai.world/h-col-148.html">
+                产品矩阵
+              </a>
+            </li>
+            <li>
+              <a target="_blank" rel="noopener noreferrer" href="https://www.gotoai.world/h-col-126.html">
+                关于我们
+              </a>
+            </li>
+          </ul>
+          <p>©2020 深圳市云展信息技术有限公司 粤ICP备15077337号 热线：400-862-1600</p>
         </div>
       </div>
     </ConfigProvider>

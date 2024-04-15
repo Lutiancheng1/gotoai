@@ -46,9 +46,9 @@
 }
 
 .form__title {
-  font-weight: 300;
+  font-weight: 600;
   margin: 0;
-  margin-bottom: 1.25rem;
+  /* margin-bottom: 1.25rem; */
 }
 
 .login .link {
@@ -203,7 +203,7 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding: 0 3rem;
+  padding: 0 2rem;
   height: 100%;
   text-align: center;
 }
@@ -221,9 +221,36 @@
 }
 
 .login .copyright {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-direction: column;
   position: fixed;
-  bottom: 10px;
-  color: #999;
+  bottom: 0;
+  color: #bfbfbf;
+  height: 72px;
+  background-color: #3375b6;
+  opacity: .8;
+  padding-right: 16px;
+}
+
+.login .copyright ul {
+  display: flex;
+}
+
+.login .copyright ul li {
+  margin-left: 6px;
+  margin-right: 2px;
+}
+
+.login .copyright ul li a {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.login .copyright p {
+  font-size: 15px;
 }
 
 @keyframes show {

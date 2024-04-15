@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import './index.css'
 import { Button, ConfigProvider, Input, InputNumber, InputNumberProps, List, Select, Switch, Tabs, Tooltip, Upload, UploadProps, Popconfirm } from 'antd'
 import { InfoCircleOutlined, UploadOutlined, DownloadOutlined, ExclamationCircleFilled } from '@ant-design/icons'
-import Toast from '@/components/Toast'
+import Toast, { useToastContext } from '@/components/Toast'
 import TextArea from 'antd/es/input/TextArea'
 import { useBoolean } from 'ahooks'
 import MJIcon from '@/assets/images/mj.jpg'
@@ -11,6 +11,8 @@ import { ITab, pictureRatioWarp, modelVersions, qualityLevels, tabs, tabsWarp, m
 import { MJdraw } from '@/api/midijourney'
 import axios from 'axios'
 import MJrequest from '@/api/midijourney'
+import { MD5 } from '@/utils/md5'
+import { randString } from '@/utils/libs'
 const DrawDesigns = () => {
   // 大模型
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -44,6 +46,10 @@ const DrawDesigns = () => {
   // 记录左侧控制烂收起折叠
   const [isFold, setIsFold] = useState(false)
   const controllerRef = useRef<HTMLDivElement>(null)
+  const { notify } = useToastContext()
+  //翻译loading状态
+  const [translateLoadingPrompt, setTranslateLoadingPrompt] = useState(false)
+  const [translateLoadingIgnore, setTranslateLoadingIgnore] = useState(false)
   const menuClick = (key: ITab) => {
     console.log(key, 'key')
     setCurrentTab(key)
@@ -123,6 +129,41 @@ const DrawDesigns = () => {
       console.log('携带参数')
     } else {
       console.log('不携带参数')
+    }
+  }
+  const translate = async (q: string, target: string) => {
+    if (!q) return
+    if (target === 'prompt') {
+      setTranslateLoadingPrompt(true)
+    } else {
+      setTranslateLoadingIgnore(true)
+    }
+    console.log('翻译')
+    const appid = '20210327000745207'
+    const key = 'SfTyVcPBdOGs7yezosr9'
+    const randomStr = randString(8)
+    const sign = MD5(appid + q + randomStr + key)
+    // 区分开发环境
+    // let url = process.env.NODE_ENV === 'development' ? `/https://fanyi-api.baidu.com/api/trans/vip/translate?q=${q}&from=zh&to=en&appid=${appid}&salt=${randomStr}&sign=${sign}` : `/baidu?q=${q}&from=zh&to=en&appid=${appid}&salt=${randomStr}&sign=${sign}`
+    // let url = `https://fanyi-api.baidu.com/api/trans/vip/translate?q=${q}&from=zh&to=en&appid=${appid}&salt=${randomStr}&sign=${sign}`
+    let url = `/baidu?q=${q}&from=zh&to=en&appid=${appid}&salt=${randomStr}&sign=${sign}`
+    const res = await axios.get(url)
+    try {
+      if (res.status === 200 && res.data && res.data.trans_result) {
+        // console.log(res.data.trans_result[0].dst)
+        const resultTetx = res.data.trans_result[0].dst
+        if (target === 'prompt') {
+          setPrompt(resultTetx)
+          setTranslateLoadingPrompt(false)
+        } else {
+          setIgnoreElements(resultTetx)
+          setTranslateLoadingIgnore(false)
+        }
+      }
+    } catch (error) {
+      notify({ type: 'error', message: '翻译失败' })
+      setTranslateLoadingPrompt(false)
+      setTranslateLoadingPrompt(false)
     }
   }
   return (
@@ -405,7 +446,7 @@ const DrawDesigns = () => {
               <div className="w-full flex justify-between items-center mb-2">
                 <div>生成提示词</div>
                 <div>
-                  <Button disabled={prompt.trim() === ''} type="primary" className="bg-[#1890ff]" icon={<i className="iconfont icon-chajiantubiao_zhongyingfanyi"></i>}>
+                  <Button loading={translateLoadingPrompt} onClick={() => translate(prompt, 'prompt')} disabled={prompt.trim() === ''} type="primary" className="bg-[#1890ff]" icon={<i className="iconfont icon-chajiantubiao_zhongyingfanyi"></i>}>
                     翻译
                   </Button>
                 </div>
@@ -417,7 +458,7 @@ const DrawDesigns = () => {
               <div className="w-full flex justify-between items-center mb-2">
                 <div>忽略元素（可选）</div>
                 <div>
-                  <Button disabled={ignoreElements.trim() === ''} type="primary" className="bg-[#1890ff]" icon={<i className="iconfont icon-chajiantubiao_zhongyingfanyi"></i>}>
+                  <Button loading={translateLoadingIgnore} onClick={() => translate(ignoreElements, 'ignore')} disabled={ignoreElements.trim() === ''} type="primary" className="bg-[#1890ff]" icon={<i className="iconfont icon-chajiantubiao_zhongyingfanyi"></i>}>
                     翻译
                   </Button>
                 </div>
@@ -427,13 +468,13 @@ const DrawDesigns = () => {
               </div>
               {/* 预设 */}
               <div className="mb-4">
-                <Button type="default" size="small" className="mr-2">
+                <Button type="default" size="small" className="mr-2" onClick={() => setPrompt('a cute cat')}>
                   可爱的小猫
                 </Button>
-                <Button type="default" size="small" className="mr-2">
+                <Button type="default" size="small" className="mr-2" onClick={() => setPrompt('a blue, girl with colorful hair, in the style of yanjun cheng, clowncore, 32k uhd, painted illustrations, close up, lively tableaus, kawaii art HD 8K')}>
                   蓝色动漫女孩
                 </Button>
-                <Button type="default" size="small">
+                <Button type="default" size="small" onClick={() => setPrompt('a little girl eating watermelon on a farm, by Maria Hernandez, unsplash, joyful expression, green fields, sunny day, bright colors, rustic atmosphere, wooden fence, straw hat, freckles, pure happiness, blissful moment')}>
                   吃西瓜小女孩
                 </Button>
               </div>

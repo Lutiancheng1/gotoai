@@ -11,7 +11,7 @@ import { menuType, menuWarp } from '@/utils/constants'
 import { useLocation } from 'react-router-dom'
 import { HistoryList } from '@/store/types'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { getHistoryList, delHistoryItem, getConversitionDetail, startChat, addChatMessages } from '@/store/action/talkActions'
+import { getHistoryList, delHistoryItem, getConversitionDetail, startChat, addChatMessages, AddChatMessagesData } from '@/store/action/talkActions'
 import { clearConversitionDetailList, clearHistoryList, initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateConversitionDetailList, updateCurrentId, updateLoading } from '@/store/reducers/talk'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { useAsyncEffect, useBoolean, useMount, useUnmount } from 'ahooks'
@@ -269,13 +269,13 @@ const KnowledgeBase = ({ isNewChat, historyList, currentConversation, conversiti
       // 滚动到底部
       scrollBottom()
       try {
-        const { payload } = await dispatch(
+        const { payload } = (await dispatch(
           addChatMessages({
             conversationId: currentQuestion!.conversationId,
             menu: currentMenuKey.current,
             query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
           })
-        )
+        )) as { payload: AddChatMessagesData }
         if (payload) {
           if (isNewChat) {
             // 刷新当前历史记录
@@ -293,7 +293,7 @@ const KnowledgeBase = ({ isNewChat, historyList, currentConversation, conversiti
               {
                 id: 0,
                 chatId: currentConversation!.chatId,
-                content: payload,
+                content: payload.message,
                 type: 1,
                 resource: '',
                 createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')

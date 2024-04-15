@@ -6,15 +6,12 @@ import Toast from '../Toast'
 import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
 import { initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateConversitionDetailList, updateCurrentId } from '@/store/reducers/talk'
-import { addChatMessages, addMessages, createChat, getHistoryList, startChat } from '@/store/action/talkActions'
+import { addChatMessages, AddChatMessagesData, getHistoryList, startChat } from '@/store/action/talkActions'
 import dayjs from 'dayjs'
 import { useLocation } from 'react-router-dom'
 import { Typewriter } from '@/utils/format'
 import { StreamGpt } from '@/api/openai'
 import { menuType, menuWarp } from '@/utils/constants'
-import { getMenuPrompts, getUserPrompts } from '@/api/prompt'
-import { ipInCN } from '@/utils'
-import openai from '@/utils/openAi'
 import { Tooltip } from 'antd'
 import copy from 'copy-to-clipboard'
 import MarkdownIt from 'markdown-it'
@@ -23,10 +20,10 @@ import 'highlight.js/styles/atom-one-dark.css'
 import defaultAvatar from '@/assets/images/default-avatar.jpg'
 import rebotAvatar from '@/assets/images/robot.svg'
 import { MessageInfo } from '@/store/types'
-import azureAi, { AZURE_OPENAI_MODEL } from '@/utils/azureAi'
 import { UserPrompt } from '@/pages/Talk'
 import { useMount } from 'ahooks'
 import { ShartChatResp } from '@/types/app'
+import { imgLazyload } from '@mdit/plugin-img-lazyload'
 // 定义一个文件信息的类型
 export type FileInfo = {
   // 文件的 id
@@ -99,7 +96,20 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       behavior: 'smooth'
     })
   }
-
+  const onDownload = (src: string) => {
+    fetch(src)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(new Blob([blob]))
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'image.png'
+        document.body.appendChild(link)
+        link.click()
+        URL.revokeObjectURL(url)
+        link.remove()
+      })
+  }
   const sendMessage = async () => {
     // 如果消息正在加载中，则直接返回
     if (messageLoading) return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
@@ -261,14 +271,18 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       // 滚动到底部
       scrollBottom()
       try {
-        const { payload } = await dispatch(
+        const { payload } = (await dispatch(
           addChatMessages({
             conversationId: currentQuestion!.conversationId,
             menu: currentMenuKey.current,
             query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
           })
-        )
+        )) as { payload: AddChatMessagesData }
         if (payload) {
+          let { message, files } = payload
+          if (files.length > 0) {
+            message += files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n')
+          }
           if (isNewChat) {
             // 刷新当前历史记录
             // 获取历史列表
@@ -285,7 +299,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
               {
                 id: 0,
                 chatId: currentConversation!.chatId,
-                content: payload,
+                content: message,
                 type: 1,
                 resource: '',
                 createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
@@ -368,6 +382,9 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   }
   // 定义markdown解析
   const md: MarkdownIt = new MarkdownIt({
+    html: true,
+    linkify: true,
+    typographer: true,
     highlight: (str, lang) => {
       if (lang && hljs.getLanguage(lang)) {
         try {
@@ -376,14 +393,37 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       }
       return `<pre class="hljs"><code>${md.utils.escapeHtml(str)}</code></pre>`
     }
-  })
+  }).use(imgLazyload)
+
+  // 保存原始的链接渲染函数
+  const defaultRender =
+    md.renderer.rules.link_open ||
+    function (tokens, idx, options, env, self) {
+      return self.renderToken(tokens, idx, options)
+    }
+  // 自定义链接渲染函数
+  md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+    // 添加 target 和 rel 属性
+    tokens[idx].attrPush(['target', '_blank'])
+    tokens[idx].attrPush(['rel', 'noopener noreferrer'])
+
+    // 调用原始的链接渲染函数
+    return defaultRender(tokens, idx, options, env, self)
+  }
+  // 自定义图片渲染
+  md.renderer.rules.image = (tokens, idx) => {
+    const token = tokens[idx]
+    const src = token.attrGet('src')
+    const alt = token.attrGet('alt')
+    const title = token.attrGet('title')
+    return `<a href="${src}" target="_blank" class="img-preview"><img src="${src}" alt="${alt}" title="${title}" style="width: 300px; height: 300px;"/></a>`
+  }
   md.renderer.rules.fence = (tokens, idx) => {
+    // 匹配 a标签  给a标签加上  target="_blank" rel="noopener noreferrer"属性
     const token = tokens[idx]
     const langClass = token.info ? `language-${token.info}` : ''
     const lines = token.content.split('\n').slice(0, -1)
     const lineNumbers = lines.map((line, i) => `<span>${i + 1}</span>`).join('\n')
-    console.log(token.info, 'token.info')
-
     const content = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true }).value
     // 为每个代码块创建一个唯一的ID
     const uniqueId = `copy-button-${Date.now()}-${Math.random()}`
@@ -400,7 +440,6 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       <pre class="hljs"><code><span class="line-numbers-rows">${lineNumbers}</span>${content}</code></pre>
     </div>
     `
-    // return `<div></div>`
   }
   const uploadHandle = (e: React.ChangeEvent<HTMLInputElement> | undefined) => {
     if (fileList.length > 10) return Toast.notify({ type: 'info', message: '最多上传十个文件' })
@@ -476,7 +515,12 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                       </div>
 
                       <div className="chat-bubble answer">
-                        <div className="markdown-body" dangerouslySetInnerHTML={{ __html: md.render(item.content) }}></div>
+                        <div
+                          className="markdown-body"
+                          dangerouslySetInnerHTML={{
+                            __html: md.render(`${item.files && item.files!.length > 0 ? item.content + '\n\n' + item.files!.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n') : item.content}`)
+                          }}
+                        ></div>
                         <div className="interact">
                           <div className="interact-operate">
                             <Tooltip title={'收藏'} placement="top">

@@ -66,8 +66,8 @@ export default function Search({ fileList, setFileList, sendValue, setSendValue,
               </div>
               <div className="search-interactive">
                 <div className="upload-image-wrap">
-                  <Tooltip title={'上传图片'}>
-                    <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" accept="image/gif,image/jpeg,image/jpg,image/png" style={{ display: 'none' }} multiple />
+                  <Tooltip title={'上传文件'}>
+                    <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" style={{ display: 'none' }} multiple />
                     <div
                       className="upload-image-btn"
                       onClick={() => {

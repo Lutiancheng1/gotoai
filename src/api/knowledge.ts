@@ -7,6 +7,7 @@ export type AutomaticRes = {
   opening_statement: string
 }
 
+
 export const sendChatMessage = async (
   body: Record<string, any>,
   {
