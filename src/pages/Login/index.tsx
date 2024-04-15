@@ -57,10 +57,10 @@ export default function Login() {
       removeAccountInfo()
     }
     // 获取Dify 配置
-    const resp = await getAppInfo()
-    if (!resp) return Toast.notify({ type: 'error', message: '获取知识库配置失败' })
-    // 保存Dify 配置
-    setDifyInfo(resp.data)
+    // const resp = await getAppInfo()
+    // if (!resp) return Toast.notify({ type: 'error', message: '获取知识库配置失败' })
+    // // 保存Dify 配置
+    // setDifyInfo(resp.data)
     // 提示登录成功
     Toast.notify({
       type: 'success',
