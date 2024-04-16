@@ -29,9 +29,11 @@ type Props = {
   messageLoading: boolean
   enterMessage: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
   uploadRef: React.RefObject<HTMLInputElement>
+  placeholder?: string
+  hasUploadBtn?: boolean
 }
 
-export default function Search({ fileList, setFileList, sendValue, setSendValue, uploadHandle, sendMessage, messageLoading, enterMessage, uploadRef }: Props) {
+export default function Search({ fileList, setFileList, sendValue, setSendValue, uploadHandle, sendMessage, messageLoading, enterMessage, uploadRef, placeholder, hasUploadBtn }: Props) {
   return (
     <div className="search-box animate__bounceInUp">
       <div className="search-container">
@@ -62,19 +64,21 @@ export default function Search({ fileList, setFileList, sendValue, setSendValue,
 
             <div className="input-wrap">
               <div className="input-box-inner">
-                <TextArea wrap="off" value={sendValue} onKeyUp={(e) => enterMessage(e)} onChange={(e) => setSendValue(e.target.value)} placeholder="输入你的问题或需求" autoSize={{ minRows: 1, maxRows: 9 }} />
+                <TextArea wrap="off" value={sendValue} onKeyUp={(e) => enterMessage(e)} onChange={(e) => setSendValue(e.target.value)} placeholder={placeholder} autoSize={{ minRows: 1, maxRows: 9 }} />
               </div>
               <div className="search-interactive">
                 <div className="upload-image-wrap">
-                  <Tooltip title={'上传文件'}>
-                    <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" style={{ display: 'none' }} multiple />
-                    <div
-                      className="upload-image-btn"
-                      onClick={() => {
-                        uploadRef.current?.click()
-                      }}
-                    ></div>
-                  </Tooltip>
+                  {hasUploadBtn && (
+                    <Tooltip title={'上传文件'}>
+                      <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" style={{ display: 'none' }} multiple />
+                      <div
+                        className="upload-image-btn"
+                        onClick={() => {
+                          uploadRef.current?.click()
+                        }}
+                      ></div>
+                    </Tooltip>
+                  )}
                 </div>
                 <div className="search-operation">
                   <div className={`enter ${messageLoading ? 'loading loading-spinner loading-xs' : ''}`} onClick={() => sendMessage()}>

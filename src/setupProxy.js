@@ -1,13 +1,12 @@
 const { createProxyMiddleware } = require('http-proxy-middleware')
 module.exports = function (app) {
-  // app.use(
-  //   '/mj',
-  //   proxy({
-  //     target: 'http://52.175.37.113:8082/mj/', // 这里是你想要跨域访问的服务器地址
-  //     changeOrigin: true
-  //   })
-  // )
-
+  app.use(
+    '/mj',
+    createProxyMiddleware({
+      target: 'http://47.245.119.126:8080/mj', // 这里是你想要跨域访问的服务器地址
+      changeOrigin: true
+    })
+  )
   app.use(
     '/baidu',
     createProxyMiddleware({
@@ -25,6 +24,16 @@ module.exports = function (app) {
       changeOrigin: true,
       pathRewrite: {
         '^/dify': ''
+      }
+    })
+  )
+  app.use(
+    '/resource',
+    createProxyMiddleware({
+      target: 'https://resource.gotoai.world', // 这里是你想要跨域访问的服务器地址
+      changeOrigin: true,
+      pathRewrite: {
+        '^/resource': ''
       }
     })
   )

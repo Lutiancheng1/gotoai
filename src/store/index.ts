@@ -2,11 +2,13 @@ import { AsyncThunk, AsyncThunkOptions, AsyncThunkPayloadCreator, configureStore
 import loginSlice from './reducers/login'
 import profileSlice from './reducers/profile'
 import talkSlice from './reducers/talk'
+import documentSlice from './reducers/document'
 const store = configureStore({
   reducer: {
     loginSlice,
     profileSlice,
-    talkSlice
+    talkSlice,
+    documentSlice
   }
 })
 

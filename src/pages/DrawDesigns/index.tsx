@@ -107,21 +107,19 @@ const DrawDesigns = () => {
   // 创建任务
   const createTask = async () => {
     // console.log('创建任务')
-    // const res = fetch('/mj/submit/imagine', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     // Authorization: `Bearer ${'MTE5Mzc2NTA1NzY2MjgzMjY3NA.Gmxibo.Gy6bhWRoeJoRkCCjwyHtzkgu8F9iPKxShhDcRE'}`,
-    //     Authorization: `Bearer ${'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcmVkIjoxNzEyOTA3OTA0LCJ1c2VyX2lkIjo0fQ.jo9IoFhBVYwruganlGkclBF9tbchFnWa2gA - kxqU2O8'}`
-    //   },
-    //   body: JSON.stringify({
-    //     base64Array: [],
-    //     notifyHook: '',
-    //     prompt: 'city --version 5.2 --aspect 3:4 --stylize 250 --quality 0.25 --chaos 1 --style raw',
-    //     state: '',
-    //     botType: 'MID_JOURNEY'
-    //   })
-    // })
+    const res = fetch('/mj/submit/imagine', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        base64Array: [],
+        notifyHook: '',
+        prompt: 'city --version 5.2 --aspect 3:4 --stylize 250 --quality 0.25 --chaos 1 --style raw',
+        state: '',
+        botType: 'MID_JOURNEY'
+      })
+    })
     let prompt = ''
     if (currentModel === 'MJ') {
     }
@@ -144,8 +142,6 @@ const DrawDesigns = () => {
     const randomStr = randString(8)
     const sign = MD5(appid + q + randomStr + key)
     // 区分开发环境
-    // let url = process.env.NODE_ENV === 'development' ? `/https://fanyi-api.baidu.com/api/trans/vip/translate?q=${q}&from=zh&to=en&appid=${appid}&salt=${randomStr}&sign=${sign}` : `/baidu?q=${q}&from=zh&to=en&appid=${appid}&salt=${randomStr}&sign=${sign}`
-    // let url = `https://fanyi-api.baidu.com/api/trans/vip/translate?q=${q}&from=zh&to=en&appid=${appid}&salt=${randomStr}&sign=${sign}`
     let url = `/baidu?q=${q}&from=zh&to=en&appid=${appid}&salt=${randomStr}&sign=${sign}`
     const res = await axios.get(url)
     try {

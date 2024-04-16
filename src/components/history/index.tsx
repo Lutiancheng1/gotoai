@@ -140,7 +140,7 @@ const History = ({ className = '', title = '对话', title_icon = false, item_Ic
   })
   return (
     <>
-      <div className={`history ${className}`} ref={historyDivRef}>
+      <div className={`history animate__animated animate__fadeInLeft animate__faster ${className}`} ref={historyDivRef}>
         <div className="histroy-header">
           <div className="left-header-block-up">
             <p className="text font-semibold">{header_title}</p>
@@ -184,9 +184,9 @@ const History = ({ className = '', title = '对话', title_icon = false, item_Ic
               {historyList.rows.map((item, index) => {
                 return (
                   <div onClick={() => getConversationList(item)} className={`history-item ${currentConversation?.chatId === item.id ? 'active' : ''}`} key={index}>
-                    <div className="title text-ellipsis overflow-hidden" title={item.title}>
+                    <div className="title " title={item.title}>
                       {item_Icon}
-                      {item.title}
+                      <span className="text-ellipsis overflow-hidden"> {item.title}</span>
                     </div>
                     <div className="time">
                       <span>{item.createTime.replace('T', '  ')}</span> <i style={{ display: 'none' }} className="iconfont icon-shanchu" onClick={(e) => delHistory(e, item.id)}></i>

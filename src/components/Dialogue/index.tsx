@@ -60,10 +60,12 @@ export const generateHistoryList = (conversationDetailList: MessageInfo[]) => {
 }
 type Props = {
   onSendMessage?: (prompt: string, message: string) => void
+  placeholder?: string
+  hasUploadBtn?: boolean
   style?: React.CSSProperties
 } & Partial<talkInitialState>
 
-const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend }: Props, ref) => {
+const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend, placeholder = '输入你的问题或需求', hasUploadBtn = true }: Props, ref) => {
   // 初始化问题Id
   let currentQuestion = currentConversation
   const location = useLocation()
@@ -254,6 +256,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     if (!defaultRule) {
       // 预设角色不需要发送消息
       setMessageLoading(true)
+      setSendValue('')
       // 更新发送次数
       await dispatch(
         updateConversitionDetailList([
@@ -281,7 +284,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
         if (payload) {
           let { message, files } = payload
           if (files.length > 0) {
-            message += files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n')
+            message += '</p><p>'
+            message += files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
           }
           if (isNewChat) {
             // 刷新当前历史记录
@@ -307,13 +311,12 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
             ])
           )
           setMessageLoading(false)
-          setSendValue('')
           // 滚动到底部
           scrollBottom()
         } else {
           setMessageLoading(false)
           setSendValue('')
-          return Toast.notify({ type: 'error', message: '接口暂未实现继续对话' })
+          return Toast.notify({ type: 'error', message: '出错了' })
         }
       } catch (error) {
         setMessageLoading(false)
@@ -355,7 +358,10 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   // 定义enterMessage函数，接收一个React.KeyboardEvent<HTMLTextAreaElement>类型的参数e
   const enterMessage = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // 如果正在加载页面，则返回
-    if (messageLoading) return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
+    if (messageLoading) {
+      setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
+      return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
+    }
     // 如果按下的是回车键
     if (e.keyCode === 13) {
       // 如果输入框为空
@@ -480,9 +486,9 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     sendBeta
   }))
 
-  // useEffect(() => {
-  //   ipInCN()
-  // }, [])
+  useEffect(() => {
+    console.log(process.env)
+  }, [])
   return (
     <div className="dialogue-detail" style={style}>
       <div className="session-box" ref={scrollBox}>
@@ -559,7 +565,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
         </div>
         {/* <div className="last-div"></div> */}
       </div>
-      <Search fileList={fileList} setFileList={setFileList} sendMessage={sendMessage} sendValue={sendValue} setSendValue={setSendValue} uploadHandle={uploadHandle} enterMessage={enterMessage} messageLoading={messageLoading} uploadRef={uploadRef} />
+      <Search fileList={fileList} setFileList={setFileList} sendMessage={sendMessage} sendValue={sendValue} setSendValue={setSendValue} uploadHandle={uploadHandle} enterMessage={enterMessage} messageLoading={messageLoading} uploadRef={uploadRef} placeholder={placeholder} hasUploadBtn={hasUploadBtn} />
     </div>
   )
 })
