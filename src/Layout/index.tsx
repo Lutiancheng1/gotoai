@@ -1,4 +1,4 @@
-import { ConfigProvider, Menu, MenuProps, Popover, Tooltip, Layout } from 'antd'
+import { ConfigProvider, Menu, MenuProps, Popover, Tooltip, Layout, Modal } from 'antd'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Sider from 'antd/es/layout/Sider'
 import React, { Suspense, useEffect, useState } from 'react'
@@ -8,13 +8,19 @@ import { menuConfig } from '@/utils/constants'
 import logo from '@/assets/images/logo.png'
 import './index.css'
 import { getAccountInfo, removeDifyInfo } from '@/utils/storage'
-import { useAppDispatch } from '@/store/hooks'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { logOut } from '@/store/reducers/login'
 import { getUserProfile } from '@/store/action/profileActions'
 import { AppDispatch, RootState } from '@/store'
 import { connect } from 'react-redux'
 import { initState, talkInitialState } from '@/store/reducers/talk'
 import GlobalLoading from '@/components/loading'
+import exitIcon from '@/assets/images/exit.svg'
+import blogIcon from '@/assets/images/blog.svg'
+import reportIcon from '@/assets/images/report.svg'
+import collectIcon from '@/assets/images/collect.svg'
+import userImg from '@/assets/images/user.jpeg'
+import { desensitizePhone } from '@/utils'
 // 导入子路由
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
 const Home = React.lazy(() => import('@/pages/Talk'))
@@ -30,9 +36,11 @@ type Props = {} & Partial<talkInitialState>
 const Index = ({ loading }: Props) => {
   const [categoryCollapsed, setCategoryCollapsed] = useState(false)
   const [currentPath, setCurrentPath] = useState('')
+  const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false)
   const navagate = useNavigate()
   const location = useLocation()
   const dispatch = useAppDispatch()
+  const user = useAppSelector((state) => state.profileSlice.user)
   const categoryItems: MenuItemType[] = menuConfig.map((item) => {
     return {
       key: item.key,
@@ -45,6 +53,9 @@ const Index = ({ loading }: Props) => {
     navagate(`/${key}`)
   }
   const logout = () => {
+    setIsLogoutModalVisible(true)
+  }
+  const handleLogoutConfirm = async () => {
     dispatch(logOut())
     removeDifyInfo()
     navagate('/login', { replace: true })
@@ -80,15 +91,102 @@ const Index = ({ loading }: Props) => {
       }}
     >
       <Layout>
-        <div className="home">
+        <div className="home layout">
+          <Modal title="提示" width={300} open={isLogoutModalVisible} onOk={handleLogoutConfirm} onCancel={() => setIsLogoutModalVisible(false)} centered okText="确认" cancelText="取消" okType="primary" maskClosable>
+            确定退出登录吗?
+          </Modal>
           <Sider
             trigger={
               <div className="logout">
                 <Popover
+                  arrow={false}
                   content={
-                    <button className="btn" onClick={() => logout()}>
-                      退出
-                    </button>
+                    <div className="my-popper" role="tooltip" onClick={(e) => e.stopPropagation()}>
+                      <div className="panda-tooltip panda-tooltip-isNoBeta">
+                        <div className="head">
+                          <div className="head-icon">
+                            <img alt="" src={userImg} />
+                            <div className="updateAvatar">
+                              <div className="innerIcon" />
+                            </div>
+                            <p className="head-icon-logo head-icon-logo-isNoBeta" />
+                            <input
+                              accept=".jpg,.jpeg,.png,.bmp,.tif,.tiff,.webp,.svg"
+                              style={{
+                                display: 'none'
+                              }}
+                              type="file"
+                            />
+                          </div>
+                          <div className="head-info">
+                            <div className="head-name">
+                              <p className="dot name">用户_{user.username}</p>
+                              <div className="icon-box">
+                                {/* <div className="edit" /> */}
+                                <Tooltip placement="top" title={desensitizePhone(user && user.phone)}>
+                                  <div className="phone" />
+                                </Tooltip>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="actions">
+                          <div className="action flex flex-x-between">
+                            <div className="flex flex-x-between flex-y-center">
+                              <p
+                                className="action-icon"
+                                style={{
+                                  backgroundImage: `url(${collectIcon})`
+                                }}
+                              />
+                              <p className="action-text">我的收藏</p>
+                            </div>
+                          </div>
+                          <Tooltip placement="top" title={'发至邮箱：feedback@gotoai.world'}>
+                            <div className="action flex flex-x-between">
+                              <div className="flex flex-x-between flex-y-center" onClick={() => window.open('mailto:feedback@gotoai.world?subject=意见反馈')}>
+                                <p
+                                  className="action-icon"
+                                  style={{
+                                    backgroundImage: `url(${reportIcon})`
+                                  }}
+                                />
+                                <p className="action-text">意见反馈</p>
+                              </div>
+                            </div>
+                          </Tooltip>
+                          <div className="action flex flex-x-between" onClick={() => window.open('https://www.gotoai.world/h-col-126.html')}>
+                            <div className="flex flex-x-between flex-y-center">
+                              <p
+                                className="action-icon"
+                                style={{
+                                  backgroundImage: `url(${blogIcon})`
+                                }}
+                              />
+                              <p className="action-text">关于我们</p>
+                            </div>
+                          </div>
+                          <div className="action flex flex-x-between" onClick={() => logout()}>
+                            <div className="flex flex-x-between flex-y-center">
+                              <p
+                                className="action-icon"
+                                style={{
+                                  backgroundImage: `url(${exitIcon})`
+                                }}
+                              />
+                              <p className="action-text">退出登录</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        className="popper__arrow"
+                        style={{
+                          left: '38px'
+                        }}
+                        x-arrow=""
+                      />
+                    </div>
                   }
                 >
                   <i onClick={(e) => e.stopPropagation()} style={{ fontSize: categoryCollapsed ? 20 : 30, marginRight: categoryCollapsed ? 10 : 20 }} className="iconfont icon-user cursor-pointer"></i>

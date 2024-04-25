@@ -22,7 +22,7 @@ const DataAnalysis = ({ isNewChat, loading }: Props) => {
       <div className="analysis-container">
         <div className="analysis-box">
           {isNewChat && <InitPage onPromptClick={onPrompt} />}
-          <Dialogue ref={dialogueRef} />
+          <Dialogue ref={dialogueRef} hasUploadBtn={true} />
         </div>
       </div>
     </div>

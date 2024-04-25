@@ -69,7 +69,7 @@ export default function Search({ fileList, setFileList, sendValue, setSendValue,
               <div className="search-interactive">
                 <div className="upload-image-wrap">
                   {hasUploadBtn && (
-                    <Tooltip title={'上传文件'}>
+                    <Tooltip title={<span className="text-12">最多上传十个文件,每个文件不超过20M</span>}>
                       <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" style={{ display: 'none' }} multiple />
                       <div
                         className="upload-image-btn"

@@ -10,6 +10,10 @@ export type DocFile = {
   mimetype: string
   size: number
   menu: number
+  indexuri: string
+  summary: string // 文档总结
+  conversationid: string
+  chatId: number
 }
 export type FileList = {
   rows: DocFile[]
@@ -64,7 +68,7 @@ const DocumentSlice = createSlice({
       state.isNewDoc = false
     },
     // 更新loading状态
-    updateLoading(state, { payload }: PayloadAction<boolean>) {
+    updateDocLoading(state, { payload }: PayloadAction<boolean>) {
       state.docLoading = payload
     },
     // 切换is newdoc
@@ -90,6 +94,6 @@ const DocumentSlice = createSlice({
   // }
 })
 
-export const { saveFileList, updateFileList, updateCurrentFile, initState, updateLoading, toggleIsNewDoc } = DocumentSlice.actions
+export const { saveFileList, updateFileList, updateCurrentFile, initState, updateDocLoading, toggleIsNewDoc } = DocumentSlice.actions
 
 export default DocumentSlice.reducer

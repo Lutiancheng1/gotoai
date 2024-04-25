@@ -14,6 +14,9 @@ export async function asyncRunSafe<T = any>(fn: Promise<T>): Promise<[Error] | [
     return [new Error('unknown error')]
   }
 }
+export const desensitizePhone = (phone: string) => {
+  return phone && phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
+}
 
 export const getTextWidthWithCanvas = (text: string, font?: string) => {
   const canvas = document.createElement('canvas')

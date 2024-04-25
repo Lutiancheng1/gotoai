@@ -62,10 +62,14 @@ type Props = {
   onSendMessage?: (prompt: string, message: string) => void
   placeholder?: string
   hasUploadBtn?: boolean
+  initChildren?: React.ReactNode
+  // lastChildFullHeight?: boolean
+  autoToBottom?: boolean
+  fileId?: string
   style?: React.CSSProperties
 } & Partial<talkInitialState>
 
-const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend, placeholder = '输入你的问题或需求', hasUploadBtn = true }: Props, ref) => {
+const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend, placeholder = '输入你的问题或需求', hasUploadBtn = false, initChildren, autoToBottom = true, fileId }: Props, ref) => {
   // 初始化问题Id
   let currentQuestion = currentConversation
   const location = useLocation()
@@ -231,20 +235,21 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     console.log(defaultRule, prompt, 'defaultRule', 'prompt')
     // defaultRule 为 true 代表是从 首页预设角色过来的 只需要 传递prompt提词 不用发送用户消息
     // 如果是新会话，则创建一个新的会话
-    if (isNewChat) {
+    if (isNewChat && currentMenuKey.current !== 1) {
       // 创建一个新的会话
       const { payload } = (await dispatch(
         startChat({
           menu: currentMenuKey.current,
           prompt: '',
-          promptId: defaultRule ? prompt!.id : 0
+          promptId: defaultRule ? prompt!.id : 0,
+          fileId: fileId
         })
       )) as { payload: ShartChatResp }
       currentQuestion = payload
       console.log('是新会话,创建一个新会话 ID为:', payload)
       console.log(currentQuestion, '更新questionId为新会话id')
       // 获取历史列表
-      dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: 10 }))
+      dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
       // 更新当前 ID
       dispatch(updateCurrentId(currentQuestion as ShartChatResp))
       console.log('更新当前id', currentQuestion)
@@ -290,11 +295,11 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
           if (isNewChat) {
             // 刷新当前历史记录
             // 获取历史列表
-            await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: 10 }))
+            await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
           }
           //第一次发送 更新左侧历史title
           if (firstSend) {
-            await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: 10 }))
+            await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
           }
           // 当前发送完成后 不是第一次发送
           dispatch(toggleFirstSend(false))
@@ -346,7 +351,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     // 滚动到底部
     scrollBottom()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversitionDetailList!?.length > 0])
+  }, [autoToBottom && conversitionDetailList!?.length > 0])
   useEffect(() => {
     const pathname = location.pathname
     currentMenuKey.current = menuWarp[pathname] as menuType
@@ -458,7 +463,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
           file_id: 'chatglm4/48efb6d2-6b3e-40ad-ba70-f63b60310844.jpeg' + files![0].lastModified,
           file_name: files![0].name,
           file_size: files![0].size / 1024 / 1024 > 1 ? parseInt((files![0].size / 1024 / 1024).toString()) + 'MB' : parseInt((files![0].size / 1024).toString()) + 'KB',
-          file_url: 'https://sfile.chatglm.cn/chatglm4/48efb6d2-6b3e-40ad-ba70-f63b60310844.jpeg',
+          file_url: 'https://sfile.chatglm.cn/chatglm4/584f8e42-72ea-4a15-9a80-b995b4ffeed8.png',
           height: 255,
           width: 198,
           type: files![0].type.split('/')[1] as string
@@ -471,7 +476,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
           file_id: 'chatglm4/48efb6d2-6b3e-40ad-ba70-f63b60310844.jpeg' + files![0].lastModified,
           file_name: files![0].name,
           file_size: files![0].size / 1024 / 1024 > 1 ? parseInt((files![0].size / 1024 / 1024).toString()) + 'MB' : parseInt((files![0].size / 1024).toString()) + 'KB',
-          file_url: 'https://sfile.chatglm.cn/chatglm4/48efb6d2-6b3e-40ad-ba70-f63b60310844.jpeg',
+          file_url: 'https://sfile.chatglm.cn/chatglm4/584f8e42-72ea-4a15-9a80-b995b4ffeed8.png',
           height: 255,
           width: 198,
           type: files![0].type.split('/')[1] as string
@@ -483,16 +488,18 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
 
   useImperativeHandle(ref, () => ({
     // 暴露给父组件的方法
-    sendBeta
+    sendBeta,
+    setSendValue
   }))
 
   useEffect(() => {
-    console.log(process.env)
+    console.log(process.env, currentMenuKey.current, 'currentMenuKey.current')
   }, [])
   return (
     <div className="dialogue-detail" style={style}>
       <div className="session-box" ref={scrollBox}>
         <div className="" ref={innerBox}>
+          {initChildren && initChildren}
           {!isNewChat &&
             conversitionDetailList &&
             conversitionDetailList.map((item, index) => {
@@ -549,11 +556,11 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                                 <div className="copy" onClick={() => handleCopyClick(item.content)}></div>
                               </i>
                             </Tooltip>
-                            <Tooltip title={'分享'} placement="top">
+                            {/* <Tooltip title={'分享'} placement="top">
                               <i className="shim">
                                 <div className="share"></div>
                               </i>
-                            </Tooltip>
+                            </Tooltip> */}
                           </div>
                         </div>
                       </div>
@@ -565,7 +572,19 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
         </div>
         {/* <div className="last-div"></div> */}
       </div>
-      <Search fileList={fileList} setFileList={setFileList} sendMessage={sendMessage} sendValue={sendValue} setSendValue={setSendValue} uploadHandle={uploadHandle} enterMessage={enterMessage} messageLoading={messageLoading} uploadRef={uploadRef} placeholder={placeholder} hasUploadBtn={hasUploadBtn} />
+      <Search
+        fileList={fileList}
+        setFileList={setFileList}
+        sendMessage={sendMessage}
+        sendValue={sendValue}
+        setSendValue={setSendValue}
+        uploadHandle={uploadHandle}
+        enterMessage={enterMessage}
+        messageLoading={messageLoading}
+        uploadRef={uploadRef}
+        placeholder={placeholder}
+        hasUploadBtn={hasUploadBtn}
+      />
     </div>
   )
 })

@@ -4,31 +4,31 @@ export const models = ['Midjourney', 'Stable Diffusion']
 export const pictureRatioWarp = [
   {
     label: '1:1',
-    value: 1,
+    value: '1:1',
     w: 100,
     h: 100
   },
   {
     label: '4:3',
-    value: 2,
+    value: '4:3',
     w: 100,
     h: 75
   },
   {
     label: '3:4',
-    value: 3,
+    value: '3:4',
     w: 75,
     h: 100
   },
   {
     label: '16:9',
-    value: 4,
+    value: '16:9',
     w: 100,
     h: 57
   },
   {
     label: '9:16',
-    value: 5,
+    value: '9:16',
     w: 57,
     h: 100
   }
@@ -75,15 +75,6 @@ export const modelVersions = {
     {
       label: '5.1',
       value: 5.1
-    },
-
-    {
-      label: '5',
-      value: 5
-    },
-    {
-      label: '4',
-      value: 4
     }
   ],
   NIJI: [
@@ -94,10 +85,6 @@ export const modelVersions = {
     {
       label: '5',
       value: 5
-    },
-    {
-      label: '4',
-      value: 4
     }
   ]
 } as { [key: string]: { label: string; value: number }[] }
@@ -114,7 +101,7 @@ export type ITab = 'imageCreation' | 'imageProcessing' | 'gallery'
 // 风格
 export const stylesWarp = [
   {
-    value: '',
+    value: 'raw',
     label: '默认'
   },
   {
@@ -128,18 +115,5 @@ export const stylesWarp = [
   {
     value: 'cute',
     label: '可爱'
-  },
-  {
-    value: 'fantasy',
-    label: '幻想'
-  },
-  {
-    value: 'portrait',
-    label: '人像'
-  },
-
-  {
-    value: 'sketch',
-    label: '素描'
   }
 ]

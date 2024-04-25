@@ -3,92 +3,104 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-}
 
-.drawDesigns .ant-tabs-nav {
-  margin: 0;
-}
+  .ant-tabs-nav {
+    margin: 0;
+  }
 
-.drawDesigns .draw-controller .ant-tabs-nav-list {
-  width: 100%;
-}
+  .draw-controller .ant-tabs-nav-list {
+    width: 100%;
+  }
 
-.drawDesigns .ant-tabs-nav-list .ant-tabs-tab-active {
-  font-weight: 600;
-}
+  .ant-tabs-nav-list .ant-tabs-tab-active {
+    font-weight: 600;
+  }
 
-.drawDesigns .ant-tabs-nav-list:first-child {
-  margin-left: 40px;
-}
+  .ant-tabs-nav-list:first-child {
+    margin-left: 40px;
+  }
 
-.draw-controller .draw-controller-tab {
-  width: 100%;
-  display: flex;
-}
+  .draw-controller .draw-controller-tab {
+    width: 100%;
+    display: flex;
+  }
 
-.draw-controller-tab li {
-  flex: 1;
-}
+  .draw-controller-tab li {
+    flex: 1;
+  }
 
-.draw-controller-tab>li {
-  margin-right: 4px;
-}
+  .draw-controller-tab>li {
+    margin-right: 4px;
+  }
 
-.draw-tabs {
-  border-bottom: 1px solid rgb(229, 231, 235);
-}
+  .draw-tabs {
+    border-bottom: 1px solid rgb(229, 231, 235);
+  }
 
-.draw-controller-tab li button {
-  /* color: inherit !important; */
-  display: flex;
-  justify-content: center;
-}
+  .draw-controller-tab li button {
+    /* color: inherit !important; */
+    display: flex;
+    justify-content: center;
+  }
 
-.draw-container .picture_ratio .aspect-item.active {
-  border: 2px solid #4096ff;
-  color: #ccc !important;
-}
+  .draw-container .picture_ratio .aspect-item.active {
+    border: 2px solid #4096ff;
+    color: #ccc !important;
+  }
 
-/* .draw-container .draw-controller {} */
+  /* .draw-container .draw-controller {} */
 
-.Midjourney .draw-controller-item-title .action button {
-  color: #747474 !important;
-  font-weight: 600;
-}
+  .Midjourney .draw-controller-item-title .action button {
+    color: #747474 !important;
+    font-weight: 600;
+  }
 
-.Midjourney .draw-controller-item-title .action button.active,
-.Midjourney .draw-controller-item-title .action button:focus {
-  background-color: #dcddde !important;
-}
+  .Midjourney .draw-controller-item-title .action button.active,
+  .Midjourney .draw-controller-item-title .action button:focus {
+    background-color: #dcddde !important;
+  }
 
-.fold {
-  border-radius: 50%;
-}
+  .fold {
+    border-radius: 50%;
+  }
 
-.fold:hover {
-  opacity: .6;
-}
+  .fold:hover {
+    opacity: .6;
+  }
 
-.draw-content header .title {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 10px;
-  align-items: center;
-  font-size: 28px;
-  font-weight: 600;
-  line-height: 36px;
+  .draw-content header .title {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+    align-items: center;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 36px;
 
-}
+  }
 
-.draw-content header .btns {
-  display: flex;
-}
+  .draw-content header .btns {
+    display: flex;
+  }
 
-.draw-content header .btns>.ant-upload-wrapper {
-  margin-right: 10px;
-}
+  .draw-content header .btns>.ant-upload-wrapper {
+    margin-right: 10px;
+  }
 
-.model .model-item.active button {
-  border-color: #4096ff;
+  .model .model-item.active button {
+    border-color: #4096ff;
+  }
+
+  .btn_no_mr>span {
+    margin-right: 2px !important;
+  }
+
+  .draw-content {
+    padding-bottom: 0;
+  }
+
+  .ant-btn-primary {
+    /* background-color: #1677ff; */
+  }
 }

@@ -22,6 +22,7 @@ export type DocumentRes = {
   ext: string | null
 }
 // 获取文档列表
+
 export const getDocumentList = createAsyncThunk('document/getDocumentList', async (params: DocumentParams, { dispatch }) => {
   const res = (await http.post('/Document/UserFiles', params)) as DocumentRes
   if (!res.rows) return Toast.notify({ type: 'error', message: res.msg })
@@ -34,8 +35,31 @@ export const getDocumentList = createAsyncThunk('document/getDocumentList', asyn
   return res
 })
 // 删除文件
+/**
+ * Deletes a document asynchronously.
+ * @param id - The ID of the document to delete.
+ * @returns A Promise that resolves to the response from the server.
+ */
 export const delDocument = createAsyncThunk('document/delDocument', async (id: string | number, { dispatch }) => {
   const res = (await http.get('/Document/DeleteFile?fileId=' + id)) as { code: number; msg: string; data: any }
   if (!res.data) return Toast.notify({ type: 'error', message: res.msg })
+  return res
+})
+
+// 获取文档总结
+/**
+ * Retrieves the summary of a document.
+ * @param id - The ID of the document.
+ * @returns A Promise that resolves to the document summary.
+ */
+export const getDocumentSummary = createAsyncThunk('document/getDocumentSummary', async (id: string) => {
+  const res = await http.get('/Document/FileSummary?fileId=' + id)
+  if (!res.data) return Toast.notify({ type: 'error', message: '获取文档总结失败' })
+  return res
+})
+
+// 根据文档id取得对话消息列表
+export const getDocumentMessages = createAsyncThunk('document/getDocumentMessages', async (id: string) => {
+  const res = await http.get('/Document/MessageList?fileId=' + id)
   return res
 })

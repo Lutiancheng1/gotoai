@@ -19,7 +19,6 @@ const router = createBrowserRouter(
             throw redirect('/talk')
           }}
         />
-
         <Route
           path="/*"
           element={

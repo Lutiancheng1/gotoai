@@ -1,4 +1,3 @@
-import History from '@/components/history'
 import './index.css'
 import pdfIcon from '@/assets/images/pdf-session.svg'
 import type { UploadFile, UploadProps } from 'antd'
@@ -10,32 +9,34 @@ import { http } from '@/utils/axios'
 import Toast from '@/components/Toast'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { useAsyncEffect, useBoolean, useMount, useUnmount, useUpdateEffect } from 'ahooks'
-import { delHistoryItem, getConversitionDetail, getHistoryList } from '@/store/action/talkActions'
 import { useAppDispatch } from '@/store/hooks'
-import { HistoryList } from '@/store/types'
-import { menuType, menuWarp } from '@/utils/constants'
-import { retry, title } from 'radash'
+import { menuType } from '@/utils/constants'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { useLocation } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { RootState, AppDispatch } from '@/store'
 import newSessionIcon from '@/assets/images/new_session_icon.svg'
 import '@/components/history/index.css'
-import { delDocument, getDocumentList } from '@/store/action/documentActions'
-import { DocFile, DocumentInitState, initState, toggleIsNewDoc, updateCurrentFile, updateLoading } from '@/store/reducers/document'
-import * as pdfjsLib from 'pdfjs-dist'
+import { delDocument, getDocumentList, getDocumentSummary } from '@/store/action/documentActions'
+import { DocFile, DocumentInitState, initState, toggleIsNewDoc, updateCurrentFile, updateDocLoading } from '@/store/reducers/document'
+
 import SplitPane, { Pane } from 'split-pane-react'
 import 'split-pane-react/esm/themes/default.css'
 import Dialogue from '@/components/Dialogue'
-import { talkInitialState } from '@/store/reducers/talk'
+import { clearConversitionDetailList, talkInitialState, toggleIsNewChat, updateCurrentId, updateLoading } from '@/store/reducers/talk'
 import UploadErrorImg from '@/assets/images/upload-error.svg'
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.1.392/pdf.worker.mjs'
+import explainIcon from './images/toolbar/explain-hover.svg'
+import quoteIcon from './images/toolbar/explain-hover.svg'
+import rewriteIcon from './images/toolbar/explain-hover.svg'
+import summaryIcon from './images/toolbar/explain-hover.svg'
+import translateIcon from './images/toolbar/explain-hover.svg'
+import PDFViewer from '@/components/PDFViewer'
+import { getConversitionDetail } from '@/store/action/talkActions'
+import { UserPrompt } from '../Talk'
+
 const { Dragger } = Upload
+type UploadResult = { url: string; fileId: string; chat: { chatId: number; conversationId: string } }
 type Props = {} & Partial<DocumentInitState> & Partial<talkInitialState>
-const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDetailList }: Props) => {
-  // 上传loading
-  const [messageLoading, setMessageLoading] = useState(false)
-  const canvasRef = useRef(null)
+const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
   // 百分比进度
   const [progress, setProgress] = useState(0)
   const props: UploadProps = {
@@ -63,33 +64,56 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDet
           message: '文件大小不能超过 30MB!'
         })
       }
-      return isLt30M
+      const isPdf = file.type === 'application/pdf'
+
+      if (!isPdf) {
+        Toast.notify({
+          type: 'error',
+          message: '只能上传pdf文件！'
+        })
+        return false
+      }
+      return isLt30M && isPdf
     },
     async customRequest(options: UploadRequestOption) {
       let timer = null
-      const { onSuccess, onError, file } = options
+      const { file } = options
       try {
         const formData = new FormData()
         formData.append('file', file)
-        dispatch(updateLoading(true))
+        dispatch(updateDocLoading(true))
         timer = setInterval(() => {
           setProgress((progress) => {
-            return progress + 3
+            return progress + 1.5
           })
-        }, 100)
-        const res = await http.post('/Document/UploadFile?menu=1', formData)
-        console.log(res)
-        if (res.data) {
+        }, 750)
+        const { data } = (await http.post('/Document/UploadFile?menu=1', formData)) as {
+          data: UploadResult
+        }
+        console.log(data)
+        if (data) {
           // 调用 onSuccess 回调函数，并将服务器响应作为参数传入
+          console.log(historyCollapsed, 'historyCollapsed')
           Toast.notify({
             type: 'success',
             message: `${(file as RcFile).name} 上传成功!`
           })
-          onSuccess!(res.data)
-          await dispatch(updateLoading(false))
+          // 如果 侧边栏是展开的 就折叠
+          if (historyDivRef.current.style.display === '') {
+            toggleHistory(true)
+          }
+          // 加载文档摘要
+          const { payload } = (await dispatch(getDocumentSummary(data.fileId))) as { payload: { data: string } }
           loadMore(1)
-          dispatch(updateCurrentFile({ id: res.data.fileId, path: res.data.url } as DocFile))
-          toggleHistory(true)
+          await dispatch(updateCurrentFile({ fileid: data.fileId, path: data.url, chatId: data.chat.chatId, conversationid: data.chat.conversationId, summary: payload.data } as unknown as DocFile))
+          dispatch(toggleIsNewChat(false))
+          dispatch(
+            updateCurrentId({
+              conversationId: data.chat.conversationId,
+              chatId: data.chat.chatId
+            })
+          )
+          await dispatch(updateDocLoading(false))
           setProgress(0)
           clearInterval(timer)
         } else {
@@ -98,8 +122,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDet
             message: `${(file as RcFile).name} 上传失败!`
           })
           setUploadError(true)
-          onError!(res.data)
-          await dispatch(updateLoading(false))
+          await dispatch(updateDocLoading(false))
           setProgress(0)
           clearInterval(timer)
         }
@@ -110,7 +133,6 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDet
         })
         setUploadError(true)
         // 调用 onError 回调函数，并将错误对象作为参数传入
-        onError!(error as UploadRequestError)
         await dispatch(updateLoading(false))
       }
     }
@@ -125,8 +147,21 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDet
   const [sizes, setSizes] = useState([50, 50])
   const [greeting, setGreeting] = useState('')
   const [uploadError, setUploadError] = useState(false)
+  const [selectionText, setSelectionText] = useState('')
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
+  const [showMenu, setShowMenu] = useState(false)
+  // 获取子组件实例
+  const dialogueRef = useRef<{ sendBeta: (defaultRule?: boolean, prompt?: UserPrompt) => Promise<void>; setSendValue: (value: string) => void }>()
+  const onPrompt = (item: UserPrompt) => {
+    console.log(item)
+    dialogueRef.current?.sendBeta(false, item)
+  }
+  const setSendValue = (text: string) => {
+    dialogueRef.current?.setSendValue(text)
+  }
   // 切换历史折叠状态
   const toggleHistory = (flag: Boolean) => {
+    console.log(historyCollapsed, 'historyCollapsed')
     if (flag) {
       historyDivRef.current.style.display = 'none'
     } else {
@@ -156,7 +191,6 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDet
       Toast.notify({ type: 'success', message: '删除成功' })
       loadMore(1)
       dispatch(toggleIsNewDoc(true))
-      toggleHistory(false)
     }
   }
 
@@ -165,55 +199,36 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDet
     await dispatch(
       getDocumentList({
         page: page ? page : fileList.pageIndex + 1,
-        pageSize: parseInt(window.innerHeight / 80 + '') + 1
+        pageSize: parseInt(window.innerHeight / 130 + '') + 1
       })
     )
   }
   // 设置当前选中文件
   const setCurrentFile = async (item: DocFile) => {
-    if (currentFile?.id === item.id) return
+    if (currentFile?.fileid === item.fileid) return
     await dispatch(updateCurrentFile(item))
     console.log(item)
     // 加载 PDF 文件
     toggleHistory(true)
-    // const loadingTask = pdfjsLib.getDocument(item.path)
-    // loadingTask.promise.then(async (pdf) => {
-    //   console.log('PDF loaded')
-
-    //   const canvas = canvasRef.current as unknown as HTMLCanvasElement
-    //   if (!canvas) return console.log('canvas not found')
-    //   const context = canvas.getContext('2d')
-
-    //   let totalHeight = 0
-
-    //   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-    //     // 获取每一页
-    //     const page = await pdf.getPage(pageNum)
-    //     console.log(`Page ${pageNum} loaded`)
-
-    //     const scale = 1.5
-    //     const viewport = page.getViewport({ scale })
-
-    //     // 更新 canvas 大小
-    //     if (canvas.width < viewport.width) {
-    //       canvas.width = viewport.width
-    //     }
-
-    //     totalHeight += viewport.height
-    //     canvas.height = totalHeight
-
-    //     // 渲染页面
-    //     const renderContext = {
-    //       canvasContext: context as CanvasRenderingContext2D,
-    //       viewport: viewport,
-    //       transform: [scale, 0, 0, scale, 0, totalHeight - viewport.height]
-    //     }
-
-    //     await page.render(renderContext).promise
-    //   }
-
-    //   console.log('All pages rendered')
-    // })
+    if (item.conversationid) {
+      //  获取对话列表
+      dispatch(toggleIsNewChat(false))
+      // 切换当前会话id
+      dispatch(
+        updateCurrentId({
+          conversationId: item.conversationid,
+          chatId: item.chatId
+        })
+      )
+      // loading
+      dispatch(updateLoading(true))
+      // 清空之前的会话详情
+      dispatch(clearConversitionDetailList())
+      // 获取会话详情
+      await dispatch(getConversitionDetail(item.chatId))
+      // 关闭 loading
+      dispatch(updateLoading(false))
+    }
   }
 
   // 页面初始化加载第一页
@@ -221,6 +236,53 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDet
     loadMore(1)
   })
 
+  const handleMenuItemClick = (action: string, to?: string | number) => {
+    // 润色语言优美一些  改写精简一些 改写扩展丰富一些 改写的通俗易懂
+    const rewriteType = ['润色语言优美一些', '改写精简一些', '改写扩展丰富一些', '改写的通俗易懂']
+    switch (action) {
+      case 'quote':
+        setSendValue(selectionText)
+        break
+      case 'rewrite':
+        setSendValue(`请将【${selectionText}】${rewriteType[to as number]}`)
+        break
+      case 'explain':
+        setSendValue(`请解释【${selectionText}】`)
+        break
+      case 'summarize':
+        setSendValue(`请总结【${selectionText}】`)
+        break
+      case 'translate':
+        setSendValue(`请将【${selectionText}】翻译成${to}`)
+    }
+    window.getSelection()!.removeAllRanges() // 清除当前的选区
+    setShowMenu(false)
+  }
+  //
+  const handleMouseUp = (event: MouseEvent) => {
+    const toolbarElement = document.getElementById('toolbar')
+    if (toolbarElement && toolbarElement.contains(event.target as Node)) {
+      // 如果点击的是菜单栏或其子元素，不做任何操作
+      return
+    }
+    const selection = window.getSelection()
+    if (selection && selection.toString().trim() !== '') {
+      // 获取选中文本的位置
+      const range = selection.getRangeAt(0)
+      const rect = range.getBoundingClientRect()
+      setSelectionText(selection.toString())
+      // 更新状态以显示菜单
+      // 注意：这里的代码需要根据你的状态管理方式适当调整
+      setShowMenu(true)
+      setMenuPosition({
+        y: rect.top - 45,
+        x: rect.right
+      })
+    } else {
+      // 没有选中文本，隐藏菜单
+      setShowMenu(false)
+    }
+  }
   // 页面卸载 清空
   useUnmount(() => {
     dispatch(initState())
@@ -229,15 +291,15 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDet
     const now = new Date()
     const hour = now.getHours()
     if (hour >= 6 && hour < 9) {
-      setGreeting('早上好')
+      setGreeting('早上好☕')
     } else if (hour >= 9 && hour < 12) {
-      setGreeting('上午好')
+      setGreeting('上午好🥙')
     } else if (hour >= 12 && hour < 14) {
-      setGreeting('中午好')
+      setGreeting('中午好🥙')
     } else if (hour >= 14 && hour < 18) {
-      setGreeting('下午好')
+      setGreeting('下午好☕️')
     } else {
-      setGreeting('晚上好')
+      setGreeting('晚上好🌙')
     }
     // console.log(greeting)
   })
@@ -290,12 +352,16 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDet
                       onClick={() => {
                         setCurrentFile(item)
                       }}
-                      className={`history-item ${currentFile?.id === item.id ? 'active' : ''}`}
+                      className={`history-item justify-between overflow-hidden ${currentFile?.fileid === item.fileid ? 'active' : ''}`}
                       key={item.id}
+                      style={{ height: '130px' }}
                     >
-                      <div className="title" title={item.name}>
+                      <div className="title font-500" title={item.name}>
                         <img src={pdfIcon} alt="" />
-                        <span className="line-clamp-2">{item.name}</span>
+                        <span className="line-clamp-3">{item.name}</span>
+                      </div>
+                      <div className="sub-title flex flex-x-between text-xs" title={item.summary}>
+                        <span className="line-clamp-3">{item.summary}</span>
                       </div>
                       <div className="time">
                         <span>{item.createtime && item.createtime.replace('T', ' ')}</span> <i style={{ display: 'none' }} className="iconfont icon-shanchu" onClick={(e) => delHistory(e, item.fileid)}></i>
@@ -308,7 +374,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDet
           </div>
         </div>
         {historyCollapsed && (
-          <div className="expand-bar z-10" style={{ position: 'fixed', width: 0 }}>
+          <div className="expand-bar z-10" style={{ position: 'fixed', width: 0, top: 45 }}>
             <Tooltip placement="right" title={'新建文档对话'}>
               <div className="add-session-icon" onClick={() => createNewConversation()}></div>
             </Tooltip>
@@ -460,47 +526,136 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading, conversitionDet
           <SplitPane split="vertical" sizes={sizes} onChange={setSizes} sashRender={() => null}>
             <Pane minSize={'30%'}>
               {/* pdfjs预览 */}
-              <div className="left">
-                <div className="preview-container" style={{ overflowY: 'scroll', height: '100vh' }}>
-                  {/* <canvas ref={canvasRef} /> */}
-                  <iframe src={currentFile?.path} title="pdf" className="w-full h-full"></iframe>
+              <div className="left relative">
+                <div className="preview-container bg-[#d4d4d7]" style={{ overflowY: 'scroll', height: '100vh' }}>
+                  {/* <iframe src={currentFile!.path} title="pdf" id="pdf_frame" className="w-full h-full"></iframe> */}
+                  <PDFViewer url={currentFile!.path} handleMouseUp={handleMouseUp} />
+                </div>
+                <div
+                  id="toolbar"
+                  style={{
+                    display: showMenu ? 'flex' : 'none',
+                    top: menuPosition.y,
+                    position: 'fixed',
+                    left: 400,
+                    zIndex: 9999,
+                    margin: '0px auto'
+                  }}
+                >
+                  <p id="quote" onClick={() => handleMenuItemClick('quote')}>
+                    <img alt="" height="16px" src={quoteIcon} width="16px" />
+                    <span>引用</span>
+                  </p>
+                  <p id="rewrite">
+                    <img alt="" height="16px" src={rewriteIcon} width="16px" />
+                    <span>改写</span>
+                    <span
+                      className="type"
+                      style={{
+                        bottom: 'auto',
+                        top: '46px'
+                      }}
+                    >
+                      {['润色美化', '精简语言', '扩展丰富', '通俗处理'].map((item, index) => (
+                        <span key={index} id={`rewrite-${index}`} onClick={() => handleMenuItemClick('rewrite', index)}>
+                          {item}
+                        </span>
+                      ))}
+                    </span>
+                  </p>
+                  <p id="explain" onClick={() => handleMenuItemClick('explain')}>
+                    <img alt="" height="16px" src={explainIcon} width="16px" />
+                    <span>解释</span>
+                  </p>
+                  <p id="summary" onClick={() => handleMenuItemClick('summarize')}>
+                    <img alt="" height="16px" src={summaryIcon} width="16px" />
+                    <span>总结</span>
+                  </p>
+                  <p id="translate">
+                    <img alt="" height="16px" src={translateIcon} width="16px" />
+                    <span>翻译</span>
+                    <span
+                      className="type"
+                      style={{
+                        bottom: 'auto',
+                        top: '46px'
+                      }}
+                    >
+                      {['中文', '英语', '日语', '韩语', '法语', '德语'].map((item, index) => (
+                        <span key={index} id={`translate-${index}`} onClick={() => handleMenuItemClick('translate', item)}>
+                          {item}
+                        </span>
+                      ))}
+                    </span>
+                  </p>
                 </div>
               </div>
             </Pane>
             <Pane minSize={'30%'}>
               {/* 对话框 */}
               <div className="right flex flex-col">
-                <div className="init-page pt-[13px]">
-                  <div className="warp">
-                    <div className="inner">
-                      <div className="init-text">
-                        <div className="title"> {greeting}☕️ </div>
-                        <div className="idea">
-                          <p className="idea-title">文章核心观点</p>
-                          <p className="idea-content">
-                            这篇文章是一份名为《高级前端工程师大厂面试题》的文档摘要，主要内容包括前端工程师面试的相关题目。文档涵盖了面试所需了解的基础知识、高级知识、框架知识以及编码题等部分。在基础知识部分，涉及到JavaScript基础、CSS基础和HTML基础等；在高级知识部分，包括ES6新特性、网络知识、安全知识等；框架知识部分则涉及Vue、React和Angular等主流框架的原理和用法；编码题部分则包括数据结构和算法等。整体来说，这份文档对于准备前端工程师面试具有很好的参考价值。
-                          </p>
-                        </div>
-                        <div className="example">
-                          <div className="example-title">试试以下例子：</div>
-                          <div className="example-content insert-prompt">
-                            <div className="title">📔 文档总结</div>
-                            <div className="desc"> 帮我梳理整个文档的大纲 </div>
-                            <div className="desc"> 帮我分析整个文档的知识点 </div>
-                            <div className="desc"> 帮我总结这篇文档的关键词，输出不超过10个 </div>
-                          </div>
-                          <div className="example-content insert-prompt">
-                            <div className="title">💼 文档提问</div>
-                            <div className="desc"> 这份文档的主要内容和结构是怎样的？ </div>
-                            <div className="desc"> 文档中的各个章节都涵盖了哪些核心知识点？ </div>
-                            <div className="desc"> 在准备前端工程师面试时，文档中的哪些部分是特别值得关注的？ </div>
+                <Dialogue
+                  placeholder="请输入文档相关的问题"
+                  hasUploadBtn={false}
+                  ref={dialogueRef}
+                  autoToBottom={false}
+                  initChildren={
+                    currentFile && (
+                      <div className="init-page pt-[13px] mb-5">
+                        <div className="warp">
+                          <div className="inner">
+                            <div className="init-text">
+                              <div className="title"> {greeting} </div>
+                              <div className="idea">
+                                <p className="idea-title">文章核心观点</p>
+                                <p className="idea-content">{currentFile && currentFile.summary}</p>
+                              </div>
+                              <div className="example">
+                                <div className="example-title">试试以下例子：</div>
+                                <div className="example-content insert-prompt">
+                                  <div className="title">📔 文档总结</div>
+                                  {['帮我梳理整个文档的大纲', '帮我分析整个文档的知识点', '帮我总结这篇文档的关键词，输出不超过10个'].map((item, index) => {
+                                    return (
+                                      <div
+                                        className="desc"
+                                        key={index}
+                                        onClick={() =>
+                                          onPrompt({
+                                            content: item
+                                          } as UserPrompt)
+                                        }
+                                      >
+                                        {item}
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                                <div className="example-content insert-prompt">
+                                  <div className="title">💼 文档提问</div>
+                                  {['这份文档的主要内容和结构是怎样的？', '文档中的各个章节都涵盖了哪些核心知识点？', '文档的核心观点是什么？'].map((item, index) => {
+                                    return (
+                                      <div
+                                        className="desc"
+                                        key={index}
+                                        onClick={() =>
+                                          onPrompt({
+                                            content: item
+                                          } as UserPrompt)
+                                        }
+                                      >
+                                        {item}
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-                <Dialogue placeholder="请输入文档相关的问题" hasUploadBtn={false} />
+                    )
+                  }
+                />
               </div>
             </Pane>
           </SplitPane>

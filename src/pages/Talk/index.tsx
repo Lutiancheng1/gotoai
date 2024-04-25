@@ -117,7 +117,7 @@ const Talk: React.FC = ({ isNewChat, currentConversation }: Props) => {
                 <div className="warp">
                   <div className="inner">
                     <div className="init-header">
-                      <div className="init-title">GotoAI 智能助理</div>
+                      <div className="init-title">AI 智能助理</div>
                     </div>
                     <div className="init-content">
                       <p>{prologue?.content}</p> <p>&nbsp;</p>

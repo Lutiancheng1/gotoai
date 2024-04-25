@@ -58,7 +58,7 @@ export const createChat = createAsyncThunk('talk/createChat', async (params: New
  * 创建新会话ID 新版
  * @returns thunk
  */
-export const startChat = createAsyncThunk('talk/startChat', async (params: { menu: number; prompt: string; promptId: number }, { dispatch }) => {
+export const startChat = createAsyncThunk('talk/startChat', async (params: { menu: number; prompt: string; promptId: number; fileId?: string }, { dispatch }) => {
   const res = (await http.post('/Chat/StartChat', params)) as { data: ShartChatResp }
   console.log(res, 'startChat')
   if (!res.data) return

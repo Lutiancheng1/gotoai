@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4472296 */
-  src: url('//at.alicdn.com/t/c/font_4472296_r4xty2l89i.woff2?t=1712753690958') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4472296_r4xty2l89i.woff?t=1712753690958') format('woff'),
-       url('//at.alicdn.com/t/c/font_4472296_r4xty2l89i.ttf?t=1712753690958') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4472296_k4pf2vu62gn.woff2?t=1713516886525') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4472296_k4pf2vu62gn.woff?t=1713516886525') format('woff'),
+       url('//at.alicdn.com/t/c/font_4472296_k4pf2vu62gn.ttf?t=1713516886525') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,22 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-zhongxinshengcheng:before {
+  content: "\e606";
+}
+
+.icon-shanchu1:before {
+  content: "\e8b6";
+}
+
+.icon-xiazaitupian:before {
+  content: "\e738";
+}
+
+.icon-huabi:before {
+  content: "\e718";
 }
 
 .icon-shuaxin:before {

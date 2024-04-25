@@ -13,96 +13,87 @@
   overflow: hidden;
   margin: 0 auto;
   background-color: #f6f7f9;
-  flex: auto
+  flex: auto;
+
+  .session-box {
+    width: 100%;
+    overflow: scroll;
+    scrollbar-width: none;
+    padding: 16px 36px 0 36px;
+    height: 100%;
+
+    .item {
+      margin-bottom: 10px;
+    }
+
+    .answer .interact {
+      padding-top: 10px;
+      margin-left: 47px;
+      display: flex;
+      flex-direction: row-reverse;
+      animation: interactEmergeAnimation .6s forwards;
+
+      .interact-operate {
+        display: -moz-box;
+        display: flex;
+        flex-direction: row;
+        margin-top: -5px;
+
+        .collect {
+          background-image: url('@/assets/images/collect.png');
+        }
+
+        .thumbs-up {
+          background-image: url('@/assets/images/thumb_up_pc.svg');
+        }
+
+        .thumbs-down {
+          background-image: url('@/assets/images/thumb_down_pc.svg');
+        }
+
+        .copy {
+          background-image: url('@/assets/images/copy_icon_pc.svg');
+        }
+
+        .share {
+          background-image: url('@/assets/images/share.png');
+        }
+      }
+
+      .shim {
+        margin-left: 8px;
+        cursor: pointer;
+        color: #999;
+        font-size: 16px;
+        text-align: center;
+        line-height: 20px;
+        border: 1px solid transparent;
+        -webkit-border-radius: 8px;
+        -moz-border-radius: 8px;
+        border-radius: 8px;
+        padding: 3px;
+
+        &:hover {
+          background: rgba(26, 32, 41, .06)
+        }
+
+        >div {
+          background-repeat: no-repeat;
+          background-position: 50%;
+          background-size: cover;
+          width: 20px;
+          height: 20px
+        }
+      }
+
+      .reverse {
+        transform: rotate(180deg)
+      }
+    }
+  }
 }
 
-.dialogue-detail .session-box {
-  width: 100%;
-  overflow: scroll;
-  scrollbar-width: none;
-  padding: 16px 36px 0 36px;
-  height: 100%;
-}
 
-.dialogue-detail .session-box .item {
-  margin-bottom: 10px;
-}
-
-.session-box .answer .interact {
-  padding-top: 10px;
-  margin-left: 47px;
-  display: flex;
-  flex-direction: row-reverse;
-  animation: interactEmergeAnimation .6s forwards
-}
-
-.dialogue-detail .answer .interact .interact-operate {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -moz-box;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: row;
-  -moz-box-orient: horizontal;
-  -moz-box-direction: normal;
-  flex-direction: row;
-  margin-top: -5px
-}
-
-.dialogue-detail .answer .interact .shim {
-  margin-left: 8px;
-  cursor: pointer;
-  color: #999;
-  font-size: 16px;
-  text-align: center;
-  line-height: 20px;
-  border: 1px solid transparent;
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  border-radius: 8px;
-  padding: 3px;
-}
-
-.dialogue-detail .answer .interact .shim:hover {
-  background: rgba(26, 32, 41, .06)
-}
-
-.dialogue-detail .answer .interact .shim>div {
-  background-repeat: no-repeat;
-  background-position: 50%;
-  -moz-background-size: cover;
-  background-size: cover;
-  width: 20px;
-  height: 20px
-}
-
-.dialogue-detail .answer .interact .interact-operate .collect {
-  background-image: url('@/assets/images/collect.png');
-}
-
-.dialogue-detail .answer .interact .interact-operate .thumbs-up {
-  background-image: url('@/assets/images/thumb_up_pc.svg');
-}
-
-.dialogue-detail .answer .interact .interact-operate .thumbs-down {
-  background-image: url('@/assets/images/thumb_down_pc.svg');
-}
-
-.dialogue-detail .answer .interact .interact-operate .copy {
-  background-image: url('@/assets/images/copy_icon_pc.svg');
-}
-
-.dialogue-detail .answer .interact .interact-operate .share {
-  background-image: url('@/assets/images/share.png');
-}
-
-.dialogue-detail .answer .interact .reverse {
-  -webkit-transform: rotate(180deg);
-  -moz-transform: rotate(180deg);
-  -o-transform: rotate(180deg);
-  transform: rotate(180deg)
-}
 
 .session-box>div .item:last-child .chat {
   margin-bottom: 47px;
@@ -228,17 +219,9 @@ code.hljs {
   display: -moz-box;
   display: flex;
   padding: 2px 8px;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -moz-box-pack: center;
   justify-content: center;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-  -moz-box-align: center;
   align-items: center;
   gap: 2px;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
   border-radius: 6px;
   background: hsla(0, 0%, 100%, .6);
   color: #1a2029;
@@ -255,8 +238,6 @@ code.hljs {
 }
 
 .markdown-body .top {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   height: 36px !important;
   display: -webkit-box;
@@ -265,16 +246,8 @@ code.hljs {
   display: flex;
   width: 100%;
   padding: 6px 12px;
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-  -moz-box-pack: justify;
   justify-content: space-between;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-  -moz-box-align: center;
   align-items: center;
-  -webkit-border-radius: 8px 8px 0 0;
-  -moz-border-radius: 8px 8px 0 0;
   border-radius: 8px 8px 0 0;
   background: #e6e9f2 !important
 }
@@ -294,14 +267,8 @@ code.hljs {
 
 .markdown-body pre.hljs {
   padding: 12px 2px 12px 40px !important;
-  -webkit-border-radius: 5px !important;
-  -moz-border-radius: 5px !important;
   border-radius: 5px !important;
-  -webkit-border-top-left-radius: 0 !important;
-  -moz-border-radius-topleft: 0 !important;
   border-top-left-radius: 0 !important;
-  -webkit-border-top-right-radius: 0 !important;
-  -moz-border-radius-topright: 0 !important;
   border-top-right-radius: 0 !important;
   position: relative;
   font-size: 14px !important;
@@ -347,7 +314,6 @@ code.hljs {
 
 .markdown-body abbr[title] {
   border-bottom: none;
-  -webkit-text-decoration: underline dotted;
   text-decoration: underline dotted
 }
 
@@ -613,7 +579,6 @@ code.hljs {
 .markdown-body input::-webkit-inner-spin-button,
 .markdown-body input::-webkit-outer-spin-button {
   margin: 0;
-  -webkit-appearance: none;
   appearance: none
 }
 
@@ -998,8 +963,6 @@ code.hljs {
   width: 40px;
   text-align: center;
   letter-spacing: -1px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
   user-select: none;
 }
 

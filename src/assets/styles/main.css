@@ -8,7 +8,6 @@
   box-sizing: border-box;
 }
 
-
 html,
 body,
 #root {
@@ -21,4 +20,8 @@ h3,
 p {
   margin: 0;
   padding: 0;
+}
+
+.ant-modal-root .ant-btn-primary {
+  background-color: #1677ff;
 }
