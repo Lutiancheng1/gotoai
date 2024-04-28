@@ -11,8 +11,12 @@ import itemIcon from '@/assets/images/ai-icon.svg'
 import backIcon from '@/assets/images/back.svg'
 import { useAppDispatch } from '@/store/hooks'
 import { FloatButton } from 'antd'
-import { useBoolean } from 'ahooks'
+import { useBoolean, useMount } from 'ahooks'
 import Loading from '@/components/loading'
+import { PrologueInfo } from '@/store/types'
+import { getMenuPrologue } from '@/api/prologue'
+import { menuWarp } from '@/utils/constants'
+import { useLocation } from 'react-router-dom'
 type PromptList = {
   id: number
   title: string
@@ -34,6 +38,8 @@ const Application: React.FC = ({ isNewChat }: Props) => {
   const [currentPromptList, setCurrentPromptList] = useState<UserPrompt[]>([])
   // 获取子组件实例
   const dialogueRef = useRef<{ sendBeta: (defaultRule?: boolean, prompt?: UserPrompt) => Promise<void> }>()
+  const [initPrologue, setInitPrologue] = useState<PrologueInfo>()
+  const location = useLocation()
   // 获取应用分类列表
   // 获取应用分类详细数据
   useEffect(() => {
@@ -73,11 +79,16 @@ const Application: React.FC = ({ isNewChat }: Props) => {
       })
     )
   }
+  useMount(async () => {
+    const res = await getMenuPrologue(menuWarp[location.pathname])
+    if (!res.data) return
+    setInitPrologue(res.data)
+  })
   return (
     <div className="application">
       <History />
       <div className="application-container">
-        {isNewChat && currentPromptList && (
+        {isNewChat && currentPromptList && initPrologue && (
           <div className="init-page animate__animated animate__fadeIn animate__faster">
             <div className="warp">
               <div className="inner">
@@ -85,7 +96,7 @@ const Application: React.FC = ({ isNewChat }: Props) => {
                   <div className="init-title">AI应用助手</div>
                 </div>
                 <div className="init-content">
-                  <p>根据组织内不同部门和业务域的AI应用场景，提供定制化的AI应用工具和员工个人AI应用工作区， 并不断丰富AI应用和工具，为您开启AI应用的快速通道，立即开始体验吧。</p>
+                  <p>{initPrologue.content}</p>
                 </div>
                 <div className="init-prompt">
                   <ul className="prompt-menu menu menu-vertical lg:menu-horizontal rounded-box">

@@ -31,9 +31,11 @@ type Props = {
   uploadRef: React.RefObject<HTMLInputElement>
   placeholder?: string
   hasUploadBtn?: boolean
+  sse?: boolean
+  hasFooter?: boolean
 }
 
-export default function Search({ fileList, setFileList, sendValue, setSendValue, uploadHandle, sendMessage, messageLoading, enterMessage, uploadRef, placeholder, hasUploadBtn }: Props) {
+export default function Search({ fileList, setFileList, sendValue, setSendValue, uploadHandle, sendMessage, messageLoading, enterMessage, uploadRef, placeholder, hasUploadBtn, sse, hasFooter }: Props) {
   return (
     <div className="search-box animate__bounceInUp">
       <div className="search-container">
@@ -64,13 +66,14 @@ export default function Search({ fileList, setFileList, sendValue, setSendValue,
 
             <div className="input-wrap">
               <div className="input-box-inner">
-                <TextArea wrap="off" value={sendValue} onKeyUp={(e) => enterMessage(e)} onChange={(e) => setSendValue(e.target.value)} placeholder={placeholder} autoSize={{ minRows: 1, maxRows: 9 }} />
+                <TextArea value={sendValue} onKeyUp={(e) => enterMessage(e)} onChange={(e) => setSendValue(e.target.value)} placeholder={placeholder} autoSize={{ minRows: 1, maxRows: 9 }} />
               </div>
               <div className="search-interactive">
                 <div className="upload-image-wrap">
                   {hasUploadBtn && (
-                    <Tooltip title={<span className="text-12">最多上传十个文件,每个文件不超过20M</span>}>
-                      <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" style={{ display: 'none' }} multiple />
+                    // <Tooltip title={<span className="text-12">最多上传十个文件,每个文件不超过20M</span>}>
+                    <Tooltip title={<span className="text-12">只支持一个文件,格式 pdf/csv/excel ,不超过20M</span>}>
+                      <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" style={{ display: 'none' }} />
                       <div
                         className="upload-image-btn"
                         onClick={() => {
@@ -81,7 +84,7 @@ export default function Search({ fileList, setFileList, sendValue, setSendValue,
                   )}
                 </div>
                 <div className="search-operation">
-                  <div className={`enter ${messageLoading ? 'loading loading-spinner loading-xs' : ''}`} onClick={() => sendMessage()}>
+                  <div className={`enter ${!sse && messageLoading ? 'loading loading-spinner loading-xs' : ''}`} onClick={() => sendMessage()}>
                     <img src={sendIcon} alt="" />
                   </div>
                 </div>
@@ -90,7 +93,7 @@ export default function Search({ fileList, setFileList, sendValue, setSendValue,
           </div>
         </div>
         {/* 底部copyright */}
-        <Footer />
+        {hasFooter && <Footer />}
       </div>
     </div>
   )

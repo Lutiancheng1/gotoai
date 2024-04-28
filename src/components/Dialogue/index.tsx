@@ -5,7 +5,7 @@ import './index.css'
 import Toast from '../Toast'
 import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
-import { initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateConversitionDetailList, updateCurrentId } from '@/store/reducers/talk'
+import { initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateConversitionDetail, updateConversitionDetailList, updateCurrentId } from '@/store/reducers/talk'
 import { addChatMessages, AddChatMessagesData, getHistoryList, startChat } from '@/store/action/talkActions'
 import dayjs from 'dayjs'
 import { useLocation } from 'react-router-dom'
@@ -19,11 +19,17 @@ import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css'
 import defaultAvatar from '@/assets/images/default-avatar.jpg'
 import rebotAvatar from '@/assets/images/robot.svg'
+import stopIcon from '@/assets/images/session_stop_icon2.svg'
+import refreshIcon from '@/assets/images/refresh.png'
 import { MessageInfo } from '@/store/types'
 import { UserPrompt } from '@/pages/Talk'
-import { useMount } from 'ahooks'
+import { useAsyncEffect, useMount, useSize, useUpdateEffect } from 'ahooks'
 import { ShartChatResp } from '@/types/app'
 import { imgLazyload } from '@mdit/plugin-img-lazyload'
+import { fetchEventSource } from '@microsoft/fetch-event-source'
+import { getTokenInfo } from '@/utils/storage'
+import { UUID } from '@/utils/libs'
+import { http } from '@/utils/axios'
 // 定义一个文件信息的类型
 export type FileInfo = {
   // 文件的 id
@@ -66,10 +72,12 @@ type Props = {
   // lastChildFullHeight?: boolean
   autoToBottom?: boolean
   fileId?: string
+  sse?: boolean
+  hasFooter?: boolean
   style?: React.CSSProperties
 } & Partial<talkInitialState>
 
-const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend, placeholder = '输入你的问题或需求', hasUploadBtn = false, initChildren, autoToBottom = true, fileId }: Props, ref) => {
+const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend, placeholder = '输入你的问题或需求', hasUploadBtn = false, initChildren, autoToBottom = true, fileId, sse = false, hasFooter = true }: Props, ref) => {
   // 初始化问题Id
   let currentQuestion = currentConversation
   const location = useLocation()
@@ -92,15 +100,24 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   // 用于处理流式传输的数据
   const streamingText = useRef('')
   // 初始化文件列表
-  const [fileList, setFileList] = useState([] as FileInfo[])
+  const [fileList, setFileList] = useState<FileInfo[]>([])
   // 记录当前菜单的key
   const currentMenuKey = useRef<menuType>(0)
+  //
+  const [currentUUID, setCurrentUUID] = useState('')
+  const [controller, setController] = useState<AbortController>()
+  const currentMessageRef = useRef<HTMLDivElement>(null)
+  // 使用 useSize 监听 scrollBoxRef 元素的尺寸变化
+  const size = useSize(currentMessageRef)
+
   const scrollBottom = () => {
     // 滚动到底部
-    scrollBox.current?.scrollTo({
-      top: scrollBox.current!.scrollTop + 100000000000000000,
-      behavior: 'smooth'
-    })
+    if (scrollBox.current) {
+      scrollBox.current.scrollTo({
+        top: scrollBox.current.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
   }
   const onDownload = (src: string) => {
     fetch(src)
@@ -121,114 +138,17 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     if (messageLoading) return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
     // 将输入框的内容发送给服务器
     setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
+    //
+    // if (fileList.length > 0) {
+    //   if (!sendValue && !sendValue.trim()) {
+    //     return Toast.notify({ type: 'info', message: '请输入需要分析的内容' })
+    //   }
+    // }
     // 如果输入框为空，则提示用户输入内容
-    if (!sendValue && !sendValue.trim()) {
+    if (!sendValue && !sendValue.trim() && fileList.length === 0) {
       return Toast.notify({ type: 'info', message: '请输入内容' })
     }
-
     sendBeta()
-    // // 创建一个 Typewriter 实例
-    // const typewriter = new Typewriter((str: string) => {
-    //   // 将输入的内容添加到流中
-    //   streamingText.current += str
-    //   console.log('str', str)
-    //   console.log('+++', streamingText.current)
-    // })
-    // // 创建一个 StreamGpt 实例
-    // const gpt = new StreamGpt({
-    //   // 开始时，将内容添加到流中
-    //   async onStart() {
-    //     dispatch(toggleIsNewChat(false))
-    //     // 将内容发送给服务器
-    //     const resp = await dispatch(
-    //       addMessages([
-    //         {
-    //           id: 0,
-    //           chatId: questionId,
-    //           content: sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
-    //           type: 0,
-    //           resource: ''
-    //         }
-    //       ])
-    //     )
-    //     console.log(resp, '开始，user')
-    //     setMessageLoading(true)
-    //   },
-    //   // 创建时，启动 Typewriter
-    //   onCreated() {
-    //     typewriter.start()
-    //     // 获取历史列表
-    //     dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: 10 }))
-    //     // 更新当前 ID
-    //     dispatch(updateCurrentId(questionId))
-    //     console.log('更新当前id', questionId)
-    //   },
-    //   // 更新时，将内容添加到流中
-    //   onPatch(text, reduceText) {
-    //     typewriter.add(text)
-    //     setRespText(reduceText)
-    //   },
-    //   // 完成时，将消息加载完成
-    //   async onDone(text) {
-    //     setMessageLoading(false)
-    //     setSendValue('')
-    //     typewriter.done()
-    //     if (text === 'Failed to fetch' || text === 'Load failed' || text === 'Network Error' || text === '请求超时。') {
-    //       return Toast.notify({ type: 'error', message: '网络错误' })
-    //     }
-    //     if (text === '请求频繁，请稍后再试') return Toast.notify({ type: 'error', message: '请求频繁，请稍后再试' })
-    //     streamingText.current = ''
-    //     console.log(text, '结束了，AI')
-
-    //     // 将内容发送给服务器
-    //     await dispatch(
-    //       addMessages([
-    //         {
-    //           id: 0,
-    //           chatId: questionId,
-    //           content: text,
-    //           type: 1,
-    //           resource: ''
-    //         }
-    //       ])
-    //     )
-    //     // 滚动到底部
-    //     scrollBox.current?.scrollTo({
-    //       top: scrollBox.current!.scrollTop + 100000000000000000,
-    //       behavior: 'smooth'
-    //     })
-    //     // scrollBox.current!.scrollTop = innerBox.current!.scrollHeight
-    //   }
-    // })
-
-    // 开始与 AI 对话
-    // if (isNewChat) {
-    //   gpt.stream([
-    //     {
-    //       role: 'system',
-    //       content: `language: 中文 description: 你是一位精通市面上所有主流开发语言的软件工程师，致力于帮助用户提高开发效率。
-    //   Workflows:理解用户需求，分析用户目前所面临的开发难题。提供针对性的开发建议和解决方案。使用各种编程语言演示示例，以帮助用户掌握高效开发方法。
-    //   Skills:精通主流开发语言：如Java、Python、C++、JavaScript等。效率提升技巧：代码模板、工具推荐、最佳实践等。few-shot learning：通过少量示例，引导用户快速掌握技能。Examples:示例1：Java多线程开发 Java // Java线程创建示例Thread thread = new Thread(() -> {// 执行任务}); thread.start();注释：此示例演示了如何使用Java创建一个新线程，以实现多线程开发。示例2：Python列表推导式 Python # Python列表推导式示例 squares = [x * x for x in range(10)]注释：此示例展示了如何使用Python列表推导式快速生成一个数的平方列表。 示例3：C++模板编程 Cpp // C++模板示例 template <typename T> T max(T a, T b) {    return a > b ? a : b; }注释：此示例演示了如何使用C++模板编程实现一个通用的最大值函数。OutputFormat:针对用户需求，提供相应编程语言的示例代码。结合注释，解释示例中的关键点和注意事项。如有必要，提供相关开发工具和资源链接。现在面对的用户是一位追求高效的开发者，请务必根据以上要求进行分析和设计，这对他的工作将非常有帮助。`
-    //     },
-    //     {
-    //       role: 'user',
-    //       content: sendValue
-    //     }
-    //   ])
-    // } else {
-    //   gpt.stream([
-    //     {
-    //       role: 'user',
-    //       content: sendValue
-    //     }
-    //   ])
-    // }
-    // gpt.stream([
-    //   {
-    //     role: 'user',
-    //     content: sendValue
-    //   }
-    // ])
   }
   // 不使用 stream流 来发消息
   const sendBeta = async (defaultRule?: boolean, prompt?: UserPrompt) => {
@@ -255,111 +175,195 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       console.log('更新当前id', currentQuestion)
       dispatch(toggleIsNewChat(false))
     }
-
+    setFileList([])
     // 将内容发送给服务器
     // 正常对话
     if (!defaultRule) {
       // 预设角色不需要发送消息
       setMessageLoading(true)
       setSendValue('')
+      let uuid = UUID()
+      setCurrentUUID(uuid)
       // 更新发送次数
       await dispatch(
-        updateConversitionDetailList([
-          {
-            id: 0,
-            chatId: currentConversation!.chatId,
-            content: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
-            type: 0,
-            resource: '',
-            createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
-          }
-        ])
+        updateConversitionDetailList(
+          sse
+            ? [
+                {
+                  id: 0,
+                  chatId: currentConversation!.chatId,
+                  content: prompt?.content || sendValue,
+                  type: 0,
+                  resource: (fileList.length > 0 && fileList[0].file_id) || '',
+                  createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
+                },
+                {
+                  id: 0,
+                  UUID: uuid,
+                  chatId: currentConversation!.chatId,
+                  content: '',
+                  isLoading: true,
+                  type: 1,
+                  resource: '',
+                  createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
+                }
+              ]
+            : {
+                id: 0,
+                chatId: currentConversation!.chatId,
+                content: prompt?.content || sendValue,
+                type: 0,
+                resource: '',
+                createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
+              }
+        )
       )
-
       // 滚动到底部
       scrollBottom()
-      try {
-        const { payload } = (await dispatch(
-          addChatMessages({
-            conversationId: currentQuestion!.conversationId,
-            menu: currentMenuKey.current,
-            query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
+      if (sse) {
+        const newController = new AbortController()
+        setController(newController)
+        const signal = newController.signal
+        try {
+          const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+          fetchEventSource(url, {
+            method: 'POST',
+            signal: signal,
+            headers: {
+              'Content-Type': 'application/json',
+              'Cache-Control': 'no-cache',
+              Connection: 'keep-alive',
+              Authorization: `Bearer ${getTokenInfo().token}`
+            },
+            body: JSON.stringify({
+              conversationId: currentQuestion!.conversationId,
+              menu: currentMenuKey.current,
+              query: prompt?.content || sendValue
+            }),
+            onopen(response) {
+              // 建立连接的回调
+              if (isNewChat) {
+                // 刷新当前历史记录
+                // 获取历史列表
+                dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
+              }
+              //第一次发送 更新左侧历史title
+              if (firstSend) {
+                dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
+              }
+              // 当前发送完成后 不是第一次发送
+              dispatch(toggleFirstSend(false))
+              // 当前发送完成后 不是第一次发送
+              dispatch(toggleFirstSend(false))
+              return Promise.resolve()
+            },
+            onmessage(msg) {
+              // 接收一次数据段时回调，因为是流式返回，所以这个回调会被调用多次
+              if (msg.event === 'message') {
+                // 处理数据段
+                let { message, files } = JSON.parse(msg.data) as unknown as AddChatMessagesData
+                let file = files && files.length > 0 ? files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n') : ''
+                dispatch(updateConversitionDetail({ UUID: uuid, content: message ? message + file : file }))
+                // 进行连接正常的操作
+              } else if (msg.event === 'message_end') {
+                setMessageLoading(false)
+                newController.abort()
+                setCurrentUUID('')
+              }
+            },
+            onclose() {
+              // 正常结束的回调
+              newController.abort() // 关闭连接
+            },
+            onerror(err) {
+              // 连接出现异常回调
+              // 必须抛出错误才会停止
+              throw err
+            }
           })
-        )) as { payload: AddChatMessagesData }
-        if (payload) {
-          let { message, files } = payload
-          if (files.length > 0) {
-            message += '</p><p>'
-            message += files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
-          }
-          if (isNewChat) {
-            // 刷新当前历史记录
-            // 获取历史列表
-            await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
-          }
-          //第一次发送 更新左侧历史title
-          if (firstSend) {
-            await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
-          }
-          // 当前发送完成后 不是第一次发送
-          dispatch(toggleFirstSend(false))
-          await dispatch(
-            updateConversitionDetailList([
-              {
+        } catch (err) {
+          setMessageLoading(false)
+          setSendValue('')
+          Toast.notify({
+            type: 'error',
+            message: '网络错误'
+          })
+          console.error('Fetch error:', err)
+        }
+      } else {
+        try {
+          const { payload } = (await dispatch(
+            addChatMessages({
+              conversationId: currentQuestion!.conversationId,
+              menu: currentMenuKey.current,
+              query: prompt?.content || sendValue,
+              resource: (fileList.length > 0 && fileList[0].file_id) || ''
+            })
+          )) as { payload: AddChatMessagesData }
+          if (payload) {
+            let { message, files } = payload
+            if (files.length > 0) {
+              message += '</p><p>'
+              message += files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
+            }
+            if (isNewChat) {
+              // 刷新当前历史记录
+              // 获取历史列表
+              await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
+            }
+            //第一次发送 更新左侧历史title
+            if (firstSend) {
+              await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
+            }
+            // 当前发送完成后 不是第一次发送
+            dispatch(toggleFirstSend(false))
+            await dispatch(
+              updateConversitionDetailList({
                 id: 0,
                 chatId: currentConversation!.chatId,
                 content: message,
                 type: 1,
                 resource: '',
                 createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
-              }
-            ])
-          )
-          setMessageLoading(false)
-          // 滚动到底部
-          scrollBottom()
-        } else {
+              })
+            )
+            setMessageLoading(false)
+            // 滚动到底部
+            scrollBottom()
+          } else {
+            setMessageLoading(false)
+            setSendValue('')
+            return Toast.notify({ type: 'error', message: '出错了' })
+          }
+        } catch (error) {
           setMessageLoading(false)
           setSendValue('')
-          return Toast.notify({ type: 'error', message: '出错了' })
+          Toast.notify({
+            type: 'error',
+            message: '网络错误'
+          })
         }
-      } catch (error) {
-        setMessageLoading(false)
-        setSendValue('')
-        Toast.notify({
-          type: 'error',
-          message: '网络错误'
-        })
       }
     } else {
       await dispatch(
-        updateConversitionDetailList([
-          {
-            id: 0,
-            chatId: currentConversation!.chatId,
-            content: prompt!.prologue,
-            type: 1,
-            resource: '',
-            createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
-          }
-        ])
+        updateConversitionDetailList({
+          id: 0,
+          chatId: currentConversation!.chatId,
+          content: prompt!.prologue,
+          type: 1,
+          resource: '',
+          createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
+        })
       )
     }
   }
-  useEffect(() => {
-    // scrollBox.current!.scrollTop = innerBox.current!.scrollHeight
-    // 滚动到底部
-    scrollBottom()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoToBottom && conversitionDetailList!?.length > 0])
-  useEffect(() => {
-    const pathname = location.pathname
-    currentMenuKey.current = menuWarp[pathname] as menuType
-  }, [dispatch, location.pathname])
-  // 初始化
-  useMount(async () => {
-    await dispatch(initState())
-  })
+  const stopMessage = async () => {
+    if (messageLoading) {
+      controller?.abort()
+      setMessageLoading(false)
+      await dispatch(updateConversitionDetail({ UUID: currentUUID, content: '\n\n本次回答已被终止' }))
+    }
+  }
   // 定义enterMessage函数，接收一个React.KeyboardEvent<HTMLTextAreaElement>类型的参数e
   const enterMessage = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // 如果正在加载页面，则返回
@@ -369,8 +373,13 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     }
     // 如果按下的是回车键
     if (e.keyCode === 13) {
+      // if (fileList.length > 0) {
+      //   if (!sendValue && !sendValue.trim()) {
+      //     return Toast.notify({ type: 'info', message: '请输入需要分析的内容' })
+      //   }
+      // }
       // 如果输入框为空
-      if (!sendValue.trim()) {
+      if (!sendValue.trim() && fileList.length === 0) {
         // 去除输入框中的回车和换行符
         setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
         // 弹出提示框，提示需要输入内容
@@ -452,37 +461,37 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     </div>
     `
   }
-  const uploadHandle = (e: React.ChangeEvent<HTMLInputElement> | undefined) => {
-    if (fileList.length > 10) return Toast.notify({ type: 'info', message: '最多上传十个文件' })
+  const uploadHandle = async (e: React.ChangeEvent<HTMLInputElement> | undefined) => {
+    // if (fileList.length > 10) return Toast.notify({ type: 'info', message: '最多上传十个文件' })
+    console.log(e?.target.files)
+
+    if (!e!.target.files) return
     const files = e!.target.files
-    console.log(files)
-    if (files!.length <= 1) {
+    const supportedFormats = ['application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv']
+    for (let i = 0; i < files.length; i++) {
+      if (!supportedFormats.includes(files[i].type)) {
+        return Toast.notify({ type: 'error', message: '文件格式不支持' })
+      }
+    }
+    // 上传文件
+    const formData = new FormData()
+    formData.append('file', files[0])
+    try {
+      const { data } = (await http.post('/Document/UploadFile?menu=' + currentMenuKey.current, formData)) as { data: { url: string; fileId: string } }
+      if (!data) return
+      // 上传成功后，将文件信息添加到 fileList 中
       setFileList([
-        ...fileList,
         {
-          file_id: 'chatglm4/48efb6d2-6b3e-40ad-ba70-f63b60310844.jpeg' + files![0].lastModified,
-          file_name: files![0].name,
-          file_size: files![0].size / 1024 / 1024 > 1 ? parseInt((files![0].size / 1024 / 1024).toString()) + 'MB' : parseInt((files![0].size / 1024).toString()) + 'KB',
-          file_url: 'https://sfile.chatglm.cn/chatglm4/584f8e42-72ea-4a15-9a80-b995b4ffeed8.png',
-          height: 255,
-          width: 198,
-          type: files![0].type.split('/')[1] as string
+          file_id: data.fileId,
+          file_name: files[0].name,
+          file_size: files[0].size,
+          file_url: data.url,
+          type: files[0].type
         }
-      ])
-    } else {
-      setFileList([
-        ...fileList,
-        {
-          file_id: 'chatglm4/48efb6d2-6b3e-40ad-ba70-f63b60310844.jpeg' + files![0].lastModified,
-          file_name: files![0].name,
-          file_size: files![0].size / 1024 / 1024 > 1 ? parseInt((files![0].size / 1024 / 1024).toString()) + 'MB' : parseInt((files![0].size / 1024).toString()) + 'KB',
-          file_url: 'https://sfile.chatglm.cn/chatglm4/584f8e42-72ea-4a15-9a80-b995b4ffeed8.png',
-          height: 255,
-          width: 198,
-          type: files![0].type.split('/')[1] as string
-        },
-        ...(files as unknown as [])
-      ])
+      ] as FileInfo[])
+      Toast.notify({ type: 'success', message: '上传成功' })
+    } catch (error) {
+      Toast.notify({ type: 'error', message: '上传失败' })
     }
   }
 
@@ -495,6 +504,33 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   useEffect(() => {
     console.log(process.env, currentMenuKey.current, 'currentMenuKey.current')
   }, [])
+
+  // 当尺寸变化时，滚动到底部
+  useUpdateEffect(() => {
+    if (currentMessageRef.current) {
+      // 滚动到底部
+      scrollBox.current!.scrollTo({
+        top: scrollBox.current!.scrollHeight,
+        behavior: 'smooth'
+      })
+    }
+  }, [size?.height]) // 依赖于元素的高度变化
+
+  useEffect(() => {
+    // 滚动到底部
+    scrollBottom()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoToBottom && conversitionDetailList!?.length > 0])
+
+  useEffect(() => {
+    const pathname = location.pathname
+    currentMenuKey.current = menuWarp[pathname] as menuType
+  }, [dispatch, location.pathname])
+
+  // 初始化
+  useMount(async () => {
+    await dispatch(initState())
+  })
   return (
     <div className="dialogue-detail" style={style}>
       <div className="session-box" ref={scrollBox}>
@@ -509,7 +545,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                     <div className="chat chat-end">
                       <div className="chat-image avatar">
                         <div className="w-10 rounded-full">
-                          <img alt="Tailwind CSS chat bubble component" src={defaultAvatar} />
+                          <img alt="" src={defaultAvatar} />
                         </div>
                       </div>
                       <Tooltip title={'点击复制到输入框'} placement="bottom">
@@ -520,57 +556,87 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                     </div>
                   )}
                   {item.type === 1 && (
-                    <div className="chat chat-start">
-                      <div className="chat-image avatar">
-                        <div className="w-10 rounded-full">
-                          <img alt="Tailwind CSS chat bubble component" src={rebotAvatar} />
+                    <>
+                      <div className="chat chat-start">
+                        <div className="chat-image avatar">
+                          <div className="w-10 rounded-full">
+                            <img alt="" src={rebotAvatar} />
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="chat-bubble answer">
-                        <div
-                          className="markdown-body"
-                          dangerouslySetInnerHTML={{
-                            __html: md.render(`${item.files && item.files!.length > 0 ? item.content + '\n\n' + item.files!.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n') : item.content}`)
-                          }}
-                        ></div>
-                        <div className="interact">
-                          <div className="interact-operate">
-                            <Tooltip title={'收藏'} placement="top">
-                              <i className="shim">
-                                <div className="collect"></div>
-                              </i>
-                            </Tooltip>
-                            <Tooltip title={'答的不错'} placement="top">
-                              <i className="shim">
-                                <div className="thumbs-up"></div>
-                              </i>
-                            </Tooltip>
-                            <Tooltip title={'还不够好'} placement="top">
-                              <i className="shim">
-                                <div className="thumbs-down"></div>
-                              </i>
-                            </Tooltip>
-                            <Tooltip title={'点击可复制'} placement="top">
-                              <i className="shim">
-                                <div className="copy" onClick={() => handleCopyClick(item.content)}></div>
-                              </i>
-                            </Tooltip>
-                            {/* <Tooltip title={'分享'} placement="top">
-                              <i className="shim">
-                                <div className="share"></div>
-                              </i>
-                            </Tooltip> */}
+                        <div className="chat-bubble answer">
+                          <div
+                            className="markdown-body"
+                            id={item.UUID}
+                            ref={index === conversitionDetailList.length - 1 ? currentMessageRef : null}
+                            dangerouslySetInnerHTML={{
+                              __html: md.render(
+                                ` ${
+                                  item.isLoading ? '<span class="loading loading-dots loading-xs"></span>' : item.files && item.files.length > 0 ? item.content + '\n\n' + item.files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n') : item.content
+                                }`
+                              )
+                            }}
+                          ></div>
+                          <div className="interact">
+                            <div className="interact-operate">
+                              <Tooltip title={'收藏'} placement="top">
+                                <i className="shim">
+                                  <div className="collect"></div>
+                                </i>
+                              </Tooltip>
+                              <Tooltip title={'答的不错'} placement="top">
+                                <i className="shim">
+                                  <div className="thumbs-up"></div>
+                                </i>
+                              </Tooltip>
+                              <Tooltip title={'还不够好'} placement="top">
+                                <i className="shim">
+                                  <div className="thumbs-down"></div>
+                                </i>
+                              </Tooltip>
+                              <Tooltip title={'点击可复制'} placement="top">
+                                <i className="shim">
+                                  <div className="copy" onClick={() => handleCopyClick(item.content)}></div>
+                                </i>
+                              </Tooltip>
+                              {/* <Tooltip title={'分享'} placement="top">
+      <i className="shim">
+        <div className="share"></div>
+      </i>
+    </Tooltip> */}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                      {/* {index === conversitionDetailList.length - 1 && (
+                        <div className="followup-container">
+                          <div className="followup-list">
+                            <div className="followup-item">帮我查看下日历</div>
+                            <div className="followup-item">提醒我明天日程</div>
+                            <div className="followup-item">查询下明天天气</div>
+                          </div>
+                        </div>
+                      )} */}
+                    </>
                   )}
                 </div>
               )
             })}
         </div>
-        {/* <div className="last-div"></div> */}
+        <div className="last-div">
+          {/* <div className="input-msg flex" style={{ display: 'none' }}>
+            <div>
+              <img src={refreshIcon} alt="" />
+              <span>重新生成</span>
+            </div>
+          </div>
+          <div className="input-msg flex" style={{ display: sse && messageLoading ? '' : 'none' }}>
+            <div onClick={stopMessage}>
+              <img src={stopIcon} alt="" />
+              <span>停止生成</span>
+            </div>
+          </div> */}
+        </div>
       </div>
       <Search
         fileList={fileList}
@@ -584,6 +650,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
         uploadRef={uploadRef}
         placeholder={placeholder}
         hasUploadBtn={hasUploadBtn}
+        sse={sse}
+        hasFooter={hasFooter}
       />
     </div>
   )

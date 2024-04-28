@@ -1,0 +1,10 @@
+.robot {
+  border: 1px solid #e0e6eb;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #fff;
+
+  .search-container {
+    min-width: 0 !important;
+  }
+}

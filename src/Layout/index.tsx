@@ -1,4 +1,4 @@
-import { ConfigProvider, Menu, MenuProps, Popover, Tooltip, Layout, Modal } from 'antd'
+import { ConfigProvider, Menu, MenuProps, Popover, Tooltip, Layout, Modal, FloatButton } from 'antd'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Sider from 'antd/es/layout/Sider'
 import React, { Suspense, useEffect, useState } from 'react'
@@ -13,7 +13,7 @@ import { logOut } from '@/store/reducers/login'
 import { getUserProfile } from '@/store/action/profileActions'
 import { AppDispatch, RootState } from '@/store'
 import { connect } from 'react-redux'
-import { initState, talkInitialState } from '@/store/reducers/talk'
+import { talkInitialState } from '@/store/reducers/talk'
 import GlobalLoading from '@/components/loading'
 import exitIcon from '@/assets/images/exit.svg'
 import blogIcon from '@/assets/images/blog.svg'
@@ -21,6 +21,8 @@ import reportIcon from '@/assets/images/report.svg'
 import collectIcon from '@/assets/images/collect.svg'
 import userImg from '@/assets/images/user.jpeg'
 import { desensitizePhone } from '@/utils'
+import Dialogue from '@/components/Dialogue'
+import Robot from '@/pages/Robot'
 // 导入子路由
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
 const Home = React.lazy(() => import('@/pages/Talk'))
@@ -41,11 +43,14 @@ const Index = ({ loading }: Props) => {
   const location = useLocation()
   const dispatch = useAppDispatch()
   const user = useAppSelector((state) => state.profileSlice.user)
+  // 聊天机器人是否折叠展开
+  const [isRobotCollapsed, setIsRobotCollapsed] = useState(false)
   const categoryItems: MenuItemType[] = menuConfig.map((item) => {
     return {
       key: item.key,
       icon: <i className={`iconfont ${item.icon}`}></i>,
-      label: item.label
+      label: item.label,
+      disabled: item.disabled
     }
   })
 
@@ -66,6 +71,7 @@ const Index = ({ loading }: Props) => {
   useEffect(() => {
     dispatch(getUserProfile(getAccountInfo().username))
   }, [dispatch])
+
   return (
     <ConfigProvider
       theme={{
@@ -99,6 +105,8 @@ const Index = ({ loading }: Props) => {
             trigger={
               <div className="logout">
                 <Popover
+                  overlayInnerStyle={{ padding: 0, borderRadius: 16 }}
+                  className="user-popover"
                   arrow={false}
                   content={
                     <div className="my-popper" role="tooltip" onClick={(e) => e.stopPropagation()}>
@@ -238,6 +246,23 @@ const Index = ({ loading }: Props) => {
               </Routes>
             </Suspense>
           </div>
+          {/* 客服机器人 */}
+          <FloatButton
+            type={isRobotCollapsed ? 'primary' : 'default'}
+            style={{
+              bottom: 180
+            }}
+            icon={isRobotCollapsed ? <i className="iconfont icon-x"></i> : <i className="iconfont icon-kefu"></i>}
+            tooltip={<span>GotoAI 智能客服</span>}
+            onClick={() => {
+              setIsRobotCollapsed(!isRobotCollapsed)
+            }}
+          />
+          <Robot
+            style={{
+              display: isRobotCollapsed ? '' : 'none'
+            }}
+          />
         </div>
       </Layout>
     </ConfigProvider>

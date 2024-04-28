@@ -1,6 +1,6 @@
-import axios, { AxiosError, AxiosResponse } from "axios"
-import { getTokenInfo, removeTokenInfo } from "./storage"
-import Toast from "@/components/Toast"
+import axios, { AxiosError, AxiosResponse } from 'axios'
+import { getTokenInfo, removeTokenInfo } from './storage'
+import Toast from '@/components/Toast'
 
 export const http = axios.create({
   timeout: 1000000000,
@@ -44,6 +44,9 @@ http.interceptors.response.use(
     return response.data
   },
   async (error: AxiosError<{ message: string }>) => {
+    if (error.code === 'ERR_CANCELED') {
+      return Promise.reject(error)
+    }
     if (!error.response) {
       // 如果因为网络原因 请求超时没有response
       Toast.notify({ type: 'error', message: '网络错误' })

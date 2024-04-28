@@ -608,9 +608,6 @@
     min-width: 450px
   }
 
-  .ant-upload-list {
-    display: none !important;
-  }
 
   .split-pane .react-split__sash {
     width: 10px !important;
@@ -629,7 +626,8 @@
     display: -webkit-box;
     display: -webkit-flex;
     display: -moz-box;
-    display: flex
+    display: flex;
+    margin-top: 0;
   }
 
   .init-page .warp {
@@ -945,4 +943,8 @@
       content: none;
     }
   }
+}
+
+.document .ant-upload-list {
+  display: none !important;
 }

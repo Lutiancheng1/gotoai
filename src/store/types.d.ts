@@ -55,6 +55,8 @@ export interface MessageInfo {
   createtime: string
   type: 0 | 1 //类型，0.user,1.ai
   resource: string
+  UUID?: string
+  isLoading?: boolean
   files?: {
     id: number
     chatMessageId: number
@@ -82,6 +84,7 @@ export interface ChatMessages {
   }
   conversationId: string
   menu: number
+  resource?: string
 }
 
 export interface DifyInfo {

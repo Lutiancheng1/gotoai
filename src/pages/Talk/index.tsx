@@ -50,7 +50,7 @@ export type UserPrompt = {
  */
 
 type Props = {} & Partial<talkInitialState>
-const Talk: React.FC = ({ isNewChat, currentConversation }: Props) => {
+const Talk: React.FC<Props> = ({ isNewChat, currentConversation }) => {
   // 存储开场白信息
   const [prologue, setPrologue] = useState<PrologueInfo>()
   // 当前用户推荐提词
@@ -138,7 +138,7 @@ const Talk: React.FC = ({ isNewChat, currentConversation }: Props) => {
                 </div>
               </div>
             )}
-            <Dialogue ref={dialogueRef} />
+            <Dialogue ref={dialogueRef} sse={true} />
           </div>
         </div>
       </Layout>

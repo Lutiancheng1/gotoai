@@ -15,6 +15,7 @@ import { dateFormat, randString } from '@/utils/libs'
 import { UploadRequestOption, UploadRequestError } from 'rc-upload/lib/interface'
 import Loading from '@/components/loading'
 import errorIcon from '@/assets/images/error.png'
+import NotFoundImg from '@/assets/images/NotFound.png'
 import { RcFile } from 'antd/es/upload'
 export interface Property {
   notifyHook?: any
@@ -501,7 +502,9 @@ const DrawDesigns = () => {
                         {tabs.map((item) => {
                           return (
                             <li className="mr-2" key={item} onClick={() => menuClick(item as ITab)}>
-                              <button className={`${item === currentTab ? 'active' : ''}`}>{tabsWarp[item]} </button>
+                              <button disabled={item !== 'imageCreation'} className={`${item === currentTab ? 'active' : ''}`}>
+                                {tabsWarp[item]}{' '}
+                              </button>
                             </li>
                           )
                         })}
@@ -567,9 +570,9 @@ const DrawDesigns = () => {
                   <div className="aspect flex items-center justify-between space-x-1">
                     {pictureRatioWarp.map((item, index) => {
                       return (
-                        <button className={`aspect-item flex-1 rounded border-2 dark:border-neutral-700 ${pictureRatio === item.label ? 'active' : ''}`} key={index} onClick={() => setPictureRatio(item.label)}>
+                        <button className={`aspect-item flex-1 rounded border-2 ${pictureRatio === item.label ? 'active' : ''}`} key={index} onClick={() => setPictureRatio(item.label)}>
                           <div className="aspect-box-wrapper mx-auto my-2 flex h-5 w-5 items-center justify-center">
-                            <div className="aspect-box rounded border-2 dark:border-neutral-700" style={{ width: item.w + '%', height: item.h + '%' }} />
+                            <div className="aspect-box rounded border-2" style={{ width: item.w + '%', height: item.h + '%' }} />
                           </div>
                           <p className="mb-1 text-center text-xs">{item.label}</p>
                         </button>
@@ -603,7 +606,7 @@ const DrawDesigns = () => {
                           }}
                           key={item}
                         >
-                          <button className="relative overflow-hidden rounded-md border-4 dark:border-neutral-700">
+                          <button className="relative overflow-hidden rounded-md border-4">
                             <span className="absolute flex h-full w-full items-center justify-center bg-black/20">
                               <span className="text-lg font-bold text-white">{item}</span>
                             </span>
@@ -780,9 +783,9 @@ const DrawDesigns = () => {
                 {/* 预览 */}
                 {!isShowTsT && base64List && base64List.length > 0 && (
                   //  圆角 边框
-                  <div className="mt-4 p-4" style={{ border: '1px solid #f0f0f0', borderRadius: '8px' }}>
+                  <div className="mt-4 p-4 bg-[#f6f7f9]" style={{ border: '1px solid #d9d9d9', borderRadius: '8px' }}>
                     <div className="mb-4">
-                      <Button type="primary" onClick={() => setBase64List([])}>
+                      <Button type="primary" danger onClick={() => setBase64List([])}>
                         清空参考图
                       </Button>
                     </div>
@@ -790,10 +793,10 @@ const DrawDesigns = () => {
                       {base64List.map((item) => {
                         return (
                           <div className="flex flex-col items-center gap-2" key={item.url}>
-                            <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-md border p-1">
+                            <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-md border ">
                               <img src={item.url} alt="" />
                             </div>
-                            <Button color="#da8583" type="default" icon={<i className="iconfont icon-shanchu1"></i>} onClick={() => setBase64List(base64List.filter((i) => i.url !== item.url))} shape="circle"></Button>
+                            <Button danger icon={<i className="iconfont icon-shanchu1"></i>} onClick={() => setBase64List(base64List.filter((i) => i.url !== item.url))} shape="circle"></Button>
                           </div>
                         )
                       })}
@@ -919,9 +922,9 @@ const DrawDesigns = () => {
                               }}
                               key={item.id}
                             >
-                              <div className="h-full relative overflow-hidden rounded-md border p-4 transition-all hover:shadow dark:border-neutral-700">
+                              <div className="h-full relative overflow-hidden rounded-md border p-4 transition-all hover:shadow">
                                 <div className="flex items-center justify-between">
-                                  <div className="n-tag __tag-dark-f4psvt-psc n-tag--round">
+                                  <div className="task_tag">
                                     {/* 任务状态: NOT_START（未启动）、SUBMITTED（已提交处理）、IN_PROGRESS（执行中）、FAILURE（失败）、SUCCESS（成功） */}
                                     <Tag
                                       color={
@@ -997,21 +1000,30 @@ const DrawDesigns = () => {
                                     {item.status === 'IN_PROGRESS' ||
                                       (item.status === 'SUCCESS' && (
                                         <a href={item.imageUrl.replace('https://cdn.discordapp.com/', 'https://mjcdn.achuanai.com/')} className="w-full h-full flex justify-center items-center cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                          <img className="cursor-pointer max-w-[100%] h-full" loading="lazy" src={item.imageUrl.replace('https://cdn.discordapp.com/', 'https://mjcdn.achuanai.com/')} alt="" />
+                                          <img
+                                            className="cursor-pointer max-w-[100%] h-full"
+                                            onError={(e) => {
+                                              // e.currentTarget.src = NotFoundImg // 设置默认图片
+                                              e.currentTarget.title = '图片无法加载' // 设置图片的 title 属性
+                                            }}
+                                            loading="lazy"
+                                            src={item.imageUrl.replace('https://cdn.discordapp.com/', 'https://mjcdn.achuanai.com/')}
+                                            alt=""
+                                          />
                                         </a>
                                       ))}
                                     {item.status === 'FAILURE' && (
-                                      <div className="flex h-full w-full rounded-md bg-[#fafafc] dark:bg-[#262629]">
+                                      <div className="flex h-full w-full rounded-md bg-[#fafafc] ">
                                         <div className="m-auto overflow-hidden text-center">
                                           <img src={errorIcon} alt="" className="inline-block text-[100px] h-[8rem] w-[8rem]" />
                                           <h2 className="text-base">任务失败</h2>
-                                          <div className="mt-2 text-sm line-clamp-3 text-slate-600 dark:text-slate-400">{item.failReason?.replace('[Invalid parameter]', '')}</div>
+                                          <div className="mt-2 text-sm line-clamp-3 text-slate-600 ">{item.failReason?.replace('[Invalid parameter]', '')}</div>
                                         </div>
                                       </div>
                                     )}
                                   </div>
                                 </div>
-                                <div className="-mx-4 -mb-4 h-full flex items-start bg-[#fafafc] px-4 py-2 dark:bg-[#262629]">
+                                <div className="-mx-4 -mb-4 h-full flex items-start bg-[#fafafc] px-4 py-2 ">
                                   <div className="flex-1">
                                     <div>
                                       {item.action === 'IMAGINE' || item.action === 'VARIATION' || item.action === 'REROLL' ? (
@@ -1097,7 +1109,7 @@ const DrawDesigns = () => {
               </div>
               {/* 分页 */}
               {taskList && (
-                <footer className="sticky bottom-0 left-0 right-0 mt-4 bg-[#f6f7f9] py-4 dark:bg-[#111114] pl-4">
+                <footer className="sticky bottom-0 left-0 right-0 mt-4 bg-[#f6f7f9] py-4 pl-4">
                   <Pagination onChange={changePagination} pageSizeOptions={['12', '24', '48', '96']} total={taskList.length} showTotal={(total, range) => `第${range[0]}-${range[1]}条 共 ${total} 条`} defaultPageSize={12} defaultCurrent={1} />
                 </footer>
               )}

@@ -1,9 +1,7 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { HistoryList, MessageInfo } from '../types'
-import { createChat, getConversitionDetail, getHistoryList, startChat } from '../action/talkActions'
+import { getConversitionDetail } from '../action/robotActions'
 import { ShartChatResp } from '@/types/app'
-import { Typewriter } from '@/utils/format'
-import { UUID } from '@/utils/libs'
 export type HistoryState = {
   rows: HistoryList[]
   recordCount: number
@@ -11,7 +9,7 @@ export type HistoryState = {
   pageIndex: number
   empty?: boolean
 }
-export type talkInitialState = {
+export type robotInitialState = {
   historyList: HistoryState
   // 当前会话id
   currentConversation: {
@@ -42,12 +40,12 @@ const initialState = {
   conversitionDetailList: [],
   loading: false,
   // 是否是新对话
-  isNewChat: false,
+  isNewChat: true,
   firstSend: true
-} as talkInitialState
+} as robotInitialState
 
 const talkSlice = createSlice({
-  name: 'talk',
+  name: 'robot',
   initialState,
   reducers: {
     // 数据同步到本地

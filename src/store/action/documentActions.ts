@@ -63,3 +63,9 @@ export const getDocumentMessages = createAsyncThunk('document/getDocumentMessage
   const res = await http.get('/Document/MessageList?fileId=' + id)
   return res
 })
+
+// 从系统文件拷贝新的文档
+export const copyDocument = createAsyncThunk('document/copyDocument', async () => {
+  const res = (await http.get('/Document/CopySystem')) as { code: number; msg: string; data: { fileId: string; url: string } }
+  return res
+})

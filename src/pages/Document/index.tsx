@@ -10,13 +10,13 @@ import Toast from '@/components/Toast'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { useAsyncEffect, useBoolean, useMount, useUnmount, useUpdateEffect } from 'ahooks'
 import { useAppDispatch } from '@/store/hooks'
-import { menuType } from '@/utils/constants'
+import { menuType, menuWarp } from '@/utils/constants'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { connect } from 'react-redux'
 import { RootState, AppDispatch } from '@/store'
 import newSessionIcon from '@/assets/images/new_session_icon.svg'
 import '@/components/history/index.css'
-import { delDocument, getDocumentList, getDocumentSummary } from '@/store/action/documentActions'
+import { copyDocument, delDocument, getDocumentList, getDocumentSummary } from '@/store/action/documentActions'
 import { DocFile, DocumentInitState, initState, toggleIsNewDoc, updateCurrentFile, updateDocLoading } from '@/store/reducers/document'
 
 import SplitPane, { Pane } from 'split-pane-react'
@@ -29,9 +29,20 @@ import quoteIcon from './images/toolbar/explain-hover.svg'
 import rewriteIcon from './images/toolbar/explain-hover.svg'
 import summaryIcon from './images/toolbar/explain-hover.svg'
 import translateIcon from './images/toolbar/explain-hover.svg'
+import document_translate from './images/document_translate.svg'
+import document_analyze from './images/document_analyze.svg'
+import document_question from './images/document_question.svg'
+import document_translate_bg from './images/document_translate_bg.png'
+import document_analyze_bg from './images/document_analyze_bg.png'
+import document_question_bg from './images/document_question_bg.png'
 import PDFViewer from '@/components/PDFViewer'
-import { getConversitionDetail } from '@/store/action/talkActions'
+import { getConversitionDetail, startChat } from '@/store/action/talkActions'
 import { UserPrompt } from '../Talk'
+import { getMenuPrologue } from '@/api/prologue'
+import { PrologueInfo } from '@/store/types'
+import { useLocation } from 'react-router-dom'
+import { ShartChatResp } from '@/types/app'
+import { AxiosError, CanceledError } from 'axios'
 
 const { Dragger } = Upload
 type UploadResult = { url: string; fileId: string; chat: { chatId: number; conversationId: string } }
@@ -39,6 +50,8 @@ type Props = {} & Partial<DocumentInitState> & Partial<talkInitialState>
 const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
   // 百分比进度
   const [progress, setProgress] = useState(0)
+  // 创建 AbortController 实例
+  const [abortController, setAbortController] = useState<AbortController | null>(null)
   const props: UploadProps = {
     name: 'file',
     accept: '.pdf',
@@ -78,6 +91,9 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
     async customRequest(options: UploadRequestOption) {
       let timer = null
       const { file } = options
+      // 每次上传前创建新的 AbortController 实例
+      const controller = new AbortController()
+      setAbortController(controller)
       try {
         const formData = new FormData()
         formData.append('file', file)
@@ -87,7 +103,9 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
             return progress + 1.5
           })
         }, 750)
-        const { data } = (await http.post('/Document/UploadFile?menu=1', formData)) as {
+        const { data } = (await http.post('/Document/UploadFile?menu=1', formData, {
+          signal: controller.signal
+        })) as {
           data: UploadResult
         }
         console.log(data)
@@ -126,7 +144,10 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
           setProgress(0)
           clearInterval(timer)
         }
-      } catch (error) {
+      } catch (error: AxiosError | CanceledError<AxiosError> | any) {
+        console.log(error)
+        clearInterval(timer as NodeJS.Timeout)
+        if (error.code === 'ERR_CANCELED') return
         Toast.notify({
           type: 'error',
           message: `${(file as RcFile).name} 上传失败!`
@@ -137,19 +158,46 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
       }
     }
   }
+
+  //
+  const cancelUpload = () => {
+    Modal.confirm({
+      title: '提示',
+      content: '确认取消上传吗?',
+      centered: true,
+      okText: '确认',
+      cancelText: '取消',
+      okType: 'primary',
+      maskClosable: true,
+      async onOk() {
+        // 调用 abort 方法取消请求
+        if (abortController) {
+          abortController.abort()
+          setAbortController(null) // 清除控制器实例
+          setProgress(0)
+          await dispatch(updateDocLoading(false))
+          Toast.notify({
+            message: '已取消上传',
+            type: 'success'
+          })
+        }
+      }
+    })
+  }
   const dispatch = useAppDispatch()
   // 记录历史折叠状态
   const [historyCollapsed, { toggle: setHistoryCollapsed }] = useBoolean(false)
   // 创建历史折叠按钮的ref
   const historyDivRef = useRef(null) as unknown as MutableRefObject<HTMLDivElement>
-  // 记录当前菜单的key
-  const currentMenuKey = useRef<menuType>(0)
   const [sizes, setSizes] = useState([50, 50])
   const [greeting, setGreeting] = useState('')
   const [uploadError, setUploadError] = useState(false)
   const [selectionText, setSelectionText] = useState('')
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   const [showMenu, setShowMenu] = useState(false)
+  const [initPrologue, setInitPrologue] = useState<PrologueInfo>()
+  const location = useLocation()
+
   // 获取子组件实例
   const dialogueRef = useRef<{ sendBeta: (defaultRule?: boolean, prompt?: UserPrompt) => Promise<void>; setSendValue: (value: string) => void }>()
   const onPrompt = (item: UserPrompt) => {
@@ -178,6 +226,12 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
       })
     }
     dispatch(toggleIsNewDoc(true))
+    dispatch(
+      updateCurrentId({
+        conversationId: '',
+        chatId: 0
+      })
+    )
     console.log(currentFile)
   }
 
@@ -192,6 +246,12 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
       loadMore(1)
       dispatch(toggleIsNewDoc(true))
     }
+    dispatch(
+      updateCurrentId({
+        conversationId: '',
+        chatId: 0
+      })
+    )
   }
 
   const loadMore = async (page?: number) => {
@@ -211,7 +271,10 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
     // 加载 PDF 文件
     toggleHistory(true)
     if (item.conversationid) {
-      //  获取对话列表
+      // loading
+      dispatch(updateLoading(true))
+      // 清空之前的会话详情
+      dispatch(clearConversitionDetailList())
       dispatch(toggleIsNewChat(false))
       // 切换当前会话id
       dispatch(
@@ -220,10 +283,6 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
           chatId: item.chatId
         })
       )
-      // loading
-      dispatch(updateLoading(true))
-      // 清空之前的会话详情
-      dispatch(clearConversitionDetailList())
       // 获取会话详情
       await dispatch(getConversitionDetail(item.chatId))
       // 关闭 loading
@@ -283,9 +342,50 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
       setShowMenu(false)
     }
   }
+  const getDefaultDoc = async (prompt: string) => {
+    dispatch(updateLoading(true))
+    const { payload: doc } = (await dispatch(copyDocument())) as {
+      payload: { code: number; msg: string; data: { fileId: string; url: string } }
+    }
+    if (!doc) return
+    // 加载文档摘要
+    const { payload: summary } = (await dispatch(getDocumentSummary(doc.data.fileId))) as { payload: { data: string } }
+    // 新建对话
+    const { payload: chat } = (await dispatch(
+      startChat({
+        menu: 1,
+        prompt: '',
+        promptId: 0,
+        fileId: doc.data.fileId
+      })
+    )) as { payload: ShartChatResp }
+
+    let docFIle = { fileid: doc.data.fileId, path: doc.data.url, chatId: chat.chatId, conversationid: chat.conversationId, summary: summary.data } as DocFile
+    await dispatch(updateCurrentFile(docFIle))
+    await dispatch(
+      updateCurrentId({
+        conversationId: chat.conversationId,
+        chatId: chat.chatId
+      })
+    )
+    await dispatch(toggleIsNewChat(false))
+    console.log(docFIle)
+    // 加载 PDF 文件
+    toggleHistory(true)
+    dispatch(updateLoading(false))
+    loadMore(1)
+    onPrompt({
+      content: prompt
+    } as UserPrompt)
+  }
   // 页面卸载 清空
   useUnmount(() => {
     dispatch(initState())
+  })
+  useMount(async () => {
+    const res = await getMenuPrologue(menuWarp[location.pathname])
+    if (!res.data) return
+    setInitPrologue(res.data)
   })
   useEffect(() => {
     const now = new Date()
@@ -387,139 +487,143 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
       </>
       {isNewDoc ? (
         <div className="upload-container">
-          <div className="upload-box">
-            <div className="title-box">
-              <p className="title">文档解读助手</p>
-              <p className="sub-title"> 上传一篇文档，可以针对文档内容进行问题解答，迎接更智能、更直观的处理文档方式。 </p>
-            </div>
-            <div className="sections">
-              <div className="section">
-                <div className="left">
-                  <div className="left-top">
-                    <p
-                      className="icon"
-                      style={{
-                        backgroundImage: 'url("https://sfile.chatglm.cn/chatglm/web/document_question_1692873581597.svg")'
-                      }}
-                    />
-                    <p className="text">文档提问</p>
-                  </div>
-                  <p className="left-middle">对文章提问，大模型利用文章内容回答</p>
-                  <p className="left-bottom" />
-                </div>
-                <div
-                  className="right"
-                  style={{
-                    backgroundImage: 'url("https://sfile.chatglm.cn/activeimg/bdms/6582b1f5b02c2c00505ff729")'
-                  }}
-                />
+          {initPrologue && (
+            <div className="upload-box">
+              <div className="title-box">
+                <p className="title">文档解读助手</p>
+                <p className="sub-title"> {initPrologue.content} </p>
               </div>
-              <div className="section">
-                <div className="left">
-                  <div className="left-top">
-                    <p
-                      className="icon"
-                      style={{
-                        backgroundImage: 'url("https://sfile.chatglm.cn/chatglm/web/document_analyze_1692873581597.svg")'
-                      }}
-                    />
-                    <p className="text">文档总结</p>
+              <div className="sections">
+                <div className="section" onClick={() => getDefaultDoc('GotoAI 是什么？')}>
+                  <div className="left">
+                    <div className="left-top">
+                      <p
+                        className="icon"
+                        style={{
+                          backgroundImage: `url(${document_question})`
+                        }}
+                      />
+                      <p className="text">文档提问</p>
+                    </div>
+                    <p className="left-middle">对文章提问，大模型利用文章内容回答</p>
+                    <p className="left-bottom" />
                   </div>
-                  <p className="left-middle">提取文章核心观点，要求简明扼要</p>
-                  <p className="left-bottom" />
-                </div>
-                <div
-                  className="right"
-                  style={{
-                    backgroundImage: 'url("https://sfile.chatglm.cn/activeimg/bdms/6582b207c49b9d0066b83c56")'
-                  }}
-                />
-              </div>
-              <div className="section">
-                <div className="left">
-                  <div className="left-top">
-                    <p
-                      className="icon"
-                      style={{
-                        backgroundImage: 'url("https://sfile.chatglm.cn/chatglm/web/document_translate_1692873581597.svg")'
-                      }}
-                    />
-                    <p className="text">文档翻译</p>
-                  </div>
-                  <p className="left-middle">选择文章中的内容翻译为英文</p>
-                  <p className="left-bottom" />
-                </div>
-                <div
-                  className="right"
-                  style={{
-                    backgroundImage: 'url("https://sfile.chatglm.cn/activeimg/bdms/6582b2174464eb0049b088ca")'
-                  }}
-                />
-              </div>
-            </div>
-            {!uploadError ? (
-              <>
-                <div className="my_upload bg-[#f6f9ff]" style={{ display: !docLoading ? '' : 'none' }}>
-                  <ConfigProvider
-                    theme={{
-                      components: {
-                        Upload: {
-                          colorBorder: '#2454ff'
-                        }
-                      }
+                  <div
+                    className="right"
+                    style={{
+                      backgroundImage: `url(${document_question_bg})`
                     }}
-                  >
-                    <Dragger {...props}>
-                      <div className="upload-outer-box">
-                        <div className="upload-inner-box">
-                          <div className="tip">
-                            <div className="tip-left" />
-                            <div className="tip-right">
-                              <p className="tip-right-title">
-                                <span className="blue">点击上传</span>
-                                <span>，</span>
-                                <span>或拖动文档到这里</span>
-                              </p>
-                              <p className="tip-right-subtitle">
-                                <span>支持PDF文件，文件大小不超过30M，不支持扫描件</span> <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)', marginLeft: 10 }} />
-                              </p>
+                  />
+                </div>
+                <div className="section" onClick={() => getDefaultDoc('请一句话总结GotoAI的优势')}>
+                  <div className="left">
+                    <div className="left-top">
+                      <p
+                        className="icon"
+                        style={{
+                          backgroundImage: `url(${document_analyze})`
+                        }}
+                      />
+                      <p className="text">文档总结</p>
+                    </div>
+                    <p className="left-middle">提取文章核心观点，要求简明扼要</p>
+                    <p className="left-bottom" />
+                  </div>
+                  <div
+                    className="right"
+                    style={{
+                      backgroundImage: `url(${document_analyze_bg})`
+                    }}
+                  />
+                </div>
+                <div className="section" onClick={() => getDefaultDoc('请将总结GotoAI解决了什么，然后将其翻译成英文')}>
+                  <div className="left">
+                    <div className="left-top">
+                      <p
+                        className="icon"
+                        style={{
+                          backgroundImage: `url(${document_translate})`
+                        }}
+                      />
+                      <p className="text">文档翻译</p>
+                    </div>
+                    <p className="left-middle">选择文章中的内容翻译为英文</p>
+                    <p className="left-bottom" />
+                  </div>
+                  <div
+                    className="right"
+                    style={{
+                      backgroundImage: `url(${document_translate_bg})`
+                    }}
+                  />
+                </div>
+              </div>
+              {!uploadError ? (
+                <>
+                  <div className="my_upload bg-[#f6f9ff]" style={{ display: !docLoading ? '' : 'none' }}>
+                    <ConfigProvider
+                      theme={{
+                        components: {
+                          Upload: {
+                            colorBorder: '#2454ff'
+                          }
+                        }
+                      }}
+                    >
+                      <Dragger {...props}>
+                        <div className="upload-outer-box">
+                          <div className="upload-inner-box">
+                            <div className="tip">
+                              <div className="tip-left" />
+                              <div className="tip-right">
+                                <p className="tip-right-title">
+                                  <span className="blue">点击上传</span>
+                                  <span>，</span>
+                                  <span>或拖动文档到这里</span>
+                                </p>
+                                <p className="tip-right-subtitle">
+                                  <span>支持PDF文件，文件大小不超过30M，不支持扫描件</span> <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)', marginLeft: 10 }} />
+                                </p>
+                              </div>
+                            </div>
+                            <div slot="tip" className="operation">
+                              <Input onClick={(e) => e.stopPropagation()} className="upload_input" autoComplete="off" placeholder="输入PDF文档链接" suffix={<i className="input-icon"></i>} />
                             </div>
                           </div>
-                          <div slot="tip" className="operation">
-                            <Input onClick={(e) => e.stopPropagation()} className="upload_input" autoComplete="off" placeholder="输入PDF文档链接" suffix={<i className="input-icon"></i>} />
-                          </div>
                         </div>
+                      </Dragger>
+                    </ConfigProvider>
+                  </div>
+                  <div className="analyze-box" style={{ display: docLoading ? '' : 'none' }}>
+                    <div className="analyze-title">
+                      <div className="analyze-title-text">
+                        <p className="analyze-doc-icon" />
+                        <p className="analyze-doc-text">正在学习，请勿关闭当前网页...</p>
                       </div>
-                    </Dragger>
-                  </ConfigProvider>
-                </div>
-                <div className="analyze-box" style={{ display: docLoading ? '' : 'none' }}>
-                  <div className="analyze-title">
-                    <div className="analyze-title-text">
-                      <p className="analyze-doc-icon" />
-                      <p className="analyze-doc-text">正在学习，请勿关闭当前网页...</p>
+                      <video src={require('@/assets/video/analyze.mp4')} autoPlay loop muted className="analyze-icon" />
                     </div>
-                    <video src={require('@/assets/video/analyze.mp4')} autoPlay loop muted className="analyze-icon" />
+                    <div className="analyze-progress overflow-hidden">
+                      <p className="analyze-progress-text" />
+                      <p className="analyze-progress-stop" onClick={cancelUpload}>
+                        停止
+                      </p>
+                      <div className="analyze-progress-bar" style={{ width: `${progress}%` }} />
+                    </div>
                   </div>
-                  <div className="analyze-progress overflow-hidden">
-                    <p className="analyze-progress-text" />
-                    <p className="analyze-progress-stop"> 停止 </p>
-                    <div className="analyze-progress-bar" style={{ width: `${progress}%` }} />
+                </>
+              ) : (
+                <div className="upload-status-outer-box">
+                  <div className="upload-status-inner-box">
+                    <img src={UploadErrorImg} alt="" />
+                    <p className="text">文档解析失败</p>
+                    <p className="operate-button error-button" onClick={() => setUploadError(false)}>
+                      上传其他文档
+                    </p>
                   </div>
                 </div>
-              </>
-            ) : (
-              <div className="upload-status-outer-box">
-                <div className="upload-status-inner-box">
-                  <img src={UploadErrorImg} alt="" />
-                  <p className="text">文档解析失败</p>
-                  <p className="operate-button error-button" onClick={() => setUploadError(false)}>
-                    上传其他文档
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       ) : (
         <div className="upload-dialog-container split-pane">
@@ -601,7 +705,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
                   autoToBottom={false}
                   initChildren={
                     currentFile && (
-                      <div className="init-page pt-[13px] mb-5">
+                      <div className="init-page mb-5">
                         <div className="warp">
                           <div className="inner">
                             <div className="init-text">

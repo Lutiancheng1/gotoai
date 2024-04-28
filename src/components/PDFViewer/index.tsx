@@ -94,6 +94,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp }) => {
     }
   }
   useEffect(() => {
+    if (!url) return
     const fetchPDF = async () => {
       try {
         if (containerRef.current) {
