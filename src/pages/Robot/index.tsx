@@ -26,6 +26,9 @@ import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { getTokenInfo } from '@/utils/storage'
 import { UUID } from '@/utils/libs'
 import TextArea from 'antd/es/input/TextArea'
+import ExcelPreview from '@/components/Excel'
+import WordPreview from '@/components/Docx'
+import CSVPreview from '@/components/Csv'
 
 type Props = {
   right?: number
@@ -37,8 +40,9 @@ type Props = {
   sse?: boolean
   hasFooter?: boolean
   style?: React.CSSProperties
+  onClose?: () => void
 } & Partial<robotInitialState>
-const Robot: React.FC<Props> = ({ right = 20, bottom = 230, isNewChat, conversitionDetailList, currentConversation, style, placeholder = '输入你的问题或需求', autoToBottom = true, sse = false }) => {
+const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversitionDetailList, currentConversation, style, placeholder = '输入你的问题或需求', autoToBottom = true, sse = false, onClose }) => {
   // 初始化问题Id
   let currentQuestion = currentConversation
   // 获取 dispatch 对象，用于触发 actions
@@ -67,6 +71,12 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 230, isNewChat, conversit
     }
   }
   const sendMessage = async () => {
+    if (!sendValue.trim()) {
+      // 去除输入框中的回车和换行符
+      setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
+      // 弹出提示框，提示需要输入内容
+      return Toast.notify({ type: 'info', message: '请输入内容' })
+    }
     // 如果消息正在加载中，则直接返回
     if (messageLoading) return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
     // 将输入框的内容发送给服务器
@@ -347,7 +357,7 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 230, isNewChat, conversit
   }, [autoToBottom && conversitionDetailList!?.length > 0])
   return (
     <div
-      className="robot absolute h-[640px] z-50 w-[400px] bg-white "
+      className="robot absolute h-[610px] z-50 w-[450px] bg-white animate__animated animate__fadeInUp animate__faster"
       style={{
         right,
         bottom,
@@ -358,6 +368,9 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 230, isNewChat, conversit
         <div className="flex items-center space-x-2">
           <img alt="logo" className="block w-auto h-6 undefined" src={logo} />
           <div className="text-sm font-bold ">智能客服</div>
+        </div>
+        <div className="icon-container icon-minus-container cursor-pointer" onClick={onClose}>
+          <i className="iconfont icon-jianhao" style={{ fontSize: '20px' }}></i>
         </div>
       </div>
       <div className="robot-container h-[calc(100%_-_56px)]">
@@ -382,6 +395,9 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 230, isNewChat, conversit
                       }}
                     ></div>
                   </div>
+                  {/* <ExcelPreview url="https://resource.gotoai.world/upload/2/20240428/e7c975264e6c4bbba770d1d3e82783d3.xlsx" /> */}
+                  {/* <WordPreview url="https://resource.gotoai.world/upload/2/20240428/a953c440de8c4670b9068922bda607d0.docx" /> */}
+                  {/* <CSVPreview url="https://resource.gotoai.world/upload/2/20240428/309d89d7a3794bea91a104303ff7016b.csv" /> */}
                 </div>
               </div>
               {/* <div className="followup-container">

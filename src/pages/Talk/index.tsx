@@ -1,17 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Layout, ConfigProvider } from 'antd'
 import './index.css'
-import { promptConfig } from '@/utils/constants'
 import History from '@/components/history'
 import { PrologueInfo } from '@/store/types'
-import Loading from '@/components/loading'
 import { AppDispatch, RootState } from '@/store'
 import { connect } from 'react-redux'
 import { talkInitialState } from '@/store/reducers/talk'
-import { getPrologue, getMenuPrologue } from '@/api/prologue'
-import { ipInCN } from '@/utils'
+import { getMenuPrologue } from '@/api/prologue'
 import Dialogue from '@/components/Dialogue'
 import { getUserPrompts } from '@/api/prompt'
+import WordPreview from '@/components/Docx'
+import ExcelPreview from '@/components/Excel'
 // 定义一个文件信息的类型
 type FileInfo = {
   // 文件的 id

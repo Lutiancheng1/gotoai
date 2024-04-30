@@ -91,7 +91,118 @@
       }
     }
 
+    .question-file {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 210px);
+      gap: 12px;
 
+      width: auto;
+      background: transparent;
+      padding: 0px;
+    }
+
+    .question-file .file-box {
+      width: 210px;
+      height: 56px;
+      padding: 8px 10px;
+      background: rgb(255, 255, 255);
+      margin-right: 12px;
+    }
+
+    .question-file .file-box .file,
+    .question-file .file-box {
+      box-sizing: border-box;
+      display: flex;
+      -webkit-box-align: center;
+      align-items: center;
+      gap: 10px;
+      border-radius: 8px;
+      background: linear-gradient(0deg, #f5f5f5, #f5f5f5);
+    }
+
+    .question-file .file-box .file {
+      width: 100%;
+      flex-shrink: 0;
+      -webkit-box-flex: 0;
+      flex-grow: 0;
+      position: relative;
+    }
+
+    .question-file .file-box .file .icon {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      background-size: cover;
+      background-repeat: no-repeat;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .question-file .file-box .file .icon .answer-error-icon {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .question-file .file-box .file .icon .answer-error-icon .file-retry-icon {
+      display: flex;
+      width: 20px;
+      height: 20px;
+      -webkit-box-pack: center;
+      justify-content: center;
+      -webkit-box-align: center;
+      align-items: center;
+      flex-shrink: 0;
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAMAAAANIilAAAAAZlBMVEVHcEz////////////////////////////////////////////////////////////////////////5QkL+z8/+0ND+3Nz8iYn+5+f/8/P7iYn8oKD/6Oj6Wlr8iIj+29v8lZX6Tk4nKiENAAAAEnRSTlMAf7+QYN8Q7yCAz1Bf0LCgr5/0ZNVmAAABQElEQVRIx+2W27KCMAxFobdQ8JoKouf+/z95dPQFSJogzvjifsQus5vZk6Yo3nq9grM7D4jojXXVLLI0OFCt5kMJONVehZPoVaWIVmtk5YXiK8CMoMlaRkHlAjZDN6jQiukVaGCgu+ZRpfrBC98UCdPUuZ8DZTxM4C1x7Dulo6Y0VfiQLuoUpR0Ht4rS9RzYKNrFwhhE1xnYDWA7D7YD2MyDN3I0edgPYJwHwxIYnwfDEphs2Okvpa+T3LAN+f/9+dyTPxg5JLysHE9ew3gG+lD/SX8fDUEynx8p/WpmYCTOdMwkGbm++AYGbmXXdOkjPQD30yedClnboaYwXVo79OkZKEbzKQ+dLmbschAfvLCSjrmlpMkvNE5YpTJP/Fre4zjrEDUrYLUl0aDcPis3CoxRo3femuv1we+sC8Vbr9c/jzx+702sp5MAAAAASUVORK5CYII=") 50% center / cover no-repeat;
+    }
+
+    .question-file .file-box .file .icon.icon-img {
+      border-radius: 8px;
+    }
+
+    .question-file .file-box .file .file-info {
+      width: calc(100% - 46px);
+      flex-shrink: 0;
+      -webkit-box-flex: 0;
+      flex-grow: 0;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      flex-direction: column;
+    }
+
+    .question-file .file-box .file .file-info .name {
+      width: 100%;
+      color: #1a2029;
+      font-size: 12px;
+      line-height: 20px;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .question-file .file-box .file .file-info .status .success {
+      display: flex;
+      -webkit-box-align: center;
+      align-items: center;
+      gap: 8px;
+      align-self: stretch;
+      overflow: hidden;
+      color: #838a95;
+      text-overflow: ellipsis;
+      font-family: "PingFang SC";
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 20px;
+    }
   }
 }
 
@@ -239,12 +350,10 @@
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, .05)
 }
 
-.dialogue-detail .session-box .copy_content:hover {
+/* .dialogue-detail .session-box .copy_content:hover {
   animation: pulse;
-  /* referring directly to the animation's @keyframe declaration */
   animation-duration: 1s;
-  /* don't forget to set a duration! */
-}
+} */
 
 pre code.hljs {
   display: block;

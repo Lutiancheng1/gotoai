@@ -7,7 +7,6 @@ import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
 import { talkInitialState } from '@/store/reducers/talk'
 import { UserPrompt } from '../Talk'
-import { PrologueInfo } from '@/store/types'
 type Props = {} & Partial<talkInitialState>
 const DataAnalysis = ({ isNewChat, loading }: Props) => {
   // 获取子组件实例
@@ -22,7 +21,7 @@ const DataAnalysis = ({ isNewChat, loading }: Props) => {
       <div className="analysis-container">
         <div className="analysis-box">
           {isNewChat && <InitPage onPromptClick={onPrompt} />}
-          <Dialogue ref={dialogueRef} hasUploadBtn={true} />
+          <Dialogue ref={dialogueRef} hasUploadBtn={true} multiple={true} />
         </div>
       </div>
     </div>

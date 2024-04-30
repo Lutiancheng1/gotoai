@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import Search from '../Search'
+import { useAppDispatch } from '@/store/hooks'
+import Search, { getIconUrlByFileType } from '../Search'
 import './index.css'
 import Toast from '../Toast'
 import { connect } from 'react-redux'
@@ -9,8 +9,6 @@ import { initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateCo
 import { addChatMessages, AddChatMessagesData, getHistoryList, startChat } from '@/store/action/talkActions'
 import dayjs from 'dayjs'
 import { useLocation } from 'react-router-dom'
-import { Typewriter } from '@/utils/format'
-import { StreamGpt } from '@/api/openai'
 import { menuType, menuWarp } from '@/utils/constants'
 import { Tooltip } from 'antd'
 import copy from 'copy-to-clipboard'
@@ -30,22 +28,28 @@ import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { getTokenInfo } from '@/utils/storage'
 import { UUID } from '@/utils/libs'
 import { http } from '@/utils/axios'
+import { isCsvFile, isExcelFile, isPdfFile, isWordFile } from '@/utils/is'
+import ExcelPreview from '../Excel'
+import { uploadFile } from '@/api/upload'
+import WordPreview from '../Docx'
+import PDFViewer from '../PDFViewer'
+import CSVPreview from '../Csv'
+import { formatFileSize, formatFileType } from '@/utils/format'
 // 定义一个文件信息的类型
 export type FileInfo = {
   // 文件的 id
-  file_id: string
+  id: string
   // 文件的名称
-  file_name: string
+  name: string
   // 文件的大小
-  file_size: number | string
+  size: number
   // 文件的 url
-  file_url: string
-  // 文件的高度
-  height: number
-  // 文件的宽度
-  width: number
+  url: string
   // 文件的头缀
   type: string
+  loading?: boolean
+  error?: boolean
+  uuid?: string
 }
 type ChatError = {
   message: string
@@ -74,10 +78,11 @@ type Props = {
   fileId?: string
   sse?: boolean
   hasFooter?: boolean
+  multiple?: boolean
   style?: React.CSSProperties
 } & Partial<talkInitialState>
 
-const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend, placeholder = '输入你的问题或需求', hasUploadBtn = false, initChildren, autoToBottom = true, fileId, sse = false, hasFooter = true }: Props, ref) => {
+const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend, placeholder = '输入你的问题或需求', hasUploadBtn = false, initChildren, autoToBottom = true, fileId, sse = false, hasFooter = true, multiple }: Props, ref) => {
   // 初始化问题Id
   let currentQuestion = currentConversation
   const location = useLocation()
@@ -95,8 +100,6 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   const innerBox = useRef<HTMLDivElement>(null)
   // 创建一个上传组件
   const uploadRef = useRef<HTMLInputElement>(null)
-  // 获取用户信息
-  const user = useAppSelector((state) => state.profileSlice.user)
   // 用于处理流式传输的数据
   const streamingText = useRef('')
   // 初始化文件列表
@@ -118,6 +121,10 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
         behavior: 'smooth'
       })
     }
+  }
+  // 刷新当前历史记录
+  const refreshHistoryList = () => {
+    dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
   }
   const onDownload = (src: string) => {
     fetch(src)
@@ -145,7 +152,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     //   }
     // }
     // 如果输入框为空，则提示用户输入内容
-    if (!sendValue && !sendValue.trim() && fileList.length === 0) {
+    if (!sendValue && !sendValue.trim()) {
       return Toast.notify({ type: 'info', message: '请输入内容' })
     }
     sendBeta()
@@ -169,7 +176,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       console.log('是新会话,创建一个新会话 ID为:', payload)
       console.log(currentQuestion, '更新questionId为新会话id')
       // 获取历史列表
-      dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
+      refreshHistoryList()
       // 更新当前 ID
       dispatch(updateCurrentId(currentQuestion as ShartChatResp))
       console.log('更新当前id', currentQuestion)
@@ -192,10 +199,17 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                 {
                   id: 0,
                   chatId: currentConversation!.chatId,
-                  content: prompt?.content || sendValue,
+                  content: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
                   type: 0,
-                  resource: (fileList.length > 0 && fileList[0].file_id) || '',
-                  createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
+                  resource: fileList.map((file) => file.id).join(',') || '',
+                  createtime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                  files: fileList.map((file) => ({
+                    id: file.id,
+                    name: file.name,
+                    url: file.url,
+                    type: file.type,
+                    size: file.size
+                  }))
                 },
                 {
                   id: 0,
@@ -211,10 +225,17 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
             : {
                 id: 0,
                 chatId: currentConversation!.chatId,
-                content: prompt?.content || sendValue,
+                content: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
                 type: 0,
-                resource: '',
-                createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
+                resource: fileList.map((file) => file.id).join(',') || '',
+                createtime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                files: fileList.map((file) => ({
+                  id: file.id,
+                  name: file.name,
+                  url: file.url,
+                  type: file.type,
+                  size: file.size
+                }))
               }
         )
       )
@@ -238,18 +259,18 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
             body: JSON.stringify({
               conversationId: currentQuestion!.conversationId,
               menu: currentMenuKey.current,
-              query: prompt?.content || sendValue
+              query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
             }),
             onopen(response) {
               // 建立连接的回调
               if (isNewChat) {
                 // 刷新当前历史记录
                 // 获取历史列表
-                dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
+                refreshHistoryList()
               }
               //第一次发送 更新左侧历史title
               if (firstSend) {
-                dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
+                refreshHistoryList()
               }
               // 当前发送完成后 不是第一次发送
               dispatch(toggleFirstSend(false))
@@ -296,24 +317,29 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
             addChatMessages({
               conversationId: currentQuestion!.conversationId,
               menu: currentMenuKey.current,
-              query: prompt?.content || sendValue,
-              resource: (fileList.length > 0 && fileList[0].file_id) || ''
+              query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
+              files: fileList.map((file) => file.id)
             })
           )) as { payload: AddChatMessagesData }
           if (payload) {
             let { message, files } = payload
             if (files.length > 0) {
               message += '</p><p>'
-              message += files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
+              message += files
+                .map((file) => {
+                  const isImage = file.type ? /(image|jpeg|jpg|gif|png)$/.test(file.type) : file.url.endsWith('.gif') || file.url.endsWith('.png') || file.url.endsWith('.jpg') || file.url.endsWith('.jpeg')
+                  return isImage ? `![图片](${file.url})` : `[文件](${file.url})`
+                })
+                .join('\n\n')
             }
             if (isNewChat) {
               // 刷新当前历史记录
               // 获取历史列表
-              await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
+              await refreshHistoryList()
             }
             //第一次发送 更新左侧历史title
             if (firstSend) {
-              await dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
+              await refreshHistoryList()
             }
             // 当前发送完成后 不是第一次发送
             dispatch(toggleFirstSend(false))
@@ -379,7 +405,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       //   }
       // }
       // 如果输入框为空
-      if (!sendValue.trim() && fileList.length === 0) {
+      if (!sendValue && !sendValue.trim()) {
         // 去除输入框中的回车和换行符
         setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
         // 弹出提示框，提示需要输入内容
@@ -462,36 +488,81 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     `
   }
   const uploadHandle = async (e: React.ChangeEvent<HTMLInputElement> | undefined) => {
-    // if (fileList.length > 10) return Toast.notify({ type: 'info', message: '最多上传十个文件' })
-    console.log(e?.target.files)
-
+    if (fileList.length > 9) return Toast.notify({ type: 'info', message: '最多上传十个文件' })
     if (!e!.target.files) return
     const files = e!.target.files
-    const supportedFormats = ['application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'text/csv']
+    const supportedFormats = ['excel', 'pdf', 'csv'] // 使用格式名称
+
     for (let i = 0; i < files.length; i++) {
-      if (!supportedFormats.includes(files[i].type)) {
-        return Toast.notify({ type: 'error', message: '文件格式不支持' })
-      }
-    }
-    // 上传文件
-    const formData = new FormData()
-    formData.append('file', files[0])
-    try {
-      const { data } = (await http.post('/Document/UploadFile?menu=' + currentMenuKey.current, formData)) as { data: { url: string; fileId: string } }
-      if (!data) return
-      // 上传成功后，将文件信息添加到 fileList 中
-      setFileList([
-        {
-          file_id: data.fileId,
-          file_name: files[0].name,
-          file_size: files[0].size,
-          file_url: data.url,
-          type: files[0].type
-        }
-      ] as FileInfo[])
-      Toast.notify({ type: 'success', message: '上传成功' })
-    } catch (error) {
-      Toast.notify({ type: 'error', message: '上传失败' })
+      const file = files[i]
+
+      // 创建一个AbortController，以便于后续可能需要取消上传
+      const controller = new AbortController()
+      const signal = controller.signal
+      let uuid = UUID()
+      // 将文件添加到fileList中
+
+      setFileList(
+        (prev) =>
+          [
+            ...prev,
+            {
+              uuid, // 将UUID添加到文件对象中
+              id: '',
+              name: file.name,
+              size: 0,
+              url: '',
+              type: file.type,
+              loading: true
+            }
+          ] as FileInfo[]
+      )
+      // 调用uploadFile方法上传每个文件
+      uploadFile(
+        currentMenuKey.current, // 假设这是你的menu参数
+        file,
+        signal,
+        (percentage) => {
+          console.log(`上传进度: ${percentage}%`, uuid) // 进度回调
+        },
+        (data) => {
+          // 成功回调
+          console.log('上传成功', data)
+          Toast.notify({ type: 'success', message: file.name + '上传成功' })
+          // 更新fileList或其他状态
+          setFileList((prev) =>
+            prev.map((item) =>
+              item.uuid === uuid // 使用UUID来匹配文件
+                ? {
+                    ...item,
+                    id: data.fileId,
+                    size: file.size,
+                    url: data.url,
+                    loading: false
+                  }
+                : item
+            )
+          )
+        },
+        (error) => {
+          setFileList((prev) =>
+            prev.map((item) =>
+              item.uuid === uuid // 使用UUID来匹配文件
+                ? {
+                    ...item,
+                    loading: false,
+                    error: true
+                  }
+                : item
+            )
+          )
+          // 失败回调
+          console.error('上传失败', error)
+          Toast.notify({ type: 'error', message: `${file.name}上传失败: ${error}` })
+        },
+        supportedFormats,
+        20 * 1024 * 1024
+      )
     }
   }
 
@@ -500,10 +571,6 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     sendBeta,
     setSendValue
   }))
-
-  useEffect(() => {
-    console.log(process.env, currentMenuKey.current, 'currentMenuKey.current')
-  }, [])
 
   // 当尺寸变化时，滚动到底部
   useUpdateEffect(() => {
@@ -549,10 +616,65 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                         </div>
                       </div>
                       <Tooltip title={'点击复制到输入框'} placement="bottom">
-                        <div className="chat-bubble answer copy_content cursor-pointer" onClick={() => setSendValue(item.content)}>
+                        <div
+                          className="chat-bubble answer copy_content cursor-pointer "
+                          style={{
+                            marginBottom: item.files && item.files.length > 0 ? '16px' : ''
+                          }}
+                          onClick={() => setSendValue(item.content)}
+                        >
                           {item.content}
                         </div>
                       </Tooltip>
+                      {item.files && item.files.length > 0 && (
+                        <>
+                          <div className="chat-image avatar">
+                            <div className="w-10 rounded-full">
+                              <img alt="" src={defaultAvatar} />
+                            </div>
+                          </div>
+                          <div className="chat-bubble answer min-w-[500px] overflow-auto">
+                            <div className="question-file">
+                              {item.files.length > 0 &&
+                                item.files.map((file) => {
+                                  return (
+                                    <div className="file-box" key={file.id}>
+                                      <div className="file">
+                                        <div className="icon" style={{ backgroundImage: `url(${getIconUrlByFileType(file.type)})` }} />
+                                        <div className="file-info">
+                                          <p className="name dot text-ellipsis" title={file.name}>
+                                            {file.name}
+                                          </p>
+                                          <div className="status">
+                                            <div className="success">
+                                              <p className="type">{formatFileType(file.type ? file.type : file.mimetype!)}</p>
+                                              <p className="size">{formatFileSize(file.size)}</p>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                            </div>
+                            {item.files.length > 0 &&
+                              item.files.map((file) => {
+                                if (isExcelFile(file.name)) {
+                                  return <ExcelPreview key={file.url} url={file.url} />
+                                } else if (isWordFile(file.name)) {
+                                  return <WordPreview key={file.url} url={file.url} />
+                                } else if (isPdfFile(file.name)) {
+                                  return <PDFViewer key={file.url} url={file.url} hasTools={false} handleMouseUp={() => {}} />
+                                } else if (isCsvFile(file.name)) {
+                                  return <CSVPreview key={file.url} url={file.url} />
+                                } else {
+                                  // 对于不支持的文件类型，可以选择不渲染或渲染一个默认组件
+                                  return null
+                                }
+                              })}
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
                   {item.type === 1 && (
@@ -606,6 +728,22 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     </Tooltip> */}
                             </div>
                           </div>
+                          {item.files &&
+                            item.files.length > 0 &&
+                            item.files.map((file) => {
+                              if (isExcelFile(file.name)) {
+                                return <ExcelPreview key={file.url} url={file.url} />
+                              } else if (isWordFile(file.name)) {
+                                return <WordPreview key={file.url} url={file.url} />
+                              } else if (isPdfFile(file.name)) {
+                                return <PDFViewer key={file.url} url={file.url} hasTools={false} handleMouseUp={() => {}} />
+                              } else if (isCsvFile(file.name)) {
+                                return <CSVPreview key={file.url} url={file.url} />
+                              } else {
+                                // 对于不支持的文件类型，可以选择不渲染或渲染一个默认组件
+                                return null
+                              }
+                            })}
                         </div>
                       </div>
                       {/* {index === conversitionDetailList.length - 1 && (
@@ -652,6 +790,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
         hasUploadBtn={hasUploadBtn}
         sse={sse}
         hasFooter={hasFooter}
+        multiple={multiple}
+        // scrollToBottom={scrollBottom}
       />
     </div>
   )

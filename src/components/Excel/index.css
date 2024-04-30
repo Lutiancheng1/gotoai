@@ -1,0 +1,40 @@
+/* ExcelPreview 组件的容器样式 */
+.excel-preview-container {
+  margin: 20px 0;
+  overflow-x: auto;
+  /* 如果表格宽度超出容器宽度，允许水平滚动 */
+}
+
+/* 表格基本样式 */
+.excel-preview-container table {
+  border-collapse: collapse;
+  /* 边框合并为单一边框 */
+  width: 100%;
+  /* 表格宽度填满容器 */
+  background-color: #fff;
+  /* 背景颜色 */
+}
+
+/* 表格单元格样式 */
+.excel-preview-container td {
+  border: 1px solid #ddd;
+  /* 单元格边框 */
+  padding: 8px;
+  /* 单元格内边距 */
+  text-align: left;
+  /* 文本对齐方式 */
+}
+
+/* 表格行样式：鼠标悬停 */
+.excel-preview-container tr:hover {
+  background-color: #f5f5f5;
+  /* 鼠标悬停时的背景颜色 */
+}
+
+/* 表头样式 */
+.excel-preview-container tr:first-child td {
+  font-weight: bold;
+  /* 字体加粗 */
+  background-color: #e9e9e9;
+  /* 背景颜色 */
+}

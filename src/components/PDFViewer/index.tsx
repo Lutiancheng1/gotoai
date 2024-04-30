@@ -15,6 +15,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 interface PDFViewerProps {
   url: string
   handleMouseUp: (event: MouseEvent) => void
+  hasTools?: boolean
 }
 const eventBus = new pdfjsViewer.EventBus()
 const linkService = new pdfjsViewer.PDFLinkService({
@@ -25,7 +26,7 @@ let viewContainer = null as HTMLDivElement | null
 let pdfPageView = null as pdfjsViewer.PDFPageView | null
 let loadingTask = null as pdfjsLib.PDFDocumentLoadingTask | null
 let loadingBar = null as HTMLDivElement | null
-const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp }) => {
+const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools = true }) => {
   const [numPages, setNumPages] = useState<number>(1)
   // 当前页面
   const [pageNumber, setPageNumber] = useState(1)
@@ -82,9 +83,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp }) => {
     linkService.setDocument(page)
     await pdfPageView.draw()
     const canvas = pdfPageView.canvas!
-
-    console.log(canvas, 'canvas----------------')
-
     // 调整文本层尺寸以匹配canvas层
     adjustTextLayerSize(pageNum, canvas.style.width, canvas.style.height)
 
@@ -163,7 +161,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp }) => {
   const scrollToPage = (pageNum: number) => {
     requestAnimationFrame(() => {
       let pageContainer = document.querySelector(`.page[data-page-number="${pageNum}"]`) as HTMLDivElement | null
-      if (pageContainer) {
+      if (pageContainer && viewContainer) {
         const topPosition = pageContainer.getBoundingClientRect().top + window.pageYOffset - containerRef.current!.getBoundingClientRect().top
         viewContainer!.scrollTo({ top: topPosition, behavior: 'smooth' })
       }
@@ -264,34 +262,36 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp }) => {
               </button>
             </div>
           </div>
-          <div id="toolbarViewerMiddle">
-            <div
-              className="splitToolbarButton"
-              style={{
-                alignItems: 'center',
-                display: 'flex'
-              }}
-            >
-              <button className="toolbarButton" id="zoomOut" title="缩小" disabled={scale === 0.5} onClick={zoomOut}>
-                <img src={minusIcon} alt="" />
-              </button>
+          {hasTools && (
+            <div id="toolbarViewerMiddle">
               <div
-                id="zoomValue"
+                className="splitToolbarButton"
                 style={{
-                  color: '#1a2029',
-                  float: 'left',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  padding: '0 10px'
+                  alignItems: 'center',
+                  display: 'flex'
                 }}
               >
-                {parseInt((scale * 100).toFixed(0)) + '%'}
+                <button className="toolbarButton" id="zoomOut" title="缩小" disabled={scale === 0.5} onClick={zoomOut}>
+                  <img src={minusIcon} alt="" />
+                </button>
+                <div
+                  id="zoomValue"
+                  style={{
+                    color: '#1a2029',
+                    float: 'left',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    padding: '0 10px'
+                  }}
+                >
+                  {parseInt((scale * 100).toFixed(0)) + '%'}
+                </div>
+                <button className="toolbarButton" id="zoomIn" title="放大" onClick={zoomIn}>
+                  <img src={plusIcon} alt="" />
+                </button>
               </div>
-              <button className="toolbarButton" id="zoomIn" title="放大" onClick={zoomIn}>
-                <img src={plusIcon} alt="" />
-              </button>
             </div>
-          </div>
+          )}
         </div>
         <div id="loadingBar">
           <div className="progress">

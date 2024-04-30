@@ -485,3 +485,46 @@
     min-width: 0 !important;
   }
 }
+
+#loadingBar {
+  /* Define these variables here, and not in :root, to avoid reflowing the
+       entire viewer when updating progress (see issue 15958). */
+  --progressBar-percent: 0%;
+  --progressBar-end-offset: 0;
+
+  position: absolute;
+  inset-inline: 0 var(--progressBar-end-offset);
+  height: 4px;
+  background-color: rgba(221, 221, 222, 1);
+  border-bottom: 1px solid rgba(184, 184, 184, 1);
+  transition-property: inset-inline-start;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
+}
+
+#outerContainer.sidebarOpen #loadingBar {
+  inset-inline-start: 200px;
+}
+
+#loadingBar .progress {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
+  width: 100%;
+  transform: scaleX(var(--progressBar-percent));
+  transform-origin: calc(50% - 50% * 1) 0;
+  height: 100%;
+  background-color: rgba(10, 132, 255, 1);
+  overflow: hidden;
+  transition: transform 200ms;
+}
+
+@keyframes progressIndeterminate {
+  0% {
+    transform: translateX(calc(-142px * 1));
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}

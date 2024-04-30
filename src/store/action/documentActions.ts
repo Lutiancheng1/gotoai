@@ -10,6 +10,7 @@ export type DocumentParams = Partial<{
   order: string
   startTime: string
   endTime: string
+  menu: number
 }>
 export type DocumentRes = {
   code: number

@@ -58,11 +58,13 @@ export interface MessageInfo {
   UUID?: string
   isLoading?: boolean
   files?: {
-    id: number
-    chatMessageId: number
+    id: number | string
+    chatMessageId?: number
     type: string
     url: string
-    mimetype: string
+    mimetype?: string
+    name: string
+    size: number
   }[]
 }
 
@@ -85,6 +87,7 @@ export interface ChatMessages {
   conversationId: string
   menu: number
   resource?: string
+  files?: string[]
 }
 
 export interface DifyInfo {

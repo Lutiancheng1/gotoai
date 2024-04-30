@@ -135,7 +135,9 @@
     color: #1a2029;
     font-size: 12px;
     line-height: 20px;
-    text-align: left
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .file-list-box .file-box .file .file-info .status .loading {

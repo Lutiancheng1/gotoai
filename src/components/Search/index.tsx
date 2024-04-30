@@ -4,6 +4,11 @@ import sendIcon from '@/assets/images/send.svg'
 import Footer from '../Footer'
 import './index.css'
 import { FileInfo } from '../Dialogue'
+import { formatFileSize, formatFileType } from '@/utils/format'
+import ExcelIcon from '@/assets/images/xlsx.png'
+import PdfIcon from '@/assets/images/pdf.png'
+import WordIcon from '@/assets/images/docx.png'
+import anyIcon from '@/assets/images/anyfile.png'
 /**
  * Renders the search component.
  *
@@ -33,9 +38,24 @@ type Props = {
   hasUploadBtn?: boolean
   sse?: boolean
   hasFooter?: boolean
+  scrollToBottom?: () => void
+  multiple?: boolean
 }
 
-export default function Search({ fileList, setFileList, sendValue, setSendValue, uploadHandle, sendMessage, messageLoading, enterMessage, uploadRef, placeholder, hasUploadBtn, sse, hasFooter }: Props) {
+export function getIconUrlByFileType(fileType: string): string {
+  const iconMap: { [key: string]: string } = {
+    'application/pdf': PdfIcon,
+    'application/msword': WordIcon,
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': WordIcon,
+    'application/vnd.ms-excel': ExcelIcon,
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ExcelIcon
+    // 其他文件类型...
+  }
+
+  return iconMap[fileType] || anyIcon // 如果找不到对应类型，返回默认图标的路径
+}
+
+export default function Search({ fileList, setFileList, sendValue, setSendValue, uploadHandle, sendMessage, messageLoading, enterMessage, uploadRef, placeholder, hasUploadBtn, sse, hasFooter, scrollToBottom, multiple }: Props) {
   return (
     <div className="search-box animate__bounceInUp">
       <div className="search-container">
@@ -45,18 +65,33 @@ export default function Search({ fileList, setFileList, sendValue, setSendValue,
               <div className="file-list-box">
                 {fileList.map((item) => {
                   return (
-                    <div className="file-box" key={item.file_id}>
+                    <div className="file-box" key={item.uuid}>
                       <div className="file">
-                        <div className="icon icon-img" style={{ backgroundImage: `url("${item.file_url}")` }}></div>
-                        <div className="file-info">
-                          <p className="name dot">{item.file_name}</p>
-                          <div className="status">
-                            <div className="success">
-                              <p className="type">{item.type}</p> <p className="size">{item.file_size}</p>
+                        <div className="icon icon-img" style={{ backgroundImage: `url(${getIconUrlByFileType(item.type)})` }}>
+                          {item.error && (
+                            <div className="answer-error-icon file-retry-cover">
+                              <p className="file-retry-icon" />
                             </div>
+                          )}
+                        </div>
+                        <div className="file-info">
+                          <p className="name dot text-ellipsis" title={item.name}>
+                            {item.name}
+                          </p>
+                          <div className="status">
+                            {item.loading && (
+                              <p className="flex text-xs">
+                                <span className="loading loading-spinner loading-xs mr-2"></span>上传中
+                              </p>
+                            )}
+                            {!item.error && !item.loading && (
+                              <div className="success">
+                                <p className="type">{formatFileType(item.type)}</p> <p className="size">{formatFileSize(item.size)}</p>
+                              </div>
+                            )}
                           </div>
                         </div>
-                        <p className="close" onClick={() => setFileList(fileList.filter((i) => i.file_id !== item.file_id))}></p>
+                        <p className="close" onClick={() => setFileList(fileList.filter((i) => i.uuid !== item.uuid))}></p>
                       </div>
                     </div>
                   )
@@ -66,14 +101,14 @@ export default function Search({ fileList, setFileList, sendValue, setSendValue,
 
             <div className="input-wrap">
               <div className="input-box-inner">
-                <TextArea value={sendValue} onKeyUp={(e) => enterMessage(e)} onChange={(e) => setSendValue(e.target.value)} placeholder={placeholder} autoSize={{ minRows: 1, maxRows: 9 }} />
+                <TextArea value={sendValue} onKeyUp={(e) => enterMessage(e)} onChange={(e) => setSendValue(e.target.value)} placeholder={placeholder} autoSize={{ minRows: 1, maxRows: 9 }} onFocus={scrollToBottom} />
               </div>
               <div className="search-interactive">
                 <div className="upload-image-wrap">
                   {hasUploadBtn && (
                     // <Tooltip title={<span className="text-12">最多上传十个文件,每个文件不超过20M</span>}>
-                    <Tooltip title={<span className="text-12">只支持一个文件,格式 pdf/csv/excel ,不超过20M</span>}>
-                      <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" style={{ display: 'none' }} />
+                    <Tooltip title={<span className="text-12">最多支持十个文件,格式 pdf/csv/excel ,不超过20M</span>}>
+                      <input onChange={(e) => uploadHandle(e)} ref={uploadRef} type="file" style={{ display: 'none' }} multiple={multiple} />
                       <div
                         className="upload-image-btn"
                         onClick={() => {

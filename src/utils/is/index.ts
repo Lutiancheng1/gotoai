@@ -53,3 +53,18 @@ export function isMap<T extends Map<any, any>>(value: T | unknown): value is T {
 export function isFile<T extends File>(value: T | unknown): value is T {
   return Object.prototype.toString.call(value) === '[object File]'
 }
+
+export function isExcelFile(fileName: string): boolean {
+  return /\.(xlsx|xls)$/i.test(fileName)
+}
+
+export function isWordFile(fileName: string): boolean {
+  return /\.(docx|doc)$/i.test(fileName)
+}
+
+export function isPdfFile(fileName: string): boolean {
+  return /\.pdf$/i.test(fileName)
+}
+export function isCsvFile(fileName: string): boolean {
+  return /\.csv$/i.test(fileName)
+}

@@ -42,10 +42,9 @@ import { getMenuPrologue } from '@/api/prologue'
 import { PrologueInfo } from '@/store/types'
 import { useLocation } from 'react-router-dom'
 import { ShartChatResp } from '@/types/app'
-import { AxiosError, CanceledError } from 'axios'
+import { uploadFile } from '@/api/upload'
 
 const { Dragger } = Upload
-type UploadResult = { url: string; fileId: string; chat: { chatId: number; conversationId: string } }
 type Props = {} & Partial<DocumentInitState> & Partial<talkInitialState>
 const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
   // 百分比进度
@@ -69,93 +68,58 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
         return
       }
     },
-    beforeUpload(file: RcFile) {
-      const isLt30M = file.size / 1024 / 1024 < 30
-      if (!isLt30M) {
-        Toast.notify({
-          type: 'error',
-          message: '文件大小不能超过 30MB!'
-        })
-      }
-      const isPdf = file.type === 'application/pdf'
-
-      if (!isPdf) {
-        Toast.notify({
-          type: 'error',
-          message: '只能上传pdf文件！'
-        })
-        return false
-      }
-      return isLt30M && isPdf
-    },
     async customRequest(options: UploadRequestOption) {
-      let timer = null
       const { file } = options
-      // 每次上传前创建新的 AbortController 实例
+      dispatch(updateDocLoading(true))
       const controller = new AbortController()
       setAbortController(controller)
-      try {
-        const formData = new FormData()
-        formData.append('file', file)
-        dispatch(updateDocLoading(true))
-        timer = setInterval(() => {
-          setProgress((progress) => {
-            return progress + 1.5
-          })
-        }, 750)
-        const { data } = (await http.post('/Document/UploadFile?menu=1', formData, {
-          signal: controller.signal
-        })) as {
-          data: UploadResult
-        }
-        console.log(data)
-        if (data) {
-          // 调用 onSuccess 回调函数，并将服务器响应作为参数传入
-          console.log(historyCollapsed, 'historyCollapsed')
-          Toast.notify({
-            type: 'success',
-            message: `${(file as RcFile).name} 上传成功!`
-          })
-          // 如果 侧边栏是展开的 就折叠
-          if (historyDivRef.current.style.display === '') {
-            toggleHistory(true)
-          }
-          // 加载文档摘要
-          const { payload } = (await dispatch(getDocumentSummary(data.fileId))) as { payload: { data: string } }
-          loadMore(1)
-          await dispatch(updateCurrentFile({ fileid: data.fileId, path: data.url, chatId: data.chat.chatId, conversationid: data.chat.conversationId, summary: payload.data } as unknown as DocFile))
-          dispatch(toggleIsNewChat(false))
-          dispatch(
-            updateCurrentId({
-              conversationId: data.chat.conversationId,
-              chatId: data.chat.chatId
+      await uploadFile(
+        1,
+        file as File,
+        controller.signal,
+        (progress) => {
+          setProgress(progress)
+        },
+        async (data) => {
+          if (data) {
+            // 调用 onSuccess 回调函数，并将服务器响应作为参数传入
+            Toast.notify({
+              type: 'success',
+              message: `${(file as RcFile).name} 上传成功!`
             })
-          )
-          await dispatch(updateDocLoading(false))
-          setProgress(0)
-          clearInterval(timer)
-        } else {
+            // 如果 侧边栏是展开的 就折叠
+            if (historyDivRef.current.style.display === '') {
+              toggleHistory(true)
+            }
+            // 加载文档摘要
+            const { payload } = (await dispatch(getDocumentSummary(data.fileId))) as { payload: { data: string } }
+            loadMore(1)
+            dispatch(updateCurrentFile({ fileid: data.fileId, path: data.url, chatId: data.chat.chatId, conversationid: data.chat.conversationId, summary: payload.data } as unknown as DocFile))
+            dispatch(toggleIsNewChat(false))
+            dispatch(
+              updateCurrentId({
+                conversationId: data.chat.conversationId,
+                chatId: data.chat.chatId
+              })
+            )
+            dispatch(updateDocLoading(false))
+            setProgress(0)
+          }
+        },
+        (error) => {
           Toast.notify({
             type: 'error',
-            message: `${(file as RcFile).name} 上传失败!`
+            message: `${error}`
           })
           setUploadError(true)
-          await dispatch(updateDocLoading(false))
+          // 调用 onError 回调函数，并将错误对象作为参数传入
+          dispatch(updateDocLoading(false))
           setProgress(0)
-          clearInterval(timer)
-        }
-      } catch (error: AxiosError | CanceledError<AxiosError> | any) {
-        console.log(error)
-        clearInterval(timer as NodeJS.Timeout)
-        if (error.code === 'ERR_CANCELED') return
-        Toast.notify({
-          type: 'error',
-          message: `${(file as RcFile).name} 上传失败!`
-        })
-        setUploadError(true)
-        // 调用 onError 回调函数，并将错误对象作为参数传入
-        await dispatch(updateLoading(false))
-      }
+        },
+
+        ['pdf'],
+        30 * 1024 * 1024
+      )
     }
   }
 
@@ -173,13 +137,8 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
         // 调用 abort 方法取消请求
         if (abortController) {
           abortController.abort()
-          setAbortController(null) // 清除控制器实例
-          setProgress(0)
           await dispatch(updateDocLoading(false))
-          Toast.notify({
-            message: '已取消上传',
-            type: 'success'
-          })
+          setProgress(0)
         }
       }
     })
@@ -259,7 +218,8 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
     await dispatch(
       getDocumentList({
         page: page ? page : fileList.pageIndex + 1,
-        pageSize: parseInt(window.innerHeight / 130 + '') + 1
+        pageSize: parseInt(window.innerHeight / 130 + '') + 1,
+        menu: 1
       })
     )
   }

@@ -31,6 +31,34 @@ export const formatTime = (num: number) => {
   }
   return `${num.toFixed(2)} ${units[index]}`
 }
+export function formatFileType(mimeType: string): string {
+  const typeMap: { [key: string]: string } = {
+    'application/pdf': 'PDF',
+    'application/msword': 'Word',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word (docx)',
+    'application/vnd.ms-excel': 'Excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel (xlsx)',
+    'text/csv': 'CSV',
+    'image/jpeg': 'JPEG 图片',
+    'image/png': 'PNG 图片',
+    'image/gif': 'GIF 图片',
+    'text/plain': '文本文件',
+    'application/zip': 'ZIP 压缩文件',
+    'application/x-rar-compressed': 'RAR 压缩文件',
+    'application/x-7z-compressed': '7z 压缩文件',
+    'video/mp4': 'MP4 视频',
+    'audio/mpeg': 'MP3 音频',
+    'application/vnd.ms-powerpoint': 'PowerPoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PowerPoint (pptx)',
+    'application/x-msdownload': '可执行文件',
+    'application/json': 'JSON 文件',
+    'application/xml': 'XML 文件',
+    'text/html': 'HTML 文件'
+    // 更多文件类型...
+  }
+
+  return typeMap[mimeType] || '未知格式'
+}
 
 // 解析Uint8Array 转为json 返回
 export const parsePack = (str: string) => {

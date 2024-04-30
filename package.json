@@ -17,10 +17,12 @@
     "axios": "^1.6.8",
     "copy-to-clipboard": "^3.3.3",
     "dayjs": "^1.11.10",
+    "docx-preview": "^0.3.0",
     "highlight.js": "^11.9.0",
     "http-proxy-middleware": "^3.0.0",
     "markdown-it": "^14.1.0",
     "openai": "^4.29.2",
+    "papaparse": "^5.4.1",
     "pdfjs-dist": "^4.1.392",
     "radash": "^12.1.0",
     "react": "^18.2.0",
@@ -34,7 +36,8 @@
     "swr": "^2.2.5",
     "typescript": "^4.9.5",
     "use-context-selector": "^1.4.4",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "craco start",
@@ -71,6 +74,7 @@
     "@types/jest": "^27.5.2",
     "@types/markdown-it": "^13.0.7",
     "@types/node": "^16.18.90",
+    "@types/papaparse": "^5.3.14",
     "@types/react": "^18.2.67",
     "@types/react-dom": "^18.2.22",
     "archiver": "^7.0.1",

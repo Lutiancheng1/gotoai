@@ -23,6 +23,8 @@ import userImg from '@/assets/images/user.jpeg'
 import { desensitizePhone } from '@/utils'
 import Dialogue from '@/components/Dialogue'
 import Robot from '@/pages/Robot'
+import { useMount } from 'ahooks'
+import { MJlogin } from '@/api/MJAIgcAPi'
 // 导入子路由
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
 const Home = React.lazy(() => import('@/pages/Talk'))
@@ -31,7 +33,7 @@ const Document = React.lazy(() => import('@/pages/Document'))
 const Code = React.lazy(() => import('@/pages/Code'))
 const KnowledgeBase = React.lazy(() => import('@/pages/KnowledgeBase'))
 const DataAnalysis = React.lazy(() => import('@/pages/DataAnalysis'))
-const DrawDesigns = React.lazy(() => import('@/pages/DrawDesigns'))
+const DrawDesigns = React.lazy(() => import('@/pages/DrawDesigns/index_new'))
 const Video = React.lazy(() => import('@/pages/Video'))
 const Application = React.lazy(() => import('@/pages/Application'))
 type Props = {} & Partial<talkInitialState>
@@ -71,7 +73,10 @@ const Index = ({ loading }: Props) => {
   useEffect(() => {
     dispatch(getUserProfile(getAccountInfo().username))
   }, [dispatch])
-
+  useMount(async () => {
+    // 登陆MJapi
+    await MJlogin()
+  })
   return (
     <ConfigProvider
       theme={{
@@ -248,17 +253,21 @@ const Index = ({ loading }: Props) => {
           </div>
           {/* 客服机器人 */}
           <FloatButton
-            type={isRobotCollapsed ? 'primary' : 'default'}
+            type="primary"
             style={{
-              bottom: 180
+              bottom: 160,
+              width: 50,
+              height: 50,
+              zIndex: 2
             }}
-            icon={isRobotCollapsed ? <i className="iconfont icon-x"></i> : <i className="iconfont icon-kefu"></i>}
+            icon={<i className="iconfont icon-kefu"></i>}
             tooltip={<span>GotoAI 智能客服</span>}
             onClick={() => {
               setIsRobotCollapsed(!isRobotCollapsed)
             }}
           />
           <Robot
+            onClose={() => setIsRobotCollapsed(false)}
             style={{
               display: isRobotCollapsed ? '' : 'none'
             }}

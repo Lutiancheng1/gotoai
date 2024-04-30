@@ -3,6 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 import { ChatMessages, GetHistoryFroMenu, HistoryList, MessageInfo, NewQuestion } from '../types'
 import { delHistory, saveHistoryList, updateConversitionDetailList, updateCurrentId, updateHistoryList } from '../reducers/talk'
 import { ShartChatResp } from '@/types/app'
+import { FileInfo } from '@/components/Dialogue'
 
 export type HisResponse = {
   rows: HistoryList[]
