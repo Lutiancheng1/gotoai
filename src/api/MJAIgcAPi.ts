@@ -63,6 +63,12 @@ request.interceptors.response.use(
         message: response.data.description,
         duration: 1000
       })
+    } else if ((response.data as MJResponse).code === 24) {
+      Toast.notify({
+        type: 'error',
+        message: '提示词包含敏感词',
+        duration: 1000
+      })
     } else {
       // code=21: 任务已存在，U时可能发生
       // code=23: 队列已满，请稍后尝试
@@ -131,11 +137,11 @@ export interface BlendParams {
 
 //  执行Blend操作，提交融图任务。
 export const submitBlend = async (params: BlendParams) => {
-  return await request.post('mj/submit/blend', params, {
+  return (await request.post('mj/submit/blend', params, {
     customConfig: {
       type: 'mj'
     }
-  })
+  })) as MJResponse
 }
 
 export interface ModalParams {
@@ -160,11 +166,11 @@ export interface DescribeParams {
 }
 // 执行Describe操作，提交图生文任务。
 export const submitDescribe = async (params: DescribeParams) => {
-  return await request.post('mj/submit/describe', params, {
+  return (await request.post('mj/submit/describe', params, {
     customConfig: {
       type: 'mj'
     }
-  })
+  })) as MJResponse
 }
 export interface ShortenParams {
   mode: 'RELAX' | 'FAST'

@@ -8,7 +8,7 @@ import { useBoolean, useMount, useRequest, useUnmount, useUpdateEffect } from 'a
 import MJIcon from '@/assets/images/mj.jpg'
 import NIJIIcon from '@/assets/images/niji.jpg'
 import { ITab, pictureRatioWarp, modelVersions, qualityLevels, tabs, tabsWarp, modalWarp, stylizationWarp, stylesWarp } from './constant'
-import { getTaskList, getTaskQueue, submitDrawAction, submitDrawImagine, TaskListResponse } from '@/api/MJAIgcAPi'
+import { getTaskList, getTaskQueue, submitDescribe, submitDrawAction, submitDrawImagine, TaskListResponse } from '@/api/MJAIgcAPi'
 import axios from 'axios'
 import { MD5 } from '@/utils/md5'
 import { dateFormat, randString } from '@/utils/libs'
@@ -54,6 +54,10 @@ export interface TaskList {
   buttons: Mjbutton[]
 }
 const labelMappings = {
+  'Upscale (2x)': '2倍采样',
+  'Upscale (4x)': '4倍采样',
+  'Redo Upscale (2x)': '重新2倍采样',
+  'Redo Upscale (4x)': '重新4倍采样',
   'Upscale (Subtle)': '微调上采样',
   'Redo Upscale (Subtle)': '重新轻微上采样',
   'Upscale (Creative)': '创意上采样',
@@ -129,7 +133,7 @@ const DrawDesigns = () => {
   const [submitLoading, setSubmitLoading] = useState(false)
   // prompt中 是否有参数
   const [withParamsPrompt, setWithParamsPrompt] = useState(false)
-  const regexp = /--(?:version|aspect|ar|quality|q|chaos|c|stylize|s|raw|fast|iw|no|style|relax|repeat|seed|stop|turbo|video|weird|iw)/
+  const regexp = /--(?:version|v|aspect|ar|quality|q|chaos|c|stylize|s|raw|fast|iw|no|style|relax|repeat|seed|stop|turbo|video|weird|iw)/
   // loading
   const [isLoading, setIsLoading] = useState(true)
   // 分页
@@ -137,10 +141,21 @@ const DrawDesigns = () => {
   const [pageSize, setPageSize] = useState(12)
   // 以图生图modal显示隐藏
   const [isShowTsT, setIsShowTsT] = useState(false)
+  // 以图生文字modal显示隐藏
+  const [isShowTsW, setIsShowTsW] = useState(false)
+  // 以图生文loading
+  const [tsWLoading, setTsWLoading] = useState(false)
+  // 融图modal显示隐藏
+  const [isShowRt, setIsShowRt] = useState(false)
+
   // 图生图 权重
   const [weights, setWeights] = useState(1)
-  // base64图片数组
-  const [base64List, setBase64List] = useState<UploadFile[]>([])
+  // 图生图base64图片数组
+  const [tstBase64List, setTstBase64List] = useState<UploadFile[]>([])
+  // 以图生文base64图片数组
+  const [tsWBase64List, setTsWBase64List] = useState<UploadFile[]>([])
+  // 融图base64图片数组
+  const [rtBase64List, setRtBase64List] = useState<UploadFile[]>([])
   // 预览visible
   const [previewVisible, setPreviewVisible] = useState(false)
   // 预览图片
@@ -227,17 +242,24 @@ const DrawDesigns = () => {
       manual: true
     })
 
+    // 立即执行一次轮询逻辑，然后设置定时器
+    const pollImmediatelyAndStartInterval = async (pollFunction: () => Promise<void>, interval: number, setIntervalRef: React.MutableRefObject<NodeJS.Timeout | null>): Promise<void> => {
+      await pollFunction() // 立即执行一次轮询
+      setIntervalRef.current = setInterval(pollFunction, interval) // 设置定时器继续轮询
+    }
+
     // 开始轮询任务队列
     const startPollingTaskQueue = () => {
       if (pollingTaskQueueInterval.current === null) {
-        pollingTaskQueueInterval.current = setInterval(async () => {
+        const pollFunction = async () => {
           const data = await getTaskQueueList()
           if (data) {
             setTaskQueueList(data)
             if (data.records.length === 0 || data.records.every((task) => task.progress === '100%')) {
               stopPollingTaskQueue() // 队列为空时停止轮询任务队列
               stopPollingTaskList()
-              getTaskList()
+              const data = await getTaskList()
+              if (data) setTaskList(data)
             } else {
               startPollingTaskList() // 开始轮询任务列表
             }
@@ -245,22 +267,15 @@ const DrawDesigns = () => {
             stopPollingTaskQueue()
             stopPollingTaskList()
           }
-        }, 7500) // 每5秒轮询一次任务队列
-      }
-    }
-
-    // 停止轮询任务队列
-    const stopPollingTaskQueue = () => {
-      if (pollingTaskQueueInterval.current) {
-        clearInterval(pollingTaskQueueInterval.current)
-        pollingTaskQueueInterval.current = null
+        }
+        pollImmediatelyAndStartInterval(pollFunction, 7500, pollingTaskQueueInterval) // 每7.5秒轮询一次任务队列
       }
     }
 
     // 开始轮询任务列表
     const startPollingTaskList = () => {
       if (pollingTaskListInterval.current === null) {
-        pollingTaskListInterval.current = setInterval(async () => {
+        const pollFunction = async () => {
           const data = await getTaskListData()
           if (data) {
             setTaskList(data)
@@ -271,10 +286,20 @@ const DrawDesigns = () => {
               })
               stopPollingTaskList()
               stopPollingTaskQueue()
-              getTaskList()
+              const data = await getTaskList()
+              if (data) setTaskList(data)
             }
           }
-        }, 4000) // 每2秒轮询一次任务列表
+        }
+        pollImmediatelyAndStartInterval(pollFunction, 4000, pollingTaskListInterval) // 每4秒轮询一次任务列表
+      }
+    }
+
+    // 停止轮询任务队列
+    const stopPollingTaskQueue = () => {
+      if (pollingTaskQueueInterval.current) {
+        clearInterval(pollingTaskQueueInterval.current)
+        pollingTaskQueueInterval.current = null
       }
     }
 
@@ -319,9 +344,11 @@ const DrawDesigns = () => {
     let resultPrompt = ''
     resultPrompt += `${prompt} `
     if (currentModel === 'MJ') {
-      resultPrompt += `--version ${currentVersion} --aspect ${pictureRatio} --stylize ${stylization} --quality ${quality} --chaos ${confusion} ${raw ? '--style raw' : ''} ${ignoreElements ? `--no ${ignoreElements}` : ''} ${repeate ? '--tile' : ''} ${base64List.length > 0 ? '--iw ' + weights : ''}`
+      resultPrompt += `--version ${currentVersion} --aspect ${pictureRatio} --stylize ${stylization} --quality ${quality} --chaos ${confusion} ${raw ? '--style raw' : ''} ${ignoreElements ? `--no ${ignoreElements}` : ''} ${repeate ? '--tile' : ''} ${
+        tstBase64List.length > 0 ? '--iw ' + weights : ''
+      }`
     } else {
-      resultPrompt += `--niji ${currentVersion} --aspect ${pictureRatio} --stylize ${stylization} --quality ${quality} --chaos ${confusion} ${currentStyle ? `--style ${currentStyle}` : ''} ${ignoreElements ? `--no ${ignoreElements}` : ''} ${base64List.length > 0 ? '--iw ' + weights : ''}`
+      resultPrompt += `--niji ${currentVersion} --aspect ${pictureRatio} --stylize ${stylization} --quality ${quality} --chaos ${confusion} ${currentStyle ? `--style ${currentStyle}` : ''} ${ignoreElements ? `--no ${ignoreElements}` : ''} ${tstBase64List.length > 0 ? '--iw ' + weights : ''}`
     }
     if (!withParams) {
       resultPrompt = prompt
@@ -330,7 +357,7 @@ const DrawDesigns = () => {
     try {
       const res = await submitDrawImagine({
         prompt: resultPrompt,
-        base64Array: base64List.length > 0 ? (base64List.map((item) => item.url) as [string]) : [],
+        base64Array: tstBase64List.length > 0 ? (tstBase64List.map((item) => item.url) as [string]) : [],
         notifyHook: '',
         state: '',
         mode: 'FAST'
@@ -338,9 +365,11 @@ const DrawDesigns = () => {
       setPrompt('')
       setIgnoreElements('')
       setSubmitLoading(false)
-      setBase64List([])
+      setTstBase64List([])
+      setTrueWithParams()
       if (res.code === 1) {
-        await getTaskQueueList()
+        await startPollingTaskList()
+        startPollingTaskQueue()
       }
     } catch (error) {
       console.log(error)
@@ -514,7 +543,7 @@ const DrawDesigns = () => {
       async onOk() {
         // let result = zoomInputRef.current ? zoomInputRef.current.resizableTextArea?.textArea.value : '' // 获取输入框的值
         // console.log('输入的缩放比例:', result) // 可以在这里使用输入的值
-
+        if (msg === '收藏') return
         const data = await submitDrawAction({
           mode: 'FAST',
           customId: b.customId,
@@ -563,8 +592,8 @@ const DrawDesigns = () => {
     const f = file as RcFile
     const res = (await getBase64(f)) as string
     if (res) {
-      setBase64List([
-        ...(base64List as []),
+      setTstBase64List([
+        ...(tstBase64List as []),
         {
           url: res,
           name: f.name,
@@ -574,8 +603,42 @@ const DrawDesigns = () => {
       ])
     }
   }
-  const onRemove = (file: UploadFile) => {
-    setBase64List(base64List.filter((item) => item.uid !== file.uid))
+  const customRequestTsW = async ({ file }: UploadRequestOption) => {
+    const f = file as RcFile
+    const res = (await getBase64(f)) as string
+    if (res) {
+      setTsWBase64List([
+        {
+          url: res,
+          name: f.name,
+          status: 'done',
+          uid: f.uid
+        }
+      ])
+    }
+  }
+  // 以图生图删除
+  const onTstRemove = (file: UploadFile) => {
+    setTstBase64List(tstBase64List.filter((item) => item.uid !== file.uid))
+  }
+  // 以图生文删除
+  const onTswRemove = (file: UploadFile) => {
+    setTsWBase64List(tsWBase64List.filter((item) => item.uid !== file.uid))
+  }
+  // 图生文ok
+  const onTswOk = async () => {
+    setTsWLoading(true)
+    const res = await submitDescribe({
+      mode: 'FAST',
+      base64: tsWBase64List.map((item) => item.url).join()
+    })
+    setTsWLoading(false)
+    setTsWBase64List([])
+    setIsShowTsW(false)
+    if (res.code === 1) {
+      startPollingTaskList()
+      startPollingTaskQueue()
+    }
   }
   return (
     <div className="drawDesigns">
@@ -643,12 +706,38 @@ const DrawDesigns = () => {
         <div className="p-2 flex">
           <div>上传图片：</div>
           <div>
-            <Upload beforeUpload={beforeUpload} customRequest={customRequest} listType="picture-card" fileList={base64List} onPreview={handlePreview} onRemove={onRemove}>
-              {base64List && base64List.length >= 2 ? null : <UploadOutlined />}
+            <Upload beforeUpload={beforeUpload} customRequest={customRequest} listType="picture-card" fileList={tstBase64List} onPreview={handlePreview} onRemove={onTstRemove}>
+              {tstBase64List && tstBase64List.length >= 2 ? null : <UploadOutlined />}
             </Upload>
             <Modal title="查看图片" open={previewVisible} footer={null} onCancel={() => setPreviewVisible(false)}>
               <img alt="" style={{ width: '100%' }} src={previewImage} />
             </Modal>
+          </div>
+        </div>
+      </Modal>
+      {/* 以图生文 */}
+      <Modal
+        title="以图生文"
+        open={isShowTsW}
+        onOk={onTswOk}
+        width={650}
+        onCancel={() => {
+          setIsShowTsW(false)
+          setTsWBase64List([])
+        }}
+        confirmLoading={tsWLoading}
+        okText="确认"
+        cancelText="取消"
+      >
+        <div className="text-sm p-3">
+          <p>上传一张图片生成相似的提示词</p>
+        </div>
+        <div className="p-2 flex">
+          <div>上传图片：</div>
+          <div>
+            <Upload beforeUpload={beforeUpload} customRequest={customRequestTsW} listType="picture-card" fileList={tsWBase64List} onRemove={onTswRemove}>
+              {tsWBase64List && tsWBase64List.length >= 1 ? null : <UploadOutlined />}
+            </Upload>
           </div>
         </div>
       </Modal>
@@ -869,40 +958,37 @@ const DrawDesigns = () => {
               <header className="mb-3">
                 <div className="title text-lg">AI绘画</div>
                 <div className="subtitle mb-2">基于Midjourney的AI绘画工具</div>
-                <p className="mb-2">图生图：生成类似风格或类型图像</p>
-                {/* 图生文：上传一张图片生成对应的提示词；融图：融合图片风格 */}
+                <p className="mb-2">图生图：生成类似风格或类型图像; 图生文：上传一张图片生成对应的提示词</p>
+
+                {/* ；融图：融合图片风格 */}
                 <div className="btns">
-                  <Button icon={<UploadOutlined />} type="primary" className="bg-blue-500" onClick={() => setIsShowTsT(true)}>
+                  <Button icon={<UploadOutlined />} type="primary" className="bg-blue-500 mr-2" onClick={() => setIsShowTsT(true)}>
                     以图生图（可选）
                   </Button>
-                  {/* <Upload {...props}>
-                    <Button type="primary" className="bg-blue-500" icon={<UploadOutlined />}>
-                      以图生文（可选）
-                    </Button>
-                  </Upload>
-                  <Upload {...props}>
-                    <Button type="primary" className="bg-blue-500" icon={<UploadOutlined />}>
-                      融图（可选）
-                    </Button>
-                  </Upload> */}
+                  <Button type="primary" className="bg-blue-500" icon={<UploadOutlined />} onClick={() => setIsShowTsW(true)}>
+                    以图生文（可选）
+                  </Button>
+                  {/* <Button type="primary" className="bg-blue-500" icon={<UploadOutlined />}>
+                    融图（可选）
+                  </Button> */}
                 </div>
                 {/* 预览 */}
-                {!isShowTsT && base64List && base64List.length > 0 && (
+                {!isShowTsT && tstBase64List && tstBase64List.length > 0 && (
                   //  圆角 边框
                   <div className="mt-4 p-4 bg-[#f6f7f9]" style={{ border: '1px solid #d9d9d9', borderRadius: '8px' }}>
                     <div className="mb-4">
-                      <Button type="primary" danger onClick={() => setBase64List([])}>
+                      <Button type="primary" danger onClick={() => setTstBase64List([])}>
                         清空参考图
                       </Button>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {base64List.map((item) => {
+                      {tstBase64List.map((item) => {
                         return (
                           <div className="flex flex-col items-center gap-2" key={item.url}>
                             <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-md border ">
                               <img src={item.url} alt="" />
                             </div>
-                            <Button danger icon={<i className="iconfont icon-shanchu1"></i>} onClick={() => setBase64List(base64List.filter((i) => i.url !== item.url))} shape="circle"></Button>
+                            <Button danger icon={<i className="iconfont icon-shanchu1"></i>} onClick={() => setTstBase64List(tstBase64List.filter((i) => i.url !== item.url))} shape="circle"></Button>
                           </div>
                         )
                       })}
@@ -912,9 +998,11 @@ const DrawDesigns = () => {
               </header>
               {/* 内容 */}
               <div className="w-full flex justify-between items-center mb-2">
-                <div>生成提示词 {withParamsPrompt ? '(提示词带有自定义参数，将不使用默认设定参数)' : ''}</div>
                 <div>
-                  <Button loading={promptTranslateLoading} type="primary" icon={<i className="iconfont icon-chajiantubiao_zhongyingfanyi"></i>} className="bg-blue-500" onClick={() => translate('prompt')}>
+                  生成提示词 {withParamsPrompt ? '(提示词带有自定义参数，将不使用默认设定参数)' : ''} <span className="text-gray-500 text-[10px]">可将图片URL地址放在提词最前面以当作垫图</span>
+                </div>
+                <div>
+                  <Button disabled={!prompt} loading={promptTranslateLoading} type="primary" icon={<i className="iconfont icon-chajiantubiao_zhongyingfanyi"></i>} className="bg-blue-500" onClick={() => translate('prompt')}>
                     翻译
                   </Button>
                 </div>
@@ -926,7 +1014,7 @@ const DrawDesigns = () => {
               <div className="w-full flex justify-between items-center mb-2">
                 <div>忽略元素（可选）</div>
                 <div>
-                  <Button loading={ignoreTranslateLoading} type="primary" icon={<i className="iconfont icon-chajiantubiao_zhongyingfanyi"></i>} className="bg-blue-500" onClick={() => translate('ignore')}>
+                  <Button disabled={!ignoreElements} loading={ignoreTranslateLoading} type="primary" icon={<i className="iconfont icon-chajiantubiao_zhongyingfanyi"></i>} className="bg-blue-500" onClick={() => translate('ignore')}>
                     翻译
                   </Button>
                 </div>
@@ -1058,7 +1146,7 @@ const DrawDesigns = () => {
                                         }[item.status] || '#fadb14'
                                       }
                                     >
-                                      {item.status === 'NOT_START' ? '未启动' : item.status === 'SUBMITTED' ? '已提交处理' : item.status === 'IN_PROGRESS' ? '执行中' : item.status === 'FAILURE' ? '失败' : '成功'}
+                                      {item.status === 'NOT_START' ? '未启动' : item.status === 'SUBMITTED' ? '已提交处理' : item.status === 'IN_PROGRESS' ? '执行中' : item.status === 'FAILURE' ? '失败' : item.status === 'MODAL' ? '需弹窗确认' : '成功'}
                                     </Tag>
                                   </div>
                                   <div className="flex items-center space-x-2">
@@ -1075,19 +1163,15 @@ const DrawDesigns = () => {
                                         }
                                       }}
                                     >
-                                      <div>
-                                        <Tooltip title={`${item.promptEn && item.promptEn.split('&').length > 1 ? item.promptEn.split('&')[item.promptEn.split('&').length - 1] : item.promptEn}`}>
-                                          <Button
-                                            onClick={() => setUsedPromot(item.promptEn.split('&').length > 1 ? item.promptEn.split('&')[item.promptEn.split('&').length - 1] : item.promptEn)}
-                                            type="default"
-                                            className="flex justify-center items-center btn_no_mr"
-                                            size="small"
-                                            icon={<i className="iconfont icon-huabi"></i>}
-                                          >
-                                            使用
-                                          </Button>
-                                        </Tooltip>
-                                      </div>
+                                      {item.action !== 'DESCRIBE' && (
+                                        <div>
+                                          <Tooltip title={item.promptEn && item.promptEn}>
+                                            <Button onClick={() => setUsedPromot(item.promptEn && item.promptEn)} type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-huabi"></i>}>
+                                              使用
+                                            </Button>
+                                          </Tooltip>
+                                        </div>
+                                      )}
                                       <div>
                                         <Button disabled={!item.imageUrl} onClick={() => downloadImage(item.imageUrl)} type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-xiazaitupian"></i>}>
                                           下载
@@ -1122,7 +1206,7 @@ const DrawDesigns = () => {
                                             }}
                                             loading="lazy"
                                             src={item.imageUrl}
-                                            alt={item.description}
+                                            alt=""
                                           />
                                         </a>
                                       ))}
@@ -1137,91 +1221,192 @@ const DrawDesigns = () => {
                                     )}
                                   </div>
                                 </div>
+
                                 <div className="-mx-4 -mb-4 h-full flex items-start bg-[#fafafc] px-4 py-2 ">
                                   <div className="flex-1">
                                     <div>
-                                      {['IMAGINE', 'VARIATION', 'REROLL', 'ZOOM', 'PAN'].includes(item.action) && (
+                                      {item.buttons && item.buttons.length > 0 && (
                                         <>
-                                          <div className="mb-2 flex items-center justify-between">
-                                            <span>放大：</span>
-                                            <Tooltip
-                                              title={
-                                                <>
-                                                  <p> 参数释义:放大某张图片 </p>
-                                                  <p> 如 U1 放大第一张图片，以此类推 </p>
-                                                </>
-                                              }
-                                            >
-                                              <InfoCircleOutlined rotate={180} />
-                                            </Tooltip>
-                                            <div className="flex-1">
-                                              <div className="flex items-center justify-around">
-                                                {item.buttons
-                                                  .filter((i) => i.label.startsWith('U'))
-                                                  .map((i, index) => {
-                                                    return (
-                                                      <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('U', item.id, i.customId, index + 1)}>
-                                                        {i.label}
-                                                      </Button>
-                                                    )
-                                                  })}
-                                                {item.buttons
-                                                  .filter((i) => i.label === '')
-                                                  .map((i) => (
-                                                    <Tooltip title={'重新生成'} key={i.customId}>
-                                                      <Button onClick={() => changeImagine('R', item.id, i.customId)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
-                                                    </Tooltip>
-                                                  ))}
+                                          {['IMAGINE', 'VARIATION', 'REROLL', 'ZOOM'].includes(item.action) && (
+                                            <>
+                                              <div className="mb-2 flex items-center justify-between">
+                                                <span>放大：</span>
+                                                <Tooltip
+                                                  title={
+                                                    <>
+                                                      <p> 参数释义:放大某张图片 </p>
+                                                      <p> 如 U1 放大第一张图片，以此类推 </p>
+                                                    </>
+                                                  }
+                                                >
+                                                  <InfoCircleOutlined rotate={180} />
+                                                </Tooltip>
+                                                <div className="flex-1">
+                                                  <div className="flex items-center justify-around">
+                                                    {item.buttons
+                                                      .filter((i) => i.label.startsWith('U'))
+                                                      .map((i, index) => {
+                                                        return (
+                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('U', item.id, i.customId, index + 1)}>
+                                                            {i.label}
+                                                          </Button>
+                                                        )
+                                                      })}
+                                                    {item.buttons
+                                                      .filter((i) => i.label === '')
+                                                      .map((i) => (
+                                                        <Tooltip title={'重新生成'} key={i.customId}>
+                                                          <Button onClick={() => changeImagine('R', item.id, i.customId)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
+                                                        </Tooltip>
+                                                      ))}
+                                                  </div>
+                                                </div>
                                               </div>
-                                            </div>
-                                          </div>
-                                          <div className="mb-2 flex items-center justify-between">
-                                            <span>变换：</span>
-                                            <Tooltip
-                                              title={
-                                                <>
-                                                  <p>参数释义:以某张图片为基准重新生成</p>
-                                                  <p>如 V1 则变换第一张图片，以此类推 </p>
-                                                </>
-                                              }
-                                            >
-                                              <InfoCircleOutlined rotate={180} />
-                                            </Tooltip>
-                                            <div className="flex-1">
-                                              <div className="flex items-center justify-around">
-                                                {item.buttons
-                                                  .filter((i) => i.label.startsWith('V'))
-                                                  .map((i, index) => {
-                                                    return (
-                                                      <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('V', item.id, i.customId, index + 1)}>
-                                                        {i.label}
-                                                      </Button>
-                                                    )
-                                                  })}
-                                                <Button className="opacity-0" type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
+                                              <div className="mb-2 flex items-center justify-between">
+                                                <span>变换：</span>
+                                                <Tooltip
+                                                  title={
+                                                    <>
+                                                      <p>参数释义:以某张图片为基准重新生成</p>
+                                                      <p>如 V1 则变换第一张图片，以此类推 </p>
+                                                    </>
+                                                  }
+                                                >
+                                                  <InfoCircleOutlined rotate={180} />
+                                                </Tooltip>
+                                                <div className="flex-1">
+                                                  <div className="flex items-center justify-around">
+                                                    {item.buttons
+                                                      .filter((i) => i.label.startsWith('V'))
+                                                      .map((i, index) => {
+                                                        return (
+                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('V', item.id, i.customId, index + 1)}>
+                                                            {i.label}
+                                                          </Button>
+                                                        )
+                                                      })}
+                                                    <Button className="opacity-0" type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
+                                                  </div>
+                                                </div>
                                               </div>
+                                            </>
+                                          )}
+                                          {['PAN'].includes(item.action) && (
+                                            <>
+                                              <div className="mb-2 flex items-center justify-between min-h-[56px]">
+                                                <span>放大：</span>
+                                                <Tooltip
+                                                  title={
+                                                    <>
+                                                      <p> 参数释义:放大某张图片 </p>
+                                                      <p> 如 U1 放大第一张图片，以此类推 </p>
+                                                    </>
+                                                  }
+                                                >
+                                                  <InfoCircleOutlined rotate={180} />
+                                                </Tooltip>
+                                                <div className="flex-1">
+                                                  <div className="flex items-center justify-around">
+                                                    {item.buttons
+                                                      .filter((i) => i.label.startsWith('U'))
+                                                      .map((i, index) => {
+                                                        return (
+                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('U', item.id, i.customId, index + 1)}>
+                                                            {i.label}
+                                                          </Button>
+                                                        )
+                                                      })}
+                                                    {item.buttons
+                                                      .filter((i) => i.label === '')
+                                                      .map((i) => (
+                                                        <Tooltip title={'重新生成'} key={i.customId}>
+                                                          <Button onClick={() => changeImagine('R', item.id, i.customId)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
+                                                        </Tooltip>
+                                                      ))}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </>
+                                          )}
+                                          {['UPSCALE'].includes(item.action) && (
+                                            <div
+                                              className="mb-2 grid grid-cols-7 gap-4 min-h-[56px]"
+                                              style={{
+                                                alignItems: item.buttons.length > 7 ? 'flex-start' : 'center'
+                                              }}
+                                            >
+                                              {item.buttons.map((b, i) => (
+                                                <Tooltip key={b.customId} title={b.label ? labelMappings[b.label] : labelMappings[b.emoji]}>
+                                                  <Button
+                                                    onClick={() => submitAction(b, item, b.label ? labelMappings[b.label] : labelMappings[b.emoji])}
+                                                    disabled={item.status === 'FAILURE' || b.label === 'Custom Zoom'}
+                                                    type="default"
+                                                    size="small"
+                                                    icon={b.emoji === 'upscale_1' || b.emoji === '⏫' ? <i className="iconfont icon-julong" /> : b.emoji === '🖌️' ? <i className="iconfont icon-huabi1" /> : b.emoji}
+                                                  ></Button>
+                                                </Tooltip>
+                                              ))}
                                             </div>
-                                          </div>
+                                          )}
+                                          {['DESCRIBE'].includes(item.action) && (
+                                            <>
+                                              <div className="mb-2 flex items-center justify-between">
+                                                <span>类型：</span>
+                                                <div className="flex-1">图生文</div>
+                                              </div>
+                                              <div className="mb-2 flex items-center justify-between">
+                                                <span>提示词：</span>
+                                                <Tooltip
+                                                  title={
+                                                    <>
+                                                      <p> 参数释义:点击可以使用提示词 </p>
+                                                      <p> 如 P1 则为第一个提示词，以此类推</p>
+                                                    </>
+                                                  }
+                                                >
+                                                  <InfoCircleOutlined rotate={180} />
+                                                </Tooltip>
+                                                <div className="flex-1">
+                                                  <div className="flex items-center justify-around">
+                                                    {item.promptEn &&
+                                                      item.promptEn
+                                                        .replaceAll(/\d️⃣/g, '') // 使用正则表达式匹配并替换所有的数字序号
+                                                        .split('\n\n')
+                                                        .map((b, i) => (
+                                                          <Tooltip key={i} title={b}>
+                                                            <Button
+                                                              onClick={() => {
+                                                                setPrompt(b)
+                                                                Toast.notify({
+                                                                  type: 'success',
+                                                                  message: '已使用，请查看提词框'
+                                                                })
+                                                              }}
+                                                              disabled={item.status === 'FAILURE'}
+                                                              type="default"
+                                                              size="small"
+                                                            >
+                                                              P{i + 1}
+                                                            </Button>
+                                                          </Tooltip>
+                                                        ))}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </>
+                                          )}
                                         </>
                                       )}
-                                      {['UPSCALE'].includes(item.action) && (
-                                        <div className="mb-2 grid grid-cols-7 gap-4 min-h-[56px]">
-                                          {item.buttons.map((b, i) => (
-                                            <Tooltip key={b.customId} title={b.label ? labelMappings[b.label] : labelMappings[b.emoji]}>
-                                              <Button
-                                                onClick={() => submitAction(b, item, b.label ? labelMappings[b.label] : labelMappings[b.emoji])}
-                                                disabled={item.status === 'FAILURE' || b.label === 'Custom Zoom'}
-                                                type="default"
-                                                size="small"
-                                                icon={b.emoji === 'upscale_1' ? <i className="iconfont icon-julong" /> : b.emoji === '🖌️' ? <i className="iconfont icon-huabi1" /> : b.emoji}
-                                              ></Button>
-                                            </Tooltip>
-                                          ))}
+                                      {item.startTime && (
+                                        <div
+                                          className="flex items-center justify-between text-slate-500"
+                                          style={{
+                                            marginTop: item.buttons && item.buttons.length === 0 ? 64 : 0
+                                          }}
+                                        >
+                                          <span>时间：{dateFormat(item.startTime, 'yyyy-MM-dd HH:mm:ss')}</span>
                                         </div>
                                       )}
-                                      <div className="flex items-center justify-between text-slate-500">
-                                        <span>时间：{dateFormat(item.startTime, 'yyyy-MM-dd HH:mm:ss')}</span>
-                                      </div>
                                     </div>
                                   </div>
                                 </div>
