@@ -21,13 +21,12 @@ import stopIcon from '@/assets/images/session_stop_icon2.svg'
 import refreshIcon from '@/assets/images/refresh.png'
 import { MessageInfo } from '@/store/types'
 import { UserPrompt } from '@/pages/Talk'
-import { useAsyncEffect, useMount, useSize, useUpdateEffect } from 'ahooks'
+import { useSize, useUnmount, useUpdateEffect } from 'ahooks'
 import { ShartChatResp } from '@/types/app'
 import { imgLazyload } from '@mdit/plugin-img-lazyload'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import { getTokenInfo } from '@/utils/storage'
 import { UUID } from '@/utils/libs'
-import { http } from '@/utils/axios'
 import { isCsvFile, isExcelFile, isPdfFile, isWordFile } from '@/utils/is'
 import ExcelPreview from '../Excel'
 import { uploadFile } from '@/api/upload'
@@ -145,12 +144,6 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     if (messageLoading) return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
     // 将输入框的内容发送给服务器
     setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
-    //
-    // if (fileList.length > 0) {
-    //   if (!sendValue && !sendValue.trim()) {
-    //     return Toast.notify({ type: 'info', message: '请输入需要分析的内容' })
-    //   }
-    // }
     // 如果输入框为空，则提示用户输入内容
     if (!sendValue && !sendValue.trim()) {
       return Toast.notify({ type: 'info', message: '请输入内容' })
@@ -208,6 +201,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                     name: file.name,
                     url: file.url,
                     type: file.type,
+                    mimetype: file.type,
                     size: file.size
                   }))
                 },
@@ -234,6 +228,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                   name: file.name,
                   url: file.url,
                   type: file.type,
+                  mimetype: file.type,
                   size: file.size
                 }))
               }
@@ -399,11 +394,6 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     }
     // 如果按下的是回车键
     if (e.keyCode === 13) {
-      // if (fileList.length > 0) {
-      //   if (!sendValue && !sendValue.trim()) {
-      //     return Toast.notify({ type: 'info', message: '请输入需要分析的内容' })
-      //   }
-      // }
       // 如果输入框为空
       if (!sendValue && !sendValue.trim()) {
         // 去除输入框中的回车和换行符
@@ -595,8 +585,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   }, [dispatch, location.pathname])
 
   // 初始化
-  useMount(async () => {
-    await dispatch(initState())
+  useUnmount(() => {
+    dispatch(initState())
   })
   return (
     <div className="dialogue-detail" style={style}>
@@ -616,38 +606,22 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                         </div>
                       </div>
                       <Tooltip title={'点击复制到输入框'} placement="bottom">
-                        <div
-                          className="chat-bubble answer copy_content cursor-pointer "
-                          style={{
-                            marginBottom: item.files && item.files.length > 0 ? '16px' : ''
-                          }}
-                          onClick={() => setSendValue(item.content)}
-                        >
-                          {item.content}
-                        </div>
-                      </Tooltip>
-                      {item.files && item.files.length > 0 && (
-                        <>
-                          <div className="chat-image avatar">
-                            <div className="w-10 rounded-full">
-                              <img alt="" src={defaultAvatar} />
-                            </div>
-                          </div>
-                          <div className="chat-bubble answer min-w-[500px] overflow-auto">
-                            <div className="question-file">
+                        <div className="chat-bubble answer copy_content cursor-pointer " onClick={() => setSendValue(item.content)}>
+                          {item.files && item.files.length > 0 && (
+                            <div className="question-file mb-3">
                               {item.files.length > 0 &&
                                 item.files.map((file) => {
                                   return (
                                     <div className="file-box" key={file.id}>
                                       <div className="file">
-                                        <div className="icon" style={{ backgroundImage: `url(${getIconUrlByFileType(file.type)})` }} />
+                                        <div className="icon" style={{ backgroundImage: `url(${getIconUrlByFileType(file.mimetype!)})` }} />
                                         <div className="file-info">
                                           <p className="name dot text-ellipsis" title={file.name}>
                                             {file.name}
                                           </p>
                                           <div className="status">
                                             <div className="success">
-                                              <p className="type">{formatFileType(file.type ? file.type : file.mimetype!)}</p>
+                                              <p className="type">{formatFileType(file.mimetype!)}</p>
                                               <p className="size">{formatFileSize(file.size)}</p>
                                             </div>
                                           </div>
@@ -657,7 +631,11 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                                   )
                                 })}
                             </div>
-                            {item.files.length > 0 &&
+                          )}
+                          {item.content}
+                        </div>
+                      </Tooltip>
+                      {/* {item.files.length > 0 &&
                               item.files.map((file) => {
                                 if (isExcelFile(file.name)) {
                                   return <ExcelPreview key={file.url} url={file.url} />
@@ -671,10 +649,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                                   // 对于不支持的文件类型，可以选择不渲染或渲染一个默认组件
                                   return null
                                 }
-                              })}
-                          </div>
-                        </>
-                      )}
+                              })} */}
                     </div>
                   )}
                   {item.type === 1 && (

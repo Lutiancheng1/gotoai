@@ -1,5 +1,4 @@
 import './index.css'
-import pdfIcon from '@/assets/images/pdf-session.svg'
 import type { UploadFile, UploadProps } from 'antd'
 import { ConfigProvider, Input, message, Modal, Tooltip, Upload } from 'antd'
 import { InfoCircleOutlined } from '@ant-design/icons'
@@ -18,11 +17,10 @@ import newSessionIcon from '@/assets/images/new_session_icon.svg'
 import '@/components/history/index.css'
 import { copyDocument, delDocument, getDocumentList, getDocumentSummary } from '@/store/action/documentActions'
 import { DocFile, DocumentInitState, initState, toggleIsNewDoc, updateCurrentFile, updateDocLoading } from '@/store/reducers/document'
-
 import SplitPane, { Pane } from 'split-pane-react'
 import 'split-pane-react/esm/themes/default.css'
 import Dialogue from '@/components/Dialogue'
-import { clearConversitionDetailList, talkInitialState, toggleIsNewChat, updateCurrentId, updateLoading } from '@/store/reducers/talk'
+import { clearConversitionDetailList, toggleIsNewChat, updateCurrentId, updateLoading } from '@/store/reducers/talk'
 import UploadErrorImg from '@/assets/images/upload-error.svg'
 import explainIcon from './images/toolbar/explain-hover.svg'
 import quoteIcon from './images/toolbar/explain-hover.svg'
@@ -35,6 +33,8 @@ import document_question from './images/document_question.svg'
 import document_translate_bg from './images/document_translate_bg.png'
 import document_analyze_bg from './images/document_analyze_bg.png'
 import document_question_bg from './images/document_question_bg.png'
+import WordIcon from '@/assets/images/docx.png'
+import pdfIcon from '@/assets/images/pdf-session.svg'
 import PDFViewer from '@/components/PDFViewer'
 import { getConversitionDetail, startChat } from '@/store/action/talkActions'
 import { UserPrompt } from '../Talk'
@@ -43,9 +43,12 @@ import { PrologueInfo } from '@/store/types'
 import { useLocation } from 'react-router-dom'
 import { ShartChatResp } from '@/types/app'
 import { uploadFile } from '@/api/upload'
+import WordPreview from '@/components/Docx'
+import { isWordFile } from '@/utils/is'
+import { isPdfFile } from 'pdfjs-dist'
 
 const { Dragger } = Upload
-type Props = {} & Partial<DocumentInitState> & Partial<talkInitialState>
+type Props = {} & Partial<DocumentInitState>
 const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
   // 百分比进度
   const [progress, setProgress] = useState(0)
@@ -53,17 +56,17 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
   const [abortController, setAbortController] = useState<AbortController | null>(null)
   const props: UploadProps = {
     name: 'file',
-    accept: '.pdf',
+    accept: '.pdf,.doc,.docx',
     onChange(info) {
       console.log(info)
     },
     onDrop(e) {
       console.log('Dropped files', e.dataTransfer.files)
       // 判断文件格式
-      if (e.dataTransfer.files[0].type !== 'application/pdf') {
+      if (e.dataTransfer.files[0].type !== 'application/pdf' && e.dataTransfer.files[0].type !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' && e.dataTransfer.files[0].type !== 'application/msword') {
         Toast.notify({
           type: 'error',
-          message: '只能上传pdf文件!'
+          message: '只能上传PDF或Word文件!'
         })
         return
       }
@@ -116,8 +119,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
           dispatch(updateDocLoading(false))
           setProgress(0)
         },
-
-        ['pdf'],
+        ['pdf', 'word'],
         30 * 1024 * 1024
       )
     }
@@ -191,7 +193,6 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
         chatId: 0
       })
     )
-    console.log(currentFile)
   }
 
   // 删除历史记录某条
@@ -321,14 +322,14 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
     )) as { payload: ShartChatResp }
 
     let docFIle = { fileid: doc.data.fileId, path: doc.data.url, chatId: chat.chatId, conversationid: chat.conversationId, summary: summary.data } as DocFile
-    await dispatch(updateCurrentFile(docFIle))
-    await dispatch(
+    dispatch(updateCurrentFile(docFIle))
+    dispatch(
       updateCurrentId({
         conversationId: chat.conversationId,
         chatId: chat.chatId
       })
     )
-    await dispatch(toggleIsNewChat(false))
+    dispatch(toggleIsNewChat(false))
     console.log(docFIle)
     // 加载 PDF 文件
     toggleHistory(true)
@@ -362,7 +363,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
       setGreeting('晚上好🌙')
     }
     // console.log(greeting)
-  })
+  }, [])
   return (
     <div className="document">
       <>
@@ -417,7 +418,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
                       style={{ height: '130px' }}
                     >
                       <div className="title font-500" title={item.name}>
-                        <img src={pdfIcon} alt="" />
+                        {isPdfFile(item.name) ? <img src={pdfIcon} alt="" /> : <img src={WordIcon} alt="" />}
                         <span className="line-clamp-3">{item.name}</span>
                       </div>
                       <div className="sub-title flex flex-x-between text-xs" title={item.summary}>
@@ -542,12 +543,12 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
                                   <span>或拖动文档到这里</span>
                                 </p>
                                 <p className="tip-right-subtitle">
-                                  <span>支持PDF文件，文件大小不超过30M，不支持扫描件</span> <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)', marginLeft: 10 }} />
+                                  <span>支持PDF、Word文件，文件大小不超过30M，不支持扫描件</span> <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)', marginLeft: 10 }} />
                                 </p>
                               </div>
                             </div>
                             <div slot="tip" className="operation">
-                              <Input onClick={(e) => e.stopPropagation()} className="upload_input" autoComplete="off" placeholder="输入PDF文档链接" suffix={<i className="input-icon"></i>} />
+                              <Input onClick={(e) => e.stopPropagation()} className="upload_input" autoComplete="off" placeholder="输入PDF、Word文档链接" suffix={<i className="input-icon"></i>} />
                             </div>
                           </div>
                         </div>
@@ -591,9 +592,8 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
             <Pane minSize={'30%'}>
               {/* pdfjs预览 */}
               <div className="left relative">
-                <div className="preview-container bg-[#d4d4d7]" style={{ overflowY: 'scroll', height: '100vh' }}>
-                  {/* <iframe src={currentFile!.path} title="pdf" id="pdf_frame" className="w-full h-full"></iframe> */}
-                  <PDFViewer url={currentFile!.path} handleMouseUp={handleMouseUp} />
+                <div className="preview-container  bg-[#d4d4d7]" style={{ overflowY: 'scroll', height: '100vh' }}>
+                  {currentFile && isPdfFile(currentFile.path) ? <PDFViewer hasTools={true} url={currentFile.path} handleMouseUp={handleMouseUp} /> : <WordPreview url={currentFile!.path} handleMouseUp={handleMouseUp} />}
                 </div>
                 <div
                   id="toolbar"
@@ -657,70 +657,72 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
             </Pane>
             <Pane minSize={'30%'}>
               {/* 对话框 */}
-              <div className="right flex flex-col">
-                <Dialogue
-                  placeholder="请输入文档相关的问题"
-                  hasUploadBtn={false}
-                  ref={dialogueRef}
-                  autoToBottom={false}
-                  initChildren={
-                    currentFile && (
-                      <div className="init-page mb-5">
-                        <div className="warp">
-                          <div className="inner">
-                            <div className="init-text">
-                              <div className="title"> {greeting} </div>
-                              <div className="idea">
-                                <p className="idea-title">文章核心观点</p>
-                                <p className="idea-content">{currentFile && currentFile.summary}</p>
-                              </div>
-                              <div className="example">
-                                <div className="example-title">试试以下例子：</div>
-                                <div className="example-content insert-prompt">
-                                  <div className="title">📔 文档总结</div>
-                                  {['帮我梳理整个文档的大纲', '帮我分析整个文档的知识点', '帮我总结这篇文档的关键词，输出不超过10个'].map((item, index) => {
-                                    return (
-                                      <div
-                                        className="desc"
-                                        key={index}
-                                        onClick={() =>
-                                          onPrompt({
-                                            content: item
-                                          } as UserPrompt)
-                                        }
-                                      >
-                                        {item}
-                                      </div>
-                                    )
-                                  })}
+              {currentFile && (
+                <div className="right flex flex-col">
+                  <Dialogue
+                    placeholder="请输入文档相关的问题"
+                    hasUploadBtn={false}
+                    ref={dialogueRef}
+                    autoToBottom={false}
+                    initChildren={
+                      currentFile && (
+                        <div className="init-page mb-5">
+                          <div className="warp">
+                            <div className="inner">
+                              <div className="init-text">
+                                <div className="title"> {greeting} </div>
+                                <div className="idea">
+                                  <p className="idea-title">文章核心观点</p>
+                                  <p className="idea-content">{currentFile && currentFile.summary}</p>
                                 </div>
-                                <div className="example-content insert-prompt">
-                                  <div className="title">💼 文档提问</div>
-                                  {['这份文档的主要内容和结构是怎样的？', '文档中的各个章节都涵盖了哪些核心知识点？', '文档的核心观点是什么？'].map((item, index) => {
-                                    return (
-                                      <div
-                                        className="desc"
-                                        key={index}
-                                        onClick={() =>
-                                          onPrompt({
-                                            content: item
-                                          } as UserPrompt)
-                                        }
-                                      >
-                                        {item}
-                                      </div>
-                                    )
-                                  })}
+                                <div className="example">
+                                  <div className="example-title">试试以下例子：</div>
+                                  <div className="example-content insert-prompt">
+                                    <div className="title">📔 文档总结</div>
+                                    {['帮我梳理整个文档的大纲', '帮我分析整个文档的知识点', '帮我总结这篇文档的关键词，输出不超过10个'].map((item, index) => {
+                                      return (
+                                        <div
+                                          className="desc"
+                                          key={index}
+                                          onClick={() =>
+                                            onPrompt({
+                                              content: item
+                                            } as UserPrompt)
+                                          }
+                                        >
+                                          {item}
+                                        </div>
+                                      )
+                                    })}
+                                  </div>
+                                  <div className="example-content insert-prompt">
+                                    <div className="title">💼 文档提问</div>
+                                    {['这份文档的主要内容和结构是怎样的？', '文档中的各个章节都涵盖了哪些核心知识点？', '文档的核心观点是什么？'].map((item, index) => {
+                                      return (
+                                        <div
+                                          className="desc"
+                                          key={index}
+                                          onClick={() =>
+                                            onPrompt({
+                                              content: item
+                                            } as UserPrompt)
+                                          }
+                                        >
+                                          {item}
+                                        </div>
+                                      )
+                                    })}
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    )
-                  }
-                />
-              </div>
+                      )
+                    }
+                  />
+                </div>
+              )}
             </Pane>
           </SplitPane>
         </div>
@@ -730,7 +732,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
 }
 // mapStateToProps 函数：将 state 映射到 props
 function mapStateToProps(state: RootState) {
-  return { ...state.documentSlice, ...state.talkSlice }
+  return state.documentSlice
 }
 
 // mapDispatchToProps 函数：将 dispatch 映射到 props

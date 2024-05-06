@@ -14,7 +14,7 @@ import Toast from '../Toast'
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.1.392/pdf.worker.min.mjs'
 interface PDFViewerProps {
   url: string
-  handleMouseUp: (event: MouseEvent) => void
+  handleMouseUp?: (event: MouseEvent) => void
   hasTools?: boolean
 }
 const eventBus = new pdfjsViewer.EventBus()
@@ -26,14 +26,14 @@ let viewContainer = null as HTMLDivElement | null
 let pdfPageView = null as pdfjsViewer.PDFPageView | null
 let loadingTask = null as pdfjsLib.PDFDocumentLoadingTask | null
 let loadingBar = null as HTMLDivElement | null
-const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools = true }) => {
+const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) => {
   const [numPages, setNumPages] = useState<number>(1)
   // 当前页面
   const [pageNumber, setPageNumber] = useState(1)
   const containerRef = useRef<HTMLDivElement | null>(null) // 添加一个ref来引用容器
   // loading
   const [loading, setLoading] = useState<boolean>(true)
-  const [scale, setScale] = useState(1) // 初始缩放比例为1
+  const [scale, setScale] = useState(0.8) // 初始缩放比例为.8
   const [pdfPageViews, setPdfPageViews] = useState<pdfjsViewer.PDFPageView[]>([]) // 存储PDFPageView实例的数组
   // 使用useScroll监听滚动
   const scroll = useScroll(viewContainer)!
@@ -102,7 +102,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools = tr
           setPdfPageViews([]) // 清空PDFPageView实例数组
           setPageNumber(1)
           setNumPages(1)
-          setScale(1)
+          setScale(0.8)
           loadingTask && loadingTask.destroy()
           loadingBar && loadingBar.style.setProperty('--progressBar-percent', `0%`)
         }
@@ -191,12 +191,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools = tr
     updatePageNumber(closestPageNum)
   }
   useMount(() => {
-    containerRef.current?.addEventListener('mouseup', handleMouseUp)
+    handleMouseUp && containerRef.current?.addEventListener('mouseup', handleMouseUp)
     viewContainer = document.querySelector('.preview-container')! as HTMLDivElement
   })
 
   useUnmount(() => {
-    containerRef.current?.removeEventListener('mouseup', handleMouseUp)
+    handleMouseUp && containerRef.current?.removeEventListener('mouseup', handleMouseUp)
     pdfPageViews.forEach((view) => view.destroy()) // 调用每个PDFPageView实例的destroy方法来销毁页面
   })
   useUpdateEffect(() => {
@@ -216,53 +216,53 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools = tr
       )}
       <div ref={containerRef} id="viewer" className="pdfViewer w-full h-full flex flex-col relative"></div>
       <div id="toolbarContainer">
-        <div id="toolbarViewer" style={{ pointerEvents: loading ? 'none' : 'auto' }}>
-          <div id="toolbarViewerLeft">
-            <div
-              className="splitToolbarButton hiddenSmallView"
-              style={{
-                alignItems: 'center',
-                display: 'flex'
-              }}
-            >
-              <button className="toolbarButton" id="previous" disabled={pageNumber === 1} title="上一页" onClick={goToPreviousPage}>
-                <img src={pageUpIcon} alt="" />
-              </button>
+        {hasTools && (
+          <div id="toolbarViewer" style={{ pointerEvents: loading ? 'none' : 'auto' }}>
+            <div id="toolbarViewerLeft">
               <div
+                className="splitToolbarButton hiddenSmallView"
                 style={{
-                  float: 'left',
-                  marginLeft: '10px',
-                  marginRight: '1px'
+                  alignItems: 'center',
+                  display: 'flex'
                 }}
               >
-                <span
-                  id="pageNumberValue"
+                <button className="toolbarButton" id="previous" disabled={pageNumber === 1} title="上一页" onClick={goToPreviousPage}>
+                  <img src={pageUpIcon} alt="" />
+                </button>
+                <div
                   style={{
-                    color: '#1a2029',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    padding: '7px 0px'
+                    float: 'left',
+                    marginLeft: '10px',
+                    marginRight: '1px'
                   }}
                 >
-                  {pageNumber}
-                </span>
-                <span
-                  className="toolbarLabel"
-                  id="numPages"
-                  style={{
-                    marginLeft: '6px',
-                    paddingLeft: '0px'
-                  }}
-                >
-                  / {numPages}
-                </span>
+                  <span
+                    id="pageNumberValue"
+                    style={{
+                      color: '#1a2029',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      padding: '7px 0px'
+                    }}
+                  >
+                    {pageNumber}
+                  </span>
+                  <span
+                    className="toolbarLabel"
+                    id="numPages"
+                    style={{
+                      marginLeft: '6px',
+                      paddingLeft: '0px'
+                    }}
+                  >
+                    / {numPages}
+                  </span>
+                </div>
+                <button className="toolbarButton" id="next" disabled={pageNumber === numPages} title="下一页" onClick={goToNextPage}>
+                  <img src={pageDownIcon} alt="" />
+                </button>
               </div>
-              <button className="toolbarButton" id="next" disabled={pageNumber === numPages} title="下一页" onClick={goToNextPage}>
-                <img src={pageDownIcon} alt="" />
-              </button>
             </div>
-          </div>
-          {hasTools && (
             <div id="toolbarViewerMiddle">
               <div
                 className="splitToolbarButton"
@@ -291,8 +291,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools = tr
                 </button>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
         <div id="loadingBar">
           <div className="progress">
             <div className="glimmer"></div>

@@ -19,6 +19,7 @@ import NotFoundImg from '@/assets/images/NotFound.png'
 import { RcFile } from 'antd/es/upload'
 import React from 'react'
 import { log } from 'console'
+import Gallery from './gallery'
 export interface Property {
   notifyHook?: any
   discordInstanceId: string
@@ -268,7 +269,7 @@ const DrawDesigns = () => {
             stopPollingTaskList()
           }
         }
-        pollImmediatelyAndStartInterval(pollFunction, 7500, pollingTaskQueueInterval) // 每7.5秒轮询一次任务队列
+        pollImmediatelyAndStartInterval(pollFunction, 8000, pollingTaskQueueInterval) // 每8秒轮询一次任务队列
       }
     }
 
@@ -672,7 +673,7 @@ const DrawDesigns = () => {
                           return (
                             <li className="mr-2" key={item} onClick={() => menuClick(item as ITab)}>
                               <button disabled={item !== 'imageCreation'} className={`${item === currentTab ? 'active' : ''}`}>
-                                {tabsWarp[item]}{' '}
+                                {tabsWarp[item]}
                               </button>
                             </li>
                           )
@@ -706,10 +707,10 @@ const DrawDesigns = () => {
         <div className="p-2 flex">
           <div>上传图片：</div>
           <div>
-            <Upload beforeUpload={beforeUpload} customRequest={customRequest} listType="picture-card" fileList={tstBase64List} onPreview={handlePreview} onRemove={onTstRemove}>
+            <Upload accept="image/*" beforeUpload={beforeUpload} customRequest={customRequest} listType="picture-card" fileList={tstBase64List} onPreview={handlePreview} onRemove={onTstRemove}>
               {tstBase64List && tstBase64List.length >= 2 ? null : <UploadOutlined />}
             </Upload>
-            <Modal title="查看图片" open={previewVisible} footer={null} onCancel={() => setPreviewVisible(false)}>
+            <Modal destroyOnClose title="查看图片" open={previewVisible} footer={null} onCancel={() => setPreviewVisible(false)}>
               <img alt="" style={{ width: '100%' }} src={previewImage} />
             </Modal>
           </div>
@@ -735,18 +736,21 @@ const DrawDesigns = () => {
         <div className="p-2 flex">
           <div>上传图片：</div>
           <div>
-            <Upload beforeUpload={beforeUpload} customRequest={customRequestTsW} listType="picture-card" fileList={tsWBase64List} onRemove={onTswRemove}>
+            <Upload accept="image/*" beforeUpload={beforeUpload} customRequest={customRequestTsW} listType="picture-card" fileList={tsWBase64List} onPreview={handlePreview} onRemove={onTswRemove}>
               {tsWBase64List && tsWBase64List.length >= 1 ? null : <UploadOutlined />}
             </Upload>
+            <Modal destroyOnClose title="查看图片" open={previewVisible} footer={null} onCancel={() => setPreviewVisible(false)}>
+              <img alt="" style={{ width: '100%' }} src={previewImage} />
+            </Modal>
           </div>
         </div>
       </Modal>
       {/* container */}
-      <section className="draw-container w-full h-full flex overflow-hidden">
+      <section className="draw-container w-full h-full flex overflow-hidden overflow-y-auto">
         {currentTab === 'imageCreation' && (
           <>
             <div className="relative bg-white" style={{ borderRight: '1px solid rgb(229, 231, 235)' }}>
-              <div className="draw-controller w-[210px] p-3" ref={controllerRef}>
+              <div className="draw-controller w-[210px] p-3 animate__animated animate__fadeInLeft animate__faster" ref={controllerRef}>
                 {/* 图片比例 */}
                 <div className="picture_ratio mb-4">
                   <div className="mb-2 flex items-center text-sm">
@@ -1427,6 +1431,7 @@ const DrawDesigns = () => {
             </div>
           </>
         )}
+        {currentTab === 'gallery' && <Gallery />}
       </section>
     </div>
   )
