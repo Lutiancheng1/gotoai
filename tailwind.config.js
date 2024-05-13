@@ -8,6 +8,7 @@ module.exports = {
   content: ['./src/**/*.{html,js,tsx}'],
   theme: {
     extend: {
+      display: ['group-hover'],
       colors: {
         'bubble-bg': '#fff', // 自定义背景颜色
         'bubble-text': '#1f2328' // 自定义字体颜色
@@ -36,7 +37,31 @@ module.exports = {
       },
       fontSize: {
         ...rem(12),
-        ...rem(13)
+        ...rem(13),
+        ...px(10),
+        ...px(11),
+        ...px(12),
+        ...px(13),
+        ...px(14),
+        ...px(15),
+        ...px(16),
+        ...px(17),
+        ...px(18),
+        ...px(19),
+        ...px(20),
+        ...px(21),
+        ...px(22),
+        ...px(23),
+        ...px(24),
+        ...px(25),
+        ...px(26),
+        ...px(27),
+        ...px(28),
+        ...px(29),
+        ...px(30),
+        ...px(31),
+        ...px(32),
+        ...px(40)
       }
     }
   },

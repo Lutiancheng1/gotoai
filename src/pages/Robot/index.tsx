@@ -42,7 +42,7 @@ type Props = {
   style?: React.CSSProperties
   onClose?: () => void
 } & Partial<robotInitialState>
-const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversitionDetailList, currentConversation, style, placeholder = '输入你的问题或需求', autoToBottom = true, sse = false, onClose }) => {
+const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversitionDetailList, currentConversation, style, placeholder = '输入你的问题或需求', autoToBottom = true, sse, onClose }) => {
   // 初始化问题Id
   let currentQuestion = currentConversation
   // 获取 dispatch 对象，用于触发 actions

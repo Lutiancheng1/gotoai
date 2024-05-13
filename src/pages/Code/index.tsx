@@ -22,7 +22,7 @@ const Code = ({ isNewChat, loading }: Props) => {
       <div className="code-container">
         <div className="code-box">
           {isNewChat && <InitPage onPromptClick={onPrompt} />}
-          <Dialogue ref={dialogueRef} hasUploadBtn={false} />
+          <Dialogue ref={dialogueRef} hasUploadBtn={false} sse={true} />
         </div>
       </div>
     </div>

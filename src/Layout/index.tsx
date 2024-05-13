@@ -1,4 +1,4 @@
-import { ConfigProvider, Menu, MenuProps, Popover, Tooltip, Layout, Modal, FloatButton } from 'antd'
+import { ConfigProvider, Menu, MenuProps, Popover, Tooltip, Layout, Modal, FloatButton, Drawer, Select, Button } from 'antd'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Sider from 'antd/es/layout/Sider'
 import React, { Suspense, useEffect, useState } from 'react'
@@ -20,11 +20,12 @@ import blogIcon from '@/assets/images/blog.svg'
 import reportIcon from '@/assets/images/report.svg'
 import collectIcon from '@/assets/images/collect.svg'
 import userImg from '@/assets/images/user.jpeg'
+import pruduct from '@/assets/images/product.svg'
 import { desensitizePhone } from '@/utils'
-import Dialogue from '@/components/Dialogue'
 import Robot from '@/pages/Robot'
 import { useMount } from 'ahooks'
 import { MJlogin } from '@/api/MJAIgcAPi'
+import { productMatrix } from '@/config'
 // 导入子路由
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
 const Home = React.lazy(() => import('@/pages/Talk'))
@@ -36,6 +37,9 @@ const DataAnalysis = React.lazy(() => import('@/pages/DataAnalysis'))
 const DrawDesigns = React.lazy(() => import('@/pages/DrawDesigns/index_new'))
 const Video = React.lazy(() => import('@/pages/Video'))
 const Application = React.lazy(() => import('@/pages/Application'))
+const MarketingCreativity = React.lazy(() => import('@/pages/MarketingCreativity'))
+const CreativityDetail = React.lazy(() => import('@/pages/MarketingCreativity/CreativityDetail'))
+
 type Props = {} & Partial<talkInitialState>
 const Index = ({ loading }: Props) => {
   const [categoryCollapsed, setCategoryCollapsed] = useState(false)
@@ -47,6 +51,10 @@ const Index = ({ loading }: Props) => {
   const user = useAppSelector((state) => state.profileSlice.user)
   // 聊天机器人是否折叠展开
   const [isRobotCollapsed, setIsRobotCollapsed] = useState(false)
+  // 产品矩阵是否显示
+  const [isProductVisible, setIsProductVisible] = useState(false)
+  // 当前矩阵的pdf链接
+  const [currentProduct, setCurrentProduct] = useState(productMatrix[0])
   const categoryItems: MenuItemType[] = menuConfig.map((item) => {
     return {
       key: item.key,
@@ -68,6 +76,9 @@ const Index = ({ loading }: Props) => {
     navagate('/login', { replace: true })
   }
   useEffect(() => {
+    if (location.pathname.substr(1).startsWith('marketingCreativity/')) {
+      return setCurrentPath('marketingCreativity')
+    }
     setCurrentPath(location.pathname.substr(1))
   }, [location])
   useEffect(() => {
@@ -106,6 +117,18 @@ const Index = ({ loading }: Props) => {
           <Modal title="提示" width={300} open={isLogoutModalVisible} onOk={handleLogoutConfirm} onCancel={() => setIsLogoutModalVisible(false)} centered okText="确认" cancelText="取消" okType="primary" maskClosable>
             确定退出登录吗?
           </Modal>
+          <Drawer title="产品矩阵" width={'65%'} placement="right" size="large" onClose={() => setIsProductVisible(false)} open={isProductVisible}>
+            {productMatrix.map((item) => {
+              return (
+                <Button key={item.key} onClick={() => setCurrentProduct(item)} className={`mr-2 mb-5 ${currentProduct.key === item.key ? 'bg-[#1677ff] text-white' : ''}`}>
+                  {item.lable}
+                </Button>
+              )
+            })}
+            <div className="w-full h-[calc(100vh-160px)]">
+              <iframe width={'100%'} height={'100%'} src={currentProduct.url} title="product"></iframe>
+            </div>
+          </Drawer>
           <Sider
             trigger={
               <div className="logout">
@@ -179,6 +202,17 @@ const Index = ({ loading }: Props) => {
                               <p className="action-text">关于我们</p>
                             </div>
                           </div>
+                          <div className="action flex flex-x-between" onClick={() => setIsProductVisible(true)}>
+                            <div className="flex flex-x-between flex-y-center">
+                              <p
+                                className="action-icon"
+                                style={{
+                                  backgroundImage: `url(${pruduct})`
+                                }}
+                              />
+                              <p className="action-text">产品矩阵</p>
+                            </div>
+                          </div>
                           <div className="action flex flex-x-between" onClick={() => logout()}>
                             <div className="flex flex-x-between flex-y-center">
                               <p
@@ -247,6 +281,8 @@ const Index = ({ loading }: Props) => {
                 <Route path="/drawDesigns" element={<DrawDesigns />} />
                 <Route path="/video" element={<Video />} />
                 <Route path="/application" element={<Application />} />
+                <Route path="/marketingCreativity" element={<MarketingCreativity />} />
+                <Route path="/marketingCreativity/:robotId" element={<CreativityDetail />} />
                 <Route path="/*" element={<NotFound />} />
               </Routes>
             </Suspense>
@@ -271,6 +307,7 @@ const Index = ({ loading }: Props) => {
             style={{
               display: isRobotCollapsed ? '' : 'none'
             }}
+            sse={true}
           />
         </div>
       </Layout>

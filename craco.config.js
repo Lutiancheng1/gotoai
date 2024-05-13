@@ -23,6 +23,20 @@ module.exports = {
     externals: {
       // 配置cdn外部资源不打包
     },
+    configure: (webpackConfig, { env, paths }) => {
+      // 添加新的规则
+      webpackConfig.module.rules.unshift({
+        test: /\.(js|mjs|jsx|ts|tsx)$/,
+        enforce: 'pre',
+        use: ['source-map-loader'],
+        exclude: [
+          /node_modules\/docx-preview/, // 排除docx-preview
+          /node_modules\/@microsoft\/fetch-event-source/ // 排除@microsoft/fetch-event-source
+        ]
+      })
+
+      return webpackConfig
+    },
     plugins: [
       // webpack构建进度条
       // @ts-ignore

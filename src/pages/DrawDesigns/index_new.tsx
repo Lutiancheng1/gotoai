@@ -1,25 +1,26 @@
-import { SetStateAction, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './index.css'
-import { Button, ConfigProvider, Input, InputNumber, InputNumberProps, List, Select, Switch, Tabs, Tooltip, Upload, UploadProps, Popconfirm, Tag, Modal, Pagination, Card, Slider, message, UploadFile, GetProp, InputRef } from 'antd'
-import { InfoCircleOutlined, UploadOutlined, DownloadOutlined, ExclamationCircleFilled } from '@ant-design/icons'
-import Toast, { useToastContext } from '@/components/Toast'
-import TextArea, { TextAreaRef } from 'antd/es/input/TextArea'
-import { useBoolean, useMount, useRequest, useUnmount, useUpdateEffect } from 'ahooks'
+import { Button, ConfigProvider, Input, InputNumber, InputNumberProps, List, Select, Switch, Tabs, Tooltip, Upload, UploadProps, Popconfirm, Tag, Modal, Pagination, Slider, UploadFile, GetProp, FloatButton, Drawer } from 'antd'
+import { InfoCircleOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons'
+import Toast from '@/components/Toast'
+import TextArea from 'antd/es/input/TextArea'
+import { useAsyncEffect, useBoolean, useMount, useRequest, useUnmount, useUpdateEffect } from 'ahooks'
 import MJIcon from '@/assets/images/mj.jpg'
 import NIJIIcon from '@/assets/images/niji.jpg'
-import { ITab, pictureRatioWarp, modelVersions, qualityLevels, tabs, tabsWarp, modalWarp, stylizationWarp, stylesWarp } from './constant'
-import { getTaskList, getTaskQueue, submitDescribe, submitDrawAction, submitDrawImagine, TaskListResponse } from '@/api/MJAIgcAPi'
+import { ITab, pictureRatioWarp, modelVersions, qualityLevels, tabs, tabsWarp, modalWarp, stylizationWarp, stylesWarp, mosaicRatioWarp, mode } from './constant'
+import { DimensionsType, getTaskList, getTaskQueue, submitBlend, submitDescribe, submitDrawAction, submitDrawImagine, submitModal, submitShorten, TaskListResponse } from '@/api/MJAIgcAPi'
 import axios from 'axios'
 import { MD5 } from '@/utils/md5'
-import { dateFormat, randString } from '@/utils/libs'
-import { UploadRequestOption, UploadRequestError } from 'rc-upload/lib/interface'
+import { dateFormat } from '@/utils/libs'
+import { UploadRequestOption } from 'rc-upload/lib/interface'
 import Loading from '@/components/loading'
 import errorIcon from '@/assets/images/error.png'
 import NotFoundImg from '@/assets/images/NotFound.png'
 import { RcFile } from 'antd/es/upload'
 import React from 'react'
-import { log } from 'console'
 import Gallery from './gallery'
+import MosaicCanvas from './MosaicCanvas/MosaicCanvas'
+
 export interface Property {
   notifyHook?: any
   discordInstanceId: string
@@ -65,7 +66,7 @@ const labelMappings = {
   'Redo Upscale (Creative)': '重新创意上采样',
   'Vary (Subtle)': '微调变化',
   'Vary (Strong)': '强烈变化',
-  'Vary (Region)': '区域变化',
+  'Vary (Region)': '局部重绘',
   'Zoom Out 2x': '放大 2倍',
   'Zoom Out 1.5x': '放大 1.5倍',
   'Custom Zoom': '自定义缩放',
@@ -86,6 +87,11 @@ const getBase64 = (file: FileType): Promise<string> =>
     reader.onload = () => resolve(reader.result as string)
     reader.onerror = (error) => reject(error)
   })
+// 调整字符串 --iw 和 --v
+const adjustString = (str: string) => {
+  const regex = /(--iw (\d+))(.*)?(--v (\d+\.\d+))/
+  return str.replace(regex, '$4$3$1')
+}
 
 const DrawDesigns = () => {
   // 大模型
@@ -97,6 +103,8 @@ const DrawDesigns = () => {
   const [currentModel, setCurrentModel] = useState<'MJ' | 'NIJI'>('MJ')
   // 图片比例
   const [pictureRatio, setPictureRatio] = useState(pictureRatioWarp[2].value)
+  // 融图的图片比例
+  const [mosaicRatio, setMosaicRatio] = useState<DimensionsType>(mosaicRatioWarp[0].value as DimensionsType)
   // 图像质量 风格化
   const [stylization, setStylization] = useState(250)
   // 当前风格
@@ -146,9 +154,12 @@ const DrawDesigns = () => {
   const [isShowTsW, setIsShowTsW] = useState(false)
   // 以图生文loading
   const [tsWLoading, setTsWLoading] = useState(false)
+  // 融图loading
+  const [rtLoading, setRtLoading] = useState(false)
+  // 自定义缩放loading
+  const [customizeLoading, setCustomizeLoading] = useState(false)
   // 融图modal显示隐藏
   const [isShowRt, setIsShowRt] = useState(false)
-
   // 图生图 权重
   const [weights, setWeights] = useState(1)
   // 图生图base64图片数组
@@ -165,8 +176,30 @@ const DrawDesigns = () => {
   const [promptTranslateLoading, setPromptTranslateLoading] = useState(false)
   // 忽略元素翻译loading
   const [ignoreTranslateLoading, setIgnoreTranslateLoading] = useState(false)
+  // 自定义缩放modal 显示隐藏
+  const [isShowZoom, setIsShowZoom] = useState(false)
+  // 自定义缩放input
   const [zoomInputValue, setZoomInputValue] = useState('')
-  let zoomInputRef = useRef<TextAreaRef>(null)
+  // 当前自定义缩放项的data
+  const [currentZoomData, setCurrentZoomData] = useState<{
+    b: Mjbutton
+    task: TaskList
+  }>()
+  // 局部重绘canvas显示隐藏
+  const [isShowCanvas, setIsShowCanvas] = useState(false)
+  // 当前局部重绘data
+  const [canvasData, setCanvasData] = useState<{
+    imageUrl: string
+    b: Mjbutton
+    task: TaskList
+  }>()
+  // 局部重绘提交loading
+  const [canvasLoading, setCanvasLoading] = useState(false)
+  // 提词优化loading
+  const [promptOptimizeLoading, setPromptOptimizeLoading] = useState(false)
+  // 提词助手显示隐藏
+  const [isShowPromptHelper, setIsShowPromptHelper] = useState(false)
+  const [modal, contextHolder] = Modal.useModal()
 
   // 计算列数
   const calculateSpan = () => {
@@ -182,7 +215,6 @@ const DrawDesigns = () => {
       return 12
     }
   }
-
   const [columnSpan, setColumnSpan] = useState(calculateSpan())
   //  设置列数
   useEffect(() => {
@@ -199,7 +231,7 @@ const DrawDesigns = () => {
     setIsFold(false)
   }
   const promptChange = (value: string) => {
-    setPrompt(value)
+    setPrompt(value.replace('/imagine prompt: ', ''))
     const flag = regexp.test(value)
     setWithParams(!flag)
   }
@@ -361,7 +393,7 @@ const DrawDesigns = () => {
         base64Array: tstBase64List.length > 0 ? (tstBase64List.map((item) => item.url) as [string]) : [],
         notifyHook: '',
         state: '',
-        mode: 'FAST'
+        mode
       })
       setPrompt('')
       setIgnoreElements('')
@@ -394,7 +426,7 @@ const DrawDesigns = () => {
       const path = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = path
-      link.download = 'image.jpg' // 替换为你想要的文件名
+      link.download = `image_${new Date().getTime()}.jpg` // 替换为你想要的文件名
       link.click()
       // 移除按钮
       link.remove()
@@ -459,8 +491,8 @@ const DrawDesigns = () => {
     startPollingTaskList()
   }
   const translate = async (target: string) => {
-    const AppId = '20210327000745207'
-    const Key = 'SfTyVcPBdOGs7yezosr9'
+    const AppId = '20240506002043542'
+    const Key = 'Y38PvAPfOOyaBKOLnQsG'
     const salt = Date.now()
     const sign = MD5(`${AppId}${target === 'prompt' ? prompt : ignoreElements}${salt}${Key}`)
     const url = `https://fanyi.gotoai.world/api/trans/vip/translate?q=${encodeURIComponent(target === 'prompt' ? prompt : ignoreElements)}&from=auto&to=en&appid=${AppId}&salt=${salt}&sign=${sign}`
@@ -493,7 +525,7 @@ const DrawDesigns = () => {
   }
   // 变换图片
   const changeImagine = async (action: 'U' | 'V' | 'R', taskId: string, customId: string, index?: number) => {
-    Modal.confirm({
+    modal.confirm({
       title: '提示',
       content: index ? `是否${action === 'U' ? '放大' : '变换'}第${index}张图片?` : '是否重新生成该组图片?',
       centered: true,
@@ -503,7 +535,7 @@ const DrawDesigns = () => {
       maskClosable: true,
       async onOk() {
         const data = await submitDrawAction({
-          mode: 'FAST',
+          mode,
           customId,
           taskId
         })
@@ -520,33 +552,19 @@ const DrawDesigns = () => {
   const submitAction = async (b: Mjbutton, task: TaskList, msg: string) => {
     console.log(b, task, msg)
     let content
-    // await setZoomInputValue(task.imageUrl + task.promptEn + '--zoom 2')
-    // if (msg === '自定义缩放') {
-    // 当msg为自定义缩放时，设置content为一个Input组件
-    // content = (
-    //   <div>
-    //     <p className="mb-1">自定义缩放</p>
-    //     <TextArea rows={6} ref={zoomInputRef} value={zoomInputValue} onChange={(e) => setZoomInputValue(e.target.value)} />
-    //   </div>
-    // )
-    // } else {
-    // }
     content = `是否${msg}该图片?`
-    Modal.confirm({
+    modal.confirm({
       title: '提示',
       content,
-      width: msg === '自定义缩放' ? 700 : undefined,
       centered: true,
       okText: '确认',
       cancelText: '取消',
       okType: 'primary',
       maskClosable: true,
       async onOk() {
-        // let result = zoomInputRef.current ? zoomInputRef.current.resizableTextArea?.textArea.value : '' // 获取输入框的值
-        // console.log('输入的缩放比例:', result) // 可以在这里使用输入的值
         if (msg === '收藏') return
         const data = await submitDrawAction({
-          mode: 'FAST',
+          mode,
           customId: b.customId,
           taskId: task.id
         })
@@ -618,6 +636,23 @@ const DrawDesigns = () => {
       ])
     }
   }
+  const customRequestRt = async ({ file }: UploadRequestOption) => {
+    const f = file as RcFile
+    const res = (await getBase64(f)) as string
+    if (res) {
+      setRtBase64List((pre) => {
+        return [
+          ...pre,
+          {
+            url: res,
+            name: f.name,
+            status: 'done',
+            uid: f.uid
+          }
+        ]
+      })
+    }
+  }
   // 以图生图删除
   const onTstRemove = (file: UploadFile) => {
     setTstBase64List(tstBase64List.filter((item) => item.uid !== file.uid))
@@ -626,11 +661,16 @@ const DrawDesigns = () => {
   const onTswRemove = (file: UploadFile) => {
     setTsWBase64List(tsWBase64List.filter((item) => item.uid !== file.uid))
   }
+  // 融图删除
+  const onRtRemove = (file: UploadFile) => {
+    setRtBase64List(rtBase64List.filter((item) => item.uid !== file.uid))
+  }
   // 图生文ok
   const onTswOk = async () => {
+    if (tsWBase64List.length === 0) return Toast.notify({ type: 'warning', message: '请上传图片' })
     setTsWLoading(true)
     const res = await submitDescribe({
-      mode: 'FAST',
+      mode,
       base64: tsWBase64List.map((item) => item.url).join()
     })
     setTsWLoading(false)
@@ -641,8 +681,124 @@ const DrawDesigns = () => {
       startPollingTaskQueue()
     }
   }
+  // 融图ok
+  const onRtOk = async () => {
+    if (rtBase64List.length === 0) return Toast.notify({ type: 'warning', message: '请上传图片' })
+    setRtLoading(true)
+    const res = await submitBlend({
+      mode: 'FAST',
+      base64Array: rtBase64List.map((item) => item.url) as string[],
+      dimensions: mosaicRatio
+    })
+    setRtLoading(false)
+    setRtBase64List([])
+    setIsShowRt(false)
+    if (res.code === 1) {
+      startPollingTaskList()
+      startPollingTaskQueue()
+    }
+  }
+  // canvas open
+  const openCanvas = (b: Mjbutton, task: TaskList) => {
+    setCanvasData({
+      imageUrl: task.imageUrl,
+      b,
+      task
+    })
+    setIsShowCanvas(true)
+  }
+  // 局部重绘ok
+  const onSubmit = async (imageData: string, prompt: string) => {
+    if (!canvasData) return
+    setCanvasLoading(true)
+    const { b, task } = canvasData
+    try {
+      const data = await submitDrawAction({
+        mode,
+        customId: b.customId,
+        taskId: task.id
+      })
+      if (data.code === 21) {
+        const res = await submitModal({
+          maskBase64: imageData,
+          prompt,
+          taskId: data.result
+        })
+        if (res.code === 1) {
+          setCanvasLoading(false)
+          setIsShowCanvas(false)
+          startPollingTaskList()
+          startPollingTaskQueue()
+        }
+      }
+    } catch (error) {
+      setCanvasLoading(false)
+      setIsShowCanvas(false)
+      Toast.notify({ type: 'error', message: '重绘失败' })
+    }
+  }
+  // 自定义缩放
+  const onScaleChange = (b: Mjbutton, task: TaskList) => {
+    setCurrentZoomData({
+      b,
+      task
+    })
+    setIsShowZoom(true)
+    setZoomInputValue(task.imageUrl + adjustString(task.promptEn) + ' --zoom 2')
+  }
+  const customZoomOk = async () => {
+    if (customizeLoading) return
+    if (!currentZoomData) return
+    setCustomizeLoading(true)
+    const { b, task } = currentZoomData
+    try {
+      const data = await submitDrawAction({
+        mode,
+        customId: b.customId,
+        taskId: task.id
+      })
+      if (data.code === 21) {
+        const res = await submitModal({
+          prompt: zoomInputValue,
+          taskId: data.result
+        })
+        if (res.code === 1) {
+          setCustomizeLoading(false)
+          setIsShowZoom(false)
+          startPollingTaskList()
+          startPollingTaskQueue()
+        }
+      }
+    } catch (error) {
+      setCustomizeLoading(false)
+      setIsShowZoom(false)
+      Toast.notify({ type: 'error', message: '自定义缩放失败' })
+    }
+  }
+  // prompt优化
+  const promptOptimize = async () => {
+    if (!prompt) return
+    if (promptOptimizeLoading) return
+    setPromptOptimizeLoading(true)
+    try {
+      const data = await submitShorten({
+        mode,
+        prompt
+      })
+      if (data.code === 1) {
+        setPromptOptimizeLoading(false)
+        setPrompt('')
+        startPollingTaskList()
+        startPollingTaskQueue()
+      }
+    } catch (error) {
+      setPromptOptimizeLoading(false)
+      Toast.notify({ type: 'error', message: '优化失败' })
+    }
+  }
   return (
     <div className="drawDesigns">
+      {contextHolder}
       {/* 上方tab切换*/}
       <section className="draw-tabs bg-white flex justify-start">
         {/* 两个模型 Midjourney  |  Stable Diffusion */}
@@ -745,6 +901,102 @@ const DrawDesigns = () => {
           </div>
         </div>
       </Modal>
+      {/* 融图 */}
+      <Modal
+        title="融图"
+        open={isShowRt}
+        onOk={onRtOk}
+        width={700}
+        onCancel={() => {
+          setIsShowRt(false)
+          setRtBase64List([])
+        }}
+        confirmLoading={rtLoading}
+        okText="确认"
+        cancelText="取消"
+      >
+        <div className="text-sm p-3">
+          <p>1、融合图片风格，最多上传 5 张图片</p>
+          <p>2、图片顺序越前，权重越高，建议把你最想融合的图片放在最前面</p>
+        </div>
+        <div className="p-2 flex">
+          <div>图片比例：</div>
+          <div className="aspect flex items-center space-x-4">
+            {mosaicRatioWarp.map((item, index) => {
+              return (
+                <button
+                  className={`aspect-item w-12 rounded border-2`}
+                  style={{
+                    border: mosaicRatio === item.value ? '2px solid #4096ff' : '',
+                    color: mosaicRatio === item.value ? '#ccc !important' : ''
+                  }}
+                  key={index}
+                  onClick={() => setMosaicRatio(item.value as DimensionsType)}
+                >
+                  <div className="aspect-box-wrapper mx-auto my-2 flex h-5 w-5 items-center justify-center">
+                    <div className="aspect-box rounded border-2" style={{ width: item.w + '%', height: item.h + '%' }} />
+                  </div>
+                  <p className="mb-1 text-center text-sm">{item.label}</p>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+        <div className="p-2 flex">
+          <div>上传图片：</div>
+          <div>
+            <Upload accept="image/*" multiple beforeUpload={beforeUpload} customRequest={customRequestRt} listType="picture-card" fileList={rtBase64List} onPreview={handlePreview} onRemove={onRtRemove}>
+              {rtBase64List && rtBase64List.length >= 5 ? null : <UploadOutlined />}
+            </Upload>
+            <Modal destroyOnClose title="查看图片" open={previewVisible} footer={null} onCancel={() => setPreviewVisible(false)}>
+              <img alt="" style={{ width: '100%' }} src={previewImage} />
+            </Modal>
+          </div>
+        </div>
+      </Modal>
+      {/* 自定义缩放 */}
+      <Modal
+        title="自定义缩放"
+        open={isShowZoom}
+        onOk={customZoomOk}
+        width={700}
+        onCancel={() => {
+          setIsShowZoom(false)
+          setZoomInputValue('')
+        }}
+        confirmLoading={customizeLoading}
+        okText="确认"
+        cancelText="取消"
+      >
+        <div className="text-sm p-3">
+          <span className="font-500 text-xl">-- zoom </span>自定义缩放的值在 1.0 到 2.0之间
+        </div>
+        <div className="text-sm p-3">
+          <TextArea value={zoomInputValue} onChange={(e) => setZoomInputValue(e.target.value)} autoSize={{ minRows: 1, maxRows: 6 }} />
+        </div>
+      </Modal>
+      {/* 提词助手 */}
+      <Drawer
+        title="提示词生成助手"
+        extra={
+          <Button
+            onClick={() => {
+              const target = document.getElementById('tools_iframe')! as HTMLIFrameElement
+              target.src = ''
+              target.src = 'https://resource.gotoai.world/upload/system/tools/tools.html'
+            }}
+          >
+            刷新
+          </Button>
+        }
+        width={1200}
+        onClose={() => setIsShowPromptHelper(false)}
+        open={isShowPromptHelper}
+      >
+        <iframe id="tools_iframe" src="https://resource.gotoai.world/upload/system/tools/tools.html" style={{ width: '100%', height: '845px', overflow: 'hidden', overflowY: 'hidden' }} title="tools"></iframe>
+      </Drawer>
+      {/* 局部重绘 */}
+      {canvasData && <MosaicCanvas loading={canvasLoading} isVisible={isShowCanvas} onClose={() => setIsShowCanvas(false)} imageUrl={canvasData.imageUrl} onSubmit={onSubmit}></MosaicCanvas>}
       {/* container */}
       <section className="draw-container w-full h-full flex overflow-hidden overflow-y-auto">
         {currentTab === 'imageCreation' && (
@@ -850,7 +1102,7 @@ const DrawDesigns = () => {
                       title={
                         <>
                           <p>重复：--tile</p>
-                          <p>参数释义：生成可用作重复平铺的图像，以创建无缝图案。</p>
+                          <p>参数释义：用于生成可用作重复平铺、拼贴的图像，例如织物、壁纸和其他无缝纹理图案。</p>
                         </>
                       }
                     >
@@ -862,7 +1114,7 @@ const DrawDesigns = () => {
                 {currentModel === 'NIJI' && (
                   <div className="style flex items-center mb-4 justify-between">
                     <div>风格</div>
-                    <Select disabled={currentVersion === 6} value={currentStyle} style={{ width: 120 }} onChange={(value) => setCurrentStyle(value)} options={stylesWarp} allowClear={false} />
+                    <Select disabled={currentVersion === 6} value={currentVersion === 6 ? currentStyle : stylesWarp[1].value} style={{ width: 120 }} onChange={(value) => setCurrentStyle(value)} options={currentVersion === 5 ? stylesWarp.slice(1) : stylesWarp} allowClear={false} />
                   </div>
                 )}
                 {/* 参数 */}
@@ -957,24 +1209,22 @@ const DrawDesigns = () => {
                 <i className={`iconfont cursor-pointer ${!isFold ? 'icon-zhedie' : 'icon-zhankai'}`}></i>
               </div>
             </div>
-            <div className="draw-content w-full p-4 overflow-y-auto">
+            <div className="draw-content w-full p-4 overflow-y-auto nw-scrollbar">
               {/* 头部 */}
               <header className="mb-3">
                 <div className="title text-lg">AI绘画</div>
                 <div className="subtitle mb-2">基于Midjourney的AI绘画工具</div>
-                <p className="mb-2">图生图：生成类似风格或类型图像; 图生文：上传一张图片生成对应的提示词</p>
-
-                {/* ；融图：融合图片风格 */}
+                <p className="mb-2">图生图：生成类似风格或类型图像; 图生文：上传一张图片生成对应的提示词；融图：融合图片风格</p>
                 <div className="btns">
                   <Button icon={<UploadOutlined />} type="primary" className="bg-blue-500 mr-2" onClick={() => setIsShowTsT(true)}>
                     以图生图（可选）
                   </Button>
-                  <Button type="primary" className="bg-blue-500" icon={<UploadOutlined />} onClick={() => setIsShowTsW(true)}>
+                  <Button type="primary" className="bg-blue-500 mr-2" icon={<UploadOutlined />} onClick={() => setIsShowTsW(true)}>
                     以图生文（可选）
                   </Button>
-                  {/* <Button type="primary" className="bg-blue-500" icon={<UploadOutlined />}>
+                  <Button type="primary" className="bg-blue-500" icon={<UploadOutlined />} onClick={() => setIsShowRt(true)}>
                     融图（可选）
-                  </Button> */}
+                  </Button>
                 </div>
                 {/* 预览 */}
                 {!isShowTsT && tstBase64List && tstBase64List.length > 0 && (
@@ -1003,9 +1253,39 @@ const DrawDesigns = () => {
               {/* 内容 */}
               <div className="w-full flex justify-between items-center mb-2">
                 <div>
-                  生成提示词 {withParamsPrompt ? '(提示词带有自定义参数，将不使用默认设定参数)' : ''} <span className="text-gray-500 text-[10px]">可将图片URL地址放在提词最前面以当作垫图</span>
+                  <span className="mr-1">生成提示词</span>
+                  <Tooltip
+                    title={
+                      <>
+                        <p>Multi Prompts 多重提示 编写提示词时可添加 ::（两个半角冒号）作为分割符号，让 Midjourney Bot 将原本的完整的描述词视作两个或者多个单独的概念，我们还可以通过在 :: 后加上数字，为不同的概念分配的不通过的权重，使生成的图像在内容上对应产生变化。 </p>
+                        <p>① 如果 :: 后没有添加数字，则默认权重值为 1。 </p>
+                        <p>② v1/ v2/ v3 版本的 :: 权重只接受整数，v4 /v5 版本接受有小数点的权重，比如 ::1.2 或 ::-.5</p>
+                        <p>③ 不同概念的权重与具体数值无关，与数值之间的比例有关，也就是以下三种数值最后的效果是一样的，因为最终 hot 的权重都是 dog 的 2 倍。 hot::2 dog 等于 hot::4 dog::2 等于 hot::100 dog::50</p>
+                        <p>④ 带数字的分隔符会影响位于它前面的所有内容，直到新的分隔符切断这种影响。</p>
+                        <p>⑤ 权重为 ::-.5 时，效果与 --no 负提示一样，以下的 2 种表述方式得到效果都是“生机勃勃郁金香花田，没有红色”。</p>
+                      </>
+                    }
+                  >
+                    <InfoCircleOutlined rotate={180} />
+                  </Tooltip>
+                  {withParamsPrompt ? '(提示词带有自定义参数，将不使用默认设定参数)' : ''} <span className="text-gray-500 text-[10px]">可将图片URL地址放在提词最前面以当作垫图</span>
                 </div>
                 <div>
+                  {/* <Tooltip
+                    title={
+                      <>
+                        <p>将提示词提交给 Midjourney Bot</p>
+                        <p>对该提示词分析权重以及优化</p>
+                      </>
+                    }
+                  >
+                    <Button disabled={!prompt} className="mr-2 bg-blue-500" type="primary" onClick={promptOptimize}>
+                      优化提词
+                    </Button>
+                  </Tooltip> */}
+                  <Button icon={<i className="iconfont icon-tools"></i>} className="mr-2" onClick={() => setIsShowPromptHelper(true)}>
+                    提词助手
+                  </Button>
                   <Button disabled={!prompt} loading={promptTranslateLoading} type="primary" icon={<i className="iconfont icon-chajiantubiao_zhongyingfanyi"></i>} className="bg-blue-500" onClick={() => translate('prompt')}>
                     翻译
                   </Button>
@@ -1170,7 +1450,7 @@ const DrawDesigns = () => {
                                       {item.action !== 'DESCRIBE' && (
                                         <div>
                                           <Tooltip title={item.promptEn && item.promptEn}>
-                                            <Button onClick={() => setUsedPromot(item.promptEn && item.promptEn)} type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-huabi"></i>}>
+                                            <Button disabled={!item.promptEn} onClick={() => setUsedPromot(item.promptEn && item.promptEn)} type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-huabi"></i>}>
                                               使用
                                             </Button>
                                           </Tooltip>
@@ -1231,7 +1511,7 @@ const DrawDesigns = () => {
                                     <div>
                                       {item.buttons && item.buttons.length > 0 && (
                                         <>
-                                          {['IMAGINE', 'VARIATION', 'REROLL', 'ZOOM'].includes(item.action) && (
+                                          {['IMAGINE', 'VARIATION', 'REROLL', 'ZOOM', 'BLEND'].includes(item.action) && (
                                             <>
                                               <div className="mb-2 flex items-center justify-between">
                                                 <span>放大：</span>
@@ -1342,8 +1622,8 @@ const DrawDesigns = () => {
                                               {item.buttons.map((b, i) => (
                                                 <Tooltip key={b.customId} title={b.label ? labelMappings[b.label] : labelMappings[b.emoji]}>
                                                   <Button
-                                                    onClick={() => submitAction(b, item, b.label ? labelMappings[b.label] : labelMappings[b.emoji])}
-                                                    disabled={item.status === 'FAILURE' || b.label === 'Custom Zoom'}
+                                                    onClick={b.label === 'Vary (Region)' ? () => openCanvas(b, item) : b.label === 'Custom Zoom' ? () => onScaleChange(b, item) : () => submitAction(b, item, b.label ? labelMappings[b.label] : labelMappings[b.emoji])}
+                                                    disabled={item.status === 'FAILURE'}
                                                     type="default"
                                                     size="small"
                                                     icon={b.emoji === 'upscale_1' || b.emoji === '⏫' ? <i className="iconfont icon-julong" /> : b.emoji === '🖌️' ? <i className="iconfont icon-huabi1" /> : b.emoji}
@@ -1399,6 +1679,29 @@ const DrawDesigns = () => {
                                               </div>
                                             </>
                                           )}
+                                          {/* {['SHORTEN'].includes(item.action) && (
+                                            <>
+                                              <div className="mb-2 flex items-center justify-between">
+                                                <span>类型：</span>
+                                                <div className="flex-1">提词优化</div>
+                                              </div>
+                                              <div className="mb-2 flex items-center justify-between">
+                                                <span>提示词：</span>
+                                                <Tooltip title={''}>
+                                                  <InfoCircleOutlined rotate={180} />
+                                                </Tooltip>
+                                                <div className="flex-1">
+                                                  <div className="flex items-center justify-around">
+                                                    {item.buttons.map((b, i) => (
+                                                      <Tooltip title={''} key={b.customId}>
+                                                        <Button onClick={() => submitAction(b, item, b.label)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={b.emoji}></Button>
+                                                      </Tooltip>
+                                                    ))}
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </>
+                                          )} */}
                                         </>
                                       )}
                                       {item.startTime && (
@@ -1429,6 +1732,12 @@ const DrawDesigns = () => {
                 </footer>
               )}
             </div>
+            <FloatButton.BackTop
+              style={{
+                right: 30
+              }}
+              target={() => document.querySelector('.draw-content') as HTMLElement}
+            />
           </>
         )}
         {currentTab === 'gallery' && <Gallery />}

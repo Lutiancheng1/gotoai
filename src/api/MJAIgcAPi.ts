@@ -69,6 +69,8 @@ request.interceptors.response.use(
         message: '提示词包含敏感词',
         duration: 1000
       })
+    } else if ((response.data as MJResponse).code === 21) {
+      return response.data as unknown as AxiosResponse<MJResponse>
     } else {
       // code=21: 任务已存在，U时可能发生
       // code=23: 队列已满，请稍后尝试
@@ -130,11 +132,11 @@ export interface BlendParams {
   mode: 'RELAX' | 'FAST'
   notifyHook?: string
   base64Array: string[]
-  dimensions?: 'PORTRAIT' | 'SQUARE,' | 'LANDSCAPE' //	"比例:PORTRAIT(2:3);SQUARE(1:1);LANDSCAPE(3:2),可用值:PORTRAIT,SQUARE,LANDSCAPE,示例值(SQUARE)"
+  dimensions?: DimensionsType //	"比例:PORTRAIT(2:3);SQUARE(1:1);LANDSCAPE(3:2),可用值:PORTRAIT,SQUARE,LANDSCAPE,示例值(SQUARE)"
   state?: string
   botType?: 'MID_JOURNEY' | 'NIJI_JOURNEY'
 }
-
+export type DimensionsType = 'PORTRAIT' | 'SQUARE,' | 'LANDSCAPE'
 //  执行Blend操作，提交融图任务。
 export const submitBlend = async (params: BlendParams) => {
   return (await request.post('mj/submit/blend', params, {
@@ -145,17 +147,17 @@ export const submitBlend = async (params: BlendParams) => {
 }
 
 export interface ModalParams {
-  maskBase64: string //局部重绘的蒙版base64，示例值 (data:image/png;base64,xxx)
+  maskBase64?: string //局部重绘的蒙版base64，示例值 (data:image/png;base64,xxx)
   prompt: string
   taskId: string
 }
 // 提交Modal任务
 export const submitModal = async (params: ModalParams) => {
-  return await request.post('mj/submit/modal', params, {
+  return (await request.post('mj/submit/modal', params, {
     customConfig: {
       type: 'mj'
     }
-  })
+  })) as MJResponse
 }
 
 export interface DescribeParams {
@@ -180,11 +182,11 @@ export interface ShortenParams {
 }
 // 提交Shorten任务
 export const submitShorten = async (params: ShortenParams) => {
-  return await request.post('mj/submit/shorten', params, {
+  return (await request.post('mj/submit/shorten', params, {
     customConfig: {
       type: 'mj'
     }
-  })
+  })) as MJResponse
 }
 
 export interface FaceSwapParams {

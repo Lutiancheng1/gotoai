@@ -33,6 +33,27 @@ export const pictureRatioWarp = [
     h: 100
   }
 ]
+// 融图比例 比例:PORTRAIT(2:3);SQUARE(1:1);LANDSCAPE(3:2),可用值:PORTRAIT,SQUARE,LANDSCAPE
+export const mosaicRatioWarp = [
+  {
+    label: '1:1',
+    value: 'SQUARE',
+    w: 100,
+    h: 100
+  },
+  {
+    label: '2:3',
+    value: 'PORTRAIT',
+    w: 75,
+    h: 100
+  },
+  {
+    label: '3:2',
+    value: 'LANDSCAPE',
+    w: 100,
+    h: 75
+  }
+]
 // 次级tab
 export const tabs = ['imageCreation', 'imageProcessing', 'gallery']
 export const tabsWarp = {
@@ -117,3 +138,5 @@ export const stylesWarp = [
     label: '可爱'
   }
 ]
+// MJ模式
+export const mode = 'FAST'

@@ -1,0 +1,679 @@
+{
+  "category": [
+    {
+      "icon": "https://cloud.zhaomi.cn/character_robot/icon/hot.png",
+      "icon_hover": "https://cloud.zhaomi.cn/character_robot/icon/hot_blue.png",
+      "icon_small": "https://cloud.zhaomi.cn/character_robot/icon/hot_small.png",
+      "list": [
+        {
+          "uid": "7c8a6a106a5dc0f3f6d70f2960435e1a",
+          "chat_type": 5,
+          "nickname": "月度总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "对过去一个月工作的回顾和总结。",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "160b14d0cefb9efac61dcecd51bc3983",
+          "chat_type": 5,
+          "nickname": "可行性研究报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "根据主题及行业输出可行性研究报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "8783d2732aef062a2033685f73ec7841",
+          "chat_type": 5,
+          "nickname": "转正申请",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "生成转正思想汇报范例",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "83d74caeacc9d542b5a03603ea161094",
+          "chat_type": 5,
+          "nickname": "代码语法纠错",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "代码语法纠错",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "7b8a0f93431cde87b8a4d48d2cf6751b",
+          "chat_type": 6,
+          "nickname": "句子复杂化",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+          "description": "句子复杂化",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "0c6f99d8081dd4dc02ea4230d72b2d04",
+          "chat_type": 5,
+          "nickname": "述职报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "快速生成述职报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "c84e5a47728ed9fe03493574e386701f",
+          "chat_type": 5,
+          "nickname": "课题申报",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "快速生成课题申报报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "9ffc08da2495a162364e05288cfe221e",
+          "chat_type": 5,
+          "nickname": "讲话发言文案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "一键生成各类场景下的讲话发言文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d6eceea41ee82eb18041b22d3bddbda5",
+          "chat_type": 5,
+          "nickname": "文章总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+          "description": "长文案总结提炼",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "ec550498b799966c0251076a01aeff0c",
+          "chat_type": 5,
+          "nickname": "工作总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "工作总结自动生成",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "132d191151974b6d92955bbd830cc4a5",
+          "chat_type": 5,
+          "nickname": "教学大纲",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "一键生成教学大纲",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "1aa4121c5ebd7ed5044c2a339417e64f",
+          "chat_type": 5,
+          "nickname": "实习报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "b78b4cf4076ff8fcfb81b744d1812bad",
+          "chat_type": 5,
+          "nickname": "教学计划",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "教学计划助手，智慧编写，提升教学质量。",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "02114486fc7fe7283421a5c285b27d43",
+          "chat_type": 5,
+          "nickname": "市场调研报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "撰写高质量市场调研报告",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "热门"
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/6c7069a0e20667162ec035a6b6bc6a07.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/48756b80500b59156827094d090964f5.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "uid": "0bc552bba1f823ed899a4a4709e93c8b",
+          "chat_type": 5,
+          "nickname": "邮件回复",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "ec550498b799966c0251076a01aeff0c",
+          "chat_type": 5,
+          "nickname": "工作总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "工作总结自动生成",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "7c8a6a106a5dc0f3f6d70f2960435e1a",
+          "chat_type": 5,
+          "nickname": "月度总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "对过去一个月工作的回顾和总结。",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d52240ab430c6dfa8460e32857f1e21d",
+          "chat_type": 5,
+          "nickname": "季度总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "总结你的季度工作成果",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "8de2759a3efd98e9318363138a58a177",
+          "chat_type": 5,
+          "nickname": "半年总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "总结你的半年工作成果",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "b92b22bf037a5ecb02c7c1724fdd4296",
+          "chat_type": 5,
+          "nickname": "年度总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "总结你的年度工作成果",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "34e4550894503308a332b10e8bb11903",
+          "chat_type": 5,
+          "nickname": "转正总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "祝你顺利转正",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "5192ddd2ef1b3cee57f886da3c5e10cb",
+          "chat_type": 5,
+          "nickname": "考核总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "完美的考核总结报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d7c7a194da2fd0fdee176d8a32ca62fb",
+          "chat_type": 5,
+          "nickname": "晋升总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "总结优势，满足晋升要求",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "ad0a9a030ad174fd7b61f0da15464d5f",
+          "chat_type": 5,
+          "nickname": "工作汇报",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "汇报近期工作成功",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "83d74caeacc9d542b5a03603ea161094",
+          "chat_type": 5,
+          "nickname": "代码语法纠错",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "代码语法纠错",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "377a0c16c3f27543d9aa98aaaee9519c",
+          "chat_type": 5,
+          "nickname": "OKR制定",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "OKR制定",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d26a7648a2c4fcde9e55d5cf602af5f7",
+          "chat_type": 5,
+          "nickname": "PPT大纲生成器",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+          "description": "PPT大纲生成器",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "日常办公"
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/b79d32db44cd7fd1e5d1a9d87db966e1.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/2fc7ff6c24cb987100008ac279d897eb.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+      "list": [
+        {
+          "uid": "ef838f2bc43c71f5f37bb3c7717e0e26",
+          "chat_type": 6,
+          "nickname": "文章改写",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+          "description": "快速文章改写",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "1a7ae8ab23cf789ab0818a5f64271c58",
+          "chat_type": 5,
+          "nickname": "文章续写",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+          "description": "文章续写",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d6eceea41ee82eb18041b22d3bddbda5",
+          "chat_type": 5,
+          "nickname": "文章总结",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+          "description": "长文案总结提炼",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "3390f00d617e96cf5927a8d5bc206da3",
+          "chat_type": 6,
+          "nickname": "白话文转文言文",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+          "description": "白话文转文言文",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d582219f009333a533f6fc2dc916c424",
+          "chat_type": 6,
+          "nickname": "文言文转白话文",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+          "description": "文言文转白话文",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "8eff4cba491fd667c786b83ae88e9fc8",
+          "chat_type": 6,
+          "nickname": "内容简化",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+          "description": "内容简化",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "7b8a0f93431cde87b8a4d48d2cf6751b",
+          "chat_type": 6,
+          "nickname": "句子复杂化",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+          "description": "句子复杂化",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "dd7e875fdb92b365f49a4714eb2bad94",
+          "chat_type": 5,
+          "nickname": "民事起诉状",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+          "description": "民事权益受到侵害时，诉讼递交的书面起诉状",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "写作工具"
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1c4b1af6a953d28d7e770b5a470a4234.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/c026440bf3aa589fe5afb49319080863.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+      "list": [
+        {
+          "uid": "52632039c3c66bdf6db17ac4daad9995",
+          "chat_type": 5,
+          "nickname": "先进事迹",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "一键生成先进事迹公文报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "0c6f99d8081dd4dc02ea4230d72b2d04",
+          "chat_type": 5,
+          "nickname": "述职报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "快速生成述职报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "b8bca2e56f84b2afe99fd65c55bc436f",
+          "chat_type": 5,
+          "nickname": "心得体会",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "快速生成各类机关单位心得体会材料",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "c4fdc64c0cb8afed9aeac8489946975e",
+          "chat_type": 5,
+          "nickname": "工作计划",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "一键生成机关单位各类工作计划",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "9ffc08da2495a162364e05288cfe221e",
+          "chat_type": 5,
+          "nickname": "讲话发言文案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "一键生成各类场景下的讲话发言文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "5284d7dd38ab98013a4eb9d6d014ba98",
+          "chat_type": 5,
+          "nickname": "调查报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "一键生成调查报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "1ee6225ecfac795341333523ae94e679",
+          "chat_type": 5,
+          "nickname": "公文写作",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "公文写作",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "cdf278d7e4d78ff0b554d3afedf448d0",
+          "chat_type": 5,
+          "nickname": "观后感",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "自动生成观后评价和反思",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "8783d2732aef062a2033685f73ec7841",
+          "chat_type": 5,
+          "nickname": "转正申请",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+          "description": "生成转正思想汇报范例",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "机关单位"
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0f5053176e63112e394c9f48757699a8.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/77f14714729b783f0695d4fad857eb96.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "uid": "02114486fc7fe7283421a5c285b27d43",
+          "chat_type": 5,
+          "nickname": "市场调研报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "撰写高质量市场调研报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "04d8221fc5ac29af7f469dde2addf81d",
+          "chat_type": 5,
+          "nickname": "科研进度报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "快速生成科研进度报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "337fd093eeed5741e8e65fd72a9fb02b",
+          "chat_type": 5,
+          "nickname": "SWOT分析报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "快速生成SWOT分析报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "c40d214cd1b390f88f998fae2bea19a9",
+          "chat_type": 5,
+          "nickname": "案例分析报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "一键生成",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "44b1cc99fca3a891303acf08a1463434",
+          "chat_type": 5,
+          "nickname": "消费者调查报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "一键生成消费者调查报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "160b14d0cefb9efac61dcecd51bc3983",
+          "chat_type": 5,
+          "nickname": "可行性研究报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "根据主题及行业输出可行性研究报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "605183a84f2b1bc0e27caa9dd7336385",
+          "chat_type": 5,
+          "nickname": "财务分析报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "一键生成企业财务分析报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "9437010dbda2ddaa85025c70be73f758",
+          "chat_type": 5,
+          "nickname": "风险评估报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "一键生成专业的风险评估报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d5234bed4a595c8bfac437e0e5f1af7a",
+          "chat_type": 5,
+          "nickname": "企业战略分析报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "快速生成企业战略分析报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "c7bbe9ed2fd6446b15a9119749064f4d",
+          "chat_type": 5,
+          "nickname": "研究报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "撰写高质量研究报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "6871a0c91e604828fb24e97bc9755656",
+          "chat_type": 5,
+          "nickname": "商业计划书",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+          "description": "撰写可以完美表达商业想法的计划书",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "分析/研究"
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/416e1a808a18dfaf87487efa24b227c0.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/fffeddce4cafc7b59ef717a0c8b95623.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "uid": "b78b4cf4076ff8fcfb81b744d1812bad",
+          "chat_type": 5,
+          "nickname": "教学计划",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "教学计划助手，智慧编写，提升教学质量。",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "ff14289eb4181e085bf77afad5f7ca70",
+          "chat_type": 5,
+          "nickname": "假期工作安排",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "一键生成假期工作安排文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "f42457e76c452ad281ea00ccc8f0a8f1",
+          "chat_type": 5,
+          "nickname": "教学评估总结报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "一键生成教学评估总结报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "c84e5a47728ed9fe03493574e386701f",
+          "chat_type": 5,
+          "nickname": "课题申报",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "快速生成课题申报报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "ce24de404a02b99daeb0e7f2e9421a82",
+          "chat_type": 5,
+          "nickname": "招生简章",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "快速生成不同院校的招生简章",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "c09d3709463adbd9ad4f4c02e3bdd008",
+          "chat_type": 5,
+          "nickname": "学术演讲稿",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "快速生成学术演讲稿",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "3c515448dd6600d298ddba757055a1ff",
+          "chat_type": 5,
+          "nickname": "论文提纲",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "一键生成您的论文提纲！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "5958a96550abfb994715bc2cfc12f832",
+          "chat_type": 5,
+          "nickname": "科研开题报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "一键生成科研开题报告",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "132d191151974b6d92955bbd830cc4a5",
+          "chat_type": 5,
+          "nickname": "教学大纲",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "一键生成教学大纲",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "93401406c658a5c11f285dade0269876",
+          "chat_type": 5,
+          "nickname": "教育活动方案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "一键生成教育活动方案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "3dac40bee3751c95992025e5d3ee760a",
+          "chat_type": 5,
+          "nickname": "读书笔记",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "教你如何写出优秀的读书笔记",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "1aa4121c5ebd7ed5044c2a339417e64f",
+          "chat_type": 5,
+          "nickname": "实习报告",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+          "description": "实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "教育/论文"
+    }
+  ],
+  "history": {
+    "icon": "https://cloud.zhaomi.cn/character_robot/icon/history.png",
+    "icon_hover": "https://cloud.zhaomi.cn/character_robot/icon/history_blue.png",
+    "icon_small": "https://cloud.zhaomi.cn/character_robot/icon/history_small.png",
+    "list": [
+      {
+        "uid": "1aa4121c5ebd7ed5044c2a339417e64f",
+        "chat_type": 5,
+        "nickname": "实习报告",
+        "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+        "description": "实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？",
+        "is_wish": 0,
+        "topics": 0
+      }
+    ],
+    "title": "最近使用"
+  },
+  "wish": {
+    "icon": "https://cloud.zhaomi.cn/character_robot/icon/wish.png",
+    "icon_hover": "https://cloud.zhaomi.cn/character_robot/icon/wish_blue.png",
+    "icon_small": "https://cloud.zhaomi.cn/character_robot/icon/wish_small.png",
+    "list": [],
+    "title": "我的收藏"
+  }
+}

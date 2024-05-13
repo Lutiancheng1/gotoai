@@ -25,3 +25,37 @@ p {
 .ant-modal-root .ant-btn-primary {
   background-color: #1677ff;
 }
+
+.nw-no-scroll::-webkit-scrollbar {
+  display: none !important
+}
+
+.nw-scrollbar::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+  height: 1px
+}
+
+.nw-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 100px;
+  background: rgba(0, 0, 0, .08)
+}
+
+.nw-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, .2)
+}
+
+.nw-scrollbar::-webkit-scrollbar-track {
+  border-radius: 100px
+}
+
+.nw-scrollbar.nw-scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+  height: 1px
+}
+
+.vh-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

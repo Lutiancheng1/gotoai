@@ -52,6 +52,8 @@ type Props = {} & Partial<DocumentInitState>
 const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
   // 百分比进度
   const [progress, setProgress] = useState(0)
+  const [modal, contextHolder] = Modal.useModal()
+
   // 创建 AbortController 实例
   const [abortController, setAbortController] = useState<AbortController | null>(null)
   const props: UploadProps = {
@@ -127,7 +129,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
 
   //
   const cancelUpload = () => {
-    Modal.confirm({
+    modal.confirm({
       title: '提示',
       content: '确认取消上传吗?',
       centered: true,
@@ -366,6 +368,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
   }, [])
   return (
     <div className="document">
+      {contextHolder}
       <>
         <div className={`history animate__animated animate__fadeInLeft animate__faster`} ref={historyDivRef} style={{ zIndex: 22, position: isNewDoc ? 'initial' : 'absolute' }}>
           <div className="histroy-header">
@@ -664,6 +667,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
                     hasUploadBtn={false}
                     ref={dialogueRef}
                     autoToBottom={false}
+                    sse={false}
                     initChildren={
                       currentFile && (
                         <div className="init-page mb-5">

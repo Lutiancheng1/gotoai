@@ -1,0 +1,109 @@
+.mosaic_canvas {
+  .ant-modal-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  #appbody {
+    height: 38px;
+    width: 100%;
+    display: flex;
+    bottom: 16px;
+    transition: opacity 0.17s ease;
+    padding-inline: 4px;
+  }
+
+  .bottomBarWrapper {
+    flex: 1;
+  }
+
+  .hstack {
+    display: flex;
+  }
+
+  .toolButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 38px;
+    height: 38px;
+    margin-right: 8px;
+    border-radius: 50%;
+
+    &.selected {
+      background-color: hsla(227, 5%, 95%, 1.0);
+    }
+
+    &:hover {
+      opacity: .7;
+    }
+
+    /* &.Undo {
+      background-color: hsla(227, 5%, 95%, 1.0);
+    } */
+  }
+
+  .ant-input-group-addon {
+    padding: 0;
+  }
+
+  .ant-input-group-wrapper {
+    vertical-align: text-top;
+  }
+
+  .fadeout {
+    opacity: 0;
+  }
+
+  #buttonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+
+  .spinner-container {
+    padding: 4px;
+    z-index: 1;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .spinner {
+    animation: spinner 1s linear infinite;
+    fill: hsla(227, 5%, 95%, 0.85);
+  }
+
+  .Submit {
+    border: none;
+    outline: none;
+    border-radius: 32px;
+    display: flex;
+    height: 28px;
+    width: 28px;
+    justify-content: center;
+    align-items: center;
+    /* background-color: hsla(227, 5%, 95%, 1.0); */
+  }
+
+  .Submit svg {
+    color: hsl(227, 5%, 35%);
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+  }
+
+  .Submit svg:hover {
+    transition: fill .17s ease;
+  }
+
+  .Submit svg:active {
+    transition: fill .17s ease;
+  }
+}

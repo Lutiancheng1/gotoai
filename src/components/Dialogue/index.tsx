@@ -21,7 +21,7 @@ import stopIcon from '@/assets/images/session_stop_icon2.svg'
 import refreshIcon from '@/assets/images/refresh.png'
 import { MessageInfo } from '@/store/types'
 import { UserPrompt } from '@/pages/Talk'
-import { useSize, useUnmount, useUpdateEffect } from 'ahooks'
+import { useMount, useSize, useUnmount, useUpdateEffect } from 'ahooks'
 import { ShartChatResp } from '@/types/app'
 import { imgLazyload } from '@mdit/plugin-img-lazyload'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
@@ -55,17 +55,6 @@ type ChatError = {
   type: string
   code: string
   param: string | null
-}
-// 接受一个conversitionDetailList 返回一个 gpt对话格式的历史记录列表 生成历史记录列表
-export const generateHistoryList = (conversationDetailList: MessageInfo[]) => {
-  if (!conversationDetailList) return []
-  return conversationDetailList.map(({ type, content }) => ({
-    role: type === 0 ? 'user' : type === 1 ? 'assistant' : 'system',
-    content
-  })) as unknown as {
-    role: 'user' | 'assistant'
-    content: string
-  }[]
 }
 type Props = {
   onSendMessage?: (prompt: string, message: string) => void
@@ -258,13 +247,9 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
             }),
             onopen(response) {
               // 建立连接的回调
-              if (isNewChat) {
+              if (isNewChat || firstSend) {
                 // 刷新当前历史记录
                 // 获取历史列表
-                refreshHistoryList()
-              }
-              //第一次发送 更新左侧历史title
-              if (firstSend) {
                 refreshHistoryList()
               }
               // 当前发送完成后 不是第一次发送
@@ -285,6 +270,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                 setMessageLoading(false)
                 newController.abort()
                 setCurrentUUID('')
+                // 更新左侧历史title
+                refreshHistoryList()
               }
             },
             onclose() {
@@ -583,7 +570,9 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     const pathname = location.pathname
     currentMenuKey.current = menuWarp[pathname] as menuType
   }, [dispatch, location.pathname])
-
+  useMount(() => {
+    dispatch(toggleIsNewChat(true))
+  })
   // 初始化
   useUnmount(() => {
     dispatch(initState())
@@ -669,7 +658,11 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                             dangerouslySetInnerHTML={{
                               __html: md.render(
                                 ` ${
-                                  item.isLoading ? '<span class="loading loading-dots loading-xs"></span>' : item.files && item.files.length > 0 ? item.content + '\n\n' + item.files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n') : item.content
+                                  item.isLoading
+                                    ? '<span class="loading loading-dots loading-xs"></span>'
+                                    : item.files && item.files.length > 0
+                                    ? item.content + '\n\n' + item.files.map((file) => (file.mimetype?.startsWith('image') ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
+                                    : item.content
                                 }`
                               )
                             }}

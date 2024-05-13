@@ -20,6 +20,10 @@
     height: 100%;
   }
 
+  .category .my-menu .ant-menu {
+    border-inline-end: none;
+  }
+
   .logout {
     display: flex;
     padding: 0 16px;

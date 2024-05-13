@@ -10,7 +10,15 @@ interface UploadResponse {
   fileId: string
   chat: { chatId: number; conversationId: string }
 }
-
+// 根据文件MIME类型定义允许的格式
+export const formatMap: { [key: string]: string[] } = {
+  image: ['image/jpeg', 'image/png', 'image/gif'],
+  word: ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+  excel: ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+  pdf: ['application/pdf'],
+  csv: ['text/csv'],
+  video: ['video/*']
+}
 // 修改函数签名以接受成功和失败的回调
 export async function uploadFile(
   menu: number,
@@ -22,15 +30,6 @@ export async function uploadFile(
   allowedFormats: string[] = [], // 允许的文件格式数组，默认为空，表示允许所有格式
   maxFileSize: number = 10 * 1024 * 1024 // 默认最大文件大小为10MB
 ): Promise<void> {
-  // 根据文件MIME类型定义允许的格式
-  const formatMap: { [key: string]: string[] } = {
-    image: ['image/jpeg', 'image/png', 'image/gif'],
-    word: ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
-    excel: ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
-    pdf: ['application/pdf'],
-    csv: ['text/csv']
-  }
-
   // 如果指定了允许的格式，则进行校验
   if (allowedFormats.length > 0) {
     const allowedMimeTypes = allowedFormats.flatMap((format) => formatMap[format] || [])

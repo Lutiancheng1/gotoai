@@ -4,13 +4,15 @@ import profileSlice from './reducers/profile'
 import talkSlice from './reducers/talk'
 import documentSlice from './reducers/document'
 import robotSlice from './reducers/robot'
+import creativitySlice from './reducers/creativity'
 const store = configureStore({
   reducer: {
     loginSlice,
     profileSlice,
     talkSlice,
     documentSlice,
-    robotSlice
+    robotSlice,
+    creativitySlice
   }
 })
 

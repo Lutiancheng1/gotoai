@@ -26,7 +26,7 @@ const KnowledgeBase = ({ isNewChat }: Props) => {
       <div className="knowledge-container">
         <div className="knowledge-box">
           {isNewChat && <InitPage onPromptClick={onPrompt} setSendValue={setSendValue} />}
-          <Dialogue ref={dialogueRef} sse={false} />
+          <Dialogue ref={dialogueRef} sse={true} />
         </div>
       </div>
     </div>

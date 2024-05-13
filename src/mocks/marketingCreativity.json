@@ -1,0 +1,3189 @@
+{
+  "category": [
+    {
+      "icon": "https://cloud.zhaomi.cn/character_robot/icon/hot.png",
+      "icon_hover": "https://cloud.zhaomi.cn/character_robot/icon/hot_blue.png",
+      "icon_small": "https://cloud.zhaomi.cn/character_robot/icon/hot_small.png",
+      "list": [
+        {
+          "uid": "d1df35e17ce0cc3b2b0edd2abab83f6f",
+          "chat_type": 2,
+          "nickname": "朋友圈文案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/972722e8dbbb6dcb3733f2b9783e8346.jpg",
+          "description": "针对定制营销事件，帮你创作多样风格的朋友圈营销文案！",
+          "is_wish": 1,
+          "topics": 0
+        },
+        {
+          "uid": "4ae7bc479efd7f2fdbc3a8aee38b8e20",
+          "chat_type": 2,
+          "nickname": "大众点评",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/2d06fc601daddfd8ef7b6c53f3532a6f.png",
+          "description": "可为大众点评场景下的店铺或生成好、中、差评",
+          "is_wish": 1,
+          "topics": 0
+        },
+        {
+          "uid": "f16f93b52ac23979fc1af04561da5d79",
+          "chat_type": 2,
+          "nickname": "金融保险",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/777d4dbde7a74aba386240d81059bf59.jpg",
+          "description": "快速生成产品介绍、活动推广、品牌宣传、服务介绍等文案，满足各类金融保险行业的业务需求，满足金融保险行业的业务需求",
+          "is_wish": 1,
+          "topics": 0
+        },
+        {
+          "uid": "d0e90128880cd9c08d87fc7711991150",
+          "chat_type": 2,
+          "nickname": "居家用品",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/45b10c47dbcc9e0927bcdb362a81b4ae.jpg",
+          "description": "一键生成符合【家居用品】产品卖点的营销文案！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "039d689d2d0b12c4c1208595083267c2",
+          "chat_type": 2,
+          "nickname": "酒水",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/9946b1caf8ae50da38ae061dee195d13.jpg",
+          "description": "一键生成各类酒水相关的营销文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d136df7fa1234bda8a1a5245ed4cc56c",
+          "chat_type": 2,
+          "nickname": "餐饮行业",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/ba50422c76e8e2472bca2f799cd004e3.png",
+          "description": "AI为您快速生成各类美食推广文案，用于线上、线下推广，达到引流目的",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "47ad1a2af30ed71f5077e6d6259ad149",
+          "chat_type": 2,
+          "nickname": "母婴",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/8ef62b49eba5b54e31abe63db06eab17.png",
+          "description": "快速生成「母婴行业」下各类场景的卖点文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "578ba993e8e59e3a0fc8835d9731dd05",
+          "chat_type": 2,
+          "nickname": "露营",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dd514a78e5818b40c834e6400807d228.png",
+          "description": "可根据需求为「露营」所需的产品生成卖点文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d1f817f7f57a75f1dbab3fd16a38c71c",
+          "chat_type": 2,
+          "nickname": "今日头条",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/affc05aca0f8224c58d66a670edca3a2.jpg",
+          "description": "快速生成多样的【头条】体文章，打造有效的软植入种草文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "de7dfd55f9827da024a2fb37764d9e79",
+          "chat_type": 2,
+          "nickname": "公众号文案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1802a6497b64c4ab2e19d75cfd58ebc7.jpeg",
+          "description": "快速生成不同场景下的多种风格的公众号文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "1a5bda178fb58add915c3d8508a05343",
+          "chat_type": 2,
+          "nickname": "什么值得买",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/bd2086a380d1af2628e887104c9c52d6.png",
+          "description": "生成「什么值得买」平台所需的各类商品的商品介绍和描述文案，用于电商品牌，种草平台等产品推广应用",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "245e2043d35337c78f68a48df2c3b0fc",
+          "chat_type": 2,
+          "nickname": "小红书爆款标题",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+          "description": "让你的小红书火爆起来！爆款标题助手，快速生成更吸睛的作品！",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "热门",
+      "isExpanded": false
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/5f2b01bc957fbd4e255687eca50d0bb3.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/0a388a6a9bf7136d10f1e1736236ca62.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/dd3c078f69a8c5b9d9d1403a8999b516.png",
+      "list": [
+        {
+          "uid": "d1df35e17ce0cc3b2b0edd2abab83f6f",
+          "chat_type": 2,
+          "nickname": "朋友圈文案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/972722e8dbbb6dcb3733f2b9783e8346.jpg",
+          "description": "针对定制营销事件，帮你创作多样风格的朋友圈营销文案！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "4ae7bc479efd7f2fdbc3a8aee38b8e20",
+          "chat_type": 2,
+          "nickname": "大众点评",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/2d06fc601daddfd8ef7b6c53f3532a6f.png",
+          "description": "可为大众点评场景下的店铺或生成好、中、差评",
+          "is_wish": 1,
+          "topics": 0
+        },
+        {
+          "uid": "97937613bab8f213d4dd542841567102",
+          "chat_type": 2,
+          "nickname": "Facebook Ad.",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d59a04ec0ba97861dbbc121366b7f4e8.png",
+          "description": "快速生成「Facebook」平台营销的推广文案，满足用户销售转化和品牌形象推广的诉求！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d1f817f7f57a75f1dbab3fd16a38c71c",
+          "chat_type": 2,
+          "nickname": "今日头条",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/affc05aca0f8224c58d66a670edca3a2.jpg",
+          "description": "快速生成多样的【头条】体文章，打造有效的软植入种草文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "4f4c499da99b41dda157ef8ff53e220d",
+          "chat_type": 10,
+          "nickname": "小红书文案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+          "description": "快速生成小红书文案，覆盖多种场景，让你立即摆脱文案创作瓶颈！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "de7dfd55f9827da024a2fb37764d9e79",
+          "chat_type": 2,
+          "nickname": "公众号文案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1802a6497b64c4ab2e19d75cfd58ebc7.jpeg",
+          "description": "快速生成不同场景下的多种风格的公众号文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "c676add0b785edc4b0fc1db0771e5b17",
+          "chat_type": 2,
+          "nickname": "Instagram",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/161e9ec472a1eb4f6c607340e2b238c7.png",
+          "description": "快速生成「Instagram」平台的文案风格，可从博主和品牌商视角生成文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "1a5bda178fb58add915c3d8508a05343",
+          "chat_type": 2,
+          "nickname": "什么值得买",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/bd2086a380d1af2628e887104c9c52d6.png",
+          "description": "生成「什么值得买」平台所需的各类商品的商品介绍和描述文案，用于电商品牌，种草平台等产品推广应用",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "0771d45752ff68be17521e672e31ba6b",
+          "chat_type": 9,
+          "nickname": "小红书文案改写",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+          "description": "根据提供的爆款小红书文案，改写类似爆款文章。",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "a35d16e4b6a748c8b97034bb24ddf671",
+          "chat_type": 10,
+          "nickname": "知乎",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/413e05ae1aa705d1236df201e4119c38.png",
+          "description": "轻松生成知乎体文章，快速实现软性种草，提升营销效果！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "245e2043d35337c78f68a48df2c3b0fc",
+          "chat_type": 2,
+          "nickname": "小红书爆款标题",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+          "description": "让你的小红书火爆起来！爆款标题助手，快速生成更吸睛的作品！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "ee35b49704e4982cf6c062400c947bb5",
+          "chat_type": 2,
+          "nickname": "热门电子产品推荐文案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d11e95bc54608ef9c031fe7dc7afb16c.jpg",
+          "description": "尽享全网大V青睐的数码产品测评模块，热度飙升中，赶快加入体验吧！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d86a1c41888e8dfada3466019be52191",
+          "chat_type": 2,
+          "nickname": "小红书旅游攻略",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/db72a4db9b004ff585cd2d4e5a2a7aba.jpg",
+          "description": "不再为攻略协作烦恼啦！快来生成你的专属旅游攻略！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "b0ab297dac53d81643124412df88f321",
+          "chat_type": 2,
+          "nickname": "美妆超级种草文案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/c108400a1b2efebb3aeb7bfd2a05ba73.jpg",
+          "description": "快来写一篇万人点赞的种草文吧！百万美妆博主精选种草文案，为你带来神奇的灵感！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "aa841a5e70010b0782b6b4e5efb3e3b6",
+          "chat_type": 2,
+          "nickname": "小红书首饰推荐文案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/9d25d291a8da1b486285c253bcf970fb.jpg",
+          "description": "一键拥有极具质感的首饰推荐文案！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "44d6abaac1df718c188631290b619850",
+          "chat_type": 2,
+          "nickname": "小红书穿搭攻略",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+          "description": "为你快速打造个性化小红书穿搭攻略，让时尚变得轻松自在！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "c470560759785e5bc74ba7f53442ca5a",
+          "chat_type": 2,
+          "nickname": "小红书投放分析",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+          "description": "根据关键指标分析小红书的投放效果，给出评估意见，辅助专业决策～",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "053b3011ffdbe0ff7da97c66e109b52a",
+          "chat_type": 2,
+          "nickname": "小红书商品种草文",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+          "description": "快速生成你想要的商品种草文，瞬间点燃购物欲望！让我们一起享受种草乐趣吧！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "b0b39b3422aa276c9077e1caebdae2dd",
+          "chat_type": 2,
+          "nickname": "微博",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/bc31091410e22957995f93a6fe96a339.png",
+          "description": "打造微博营销利器，针对品牌方和博主不同口吻，快速生成热点事件或品牌博文！",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "平台文案",
+      "isExpanded": false
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/f37f5389cc64517877326dc1ed62885b.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/d9fcd1a5e8a8da89aeebb0b4525d3b5c.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/502f6f0348856bd44374f2b13c34cebc.png",
+      "list": [
+        {
+          "uid": "f16f93b52ac23979fc1af04561da5d79",
+          "chat_type": 2,
+          "nickname": "金融保险",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/777d4dbde7a74aba386240d81059bf59.jpg",
+          "description": "快速生成产品介绍、活动推广、品牌宣传、服务介绍等文案，满足各类金融保险行业的业务需求，满足金融保险行业的业务需求",
+          "is_wish": 1,
+          "topics": 0
+        },
+        {
+          "uid": "d0e90128880cd9c08d87fc7711991150",
+          "chat_type": 2,
+          "nickname": "居家用品",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/45b10c47dbcc9e0927bcdb362a81b4ae.jpg",
+          "description": "一键生成符合【家居用品】产品卖点的营销文案！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "039d689d2d0b12c4c1208595083267c2",
+          "chat_type": 2,
+          "nickname": "酒水",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/9946b1caf8ae50da38ae061dee195d13.jpg",
+          "description": "一键生成各类酒水相关的营销文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d136df7fa1234bda8a1a5245ed4cc56c",
+          "chat_type": 2,
+          "nickname": "餐饮行业",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/ba50422c76e8e2472bca2f799cd004e3.png",
+          "description": "AI为您快速生成各类美食推广文案，用于线上、线下推广，达到引流目的",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "47ad1a2af30ed71f5077e6d6259ad149",
+          "chat_type": 2,
+          "nickname": "母婴",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/8ef62b49eba5b54e31abe63db06eab17.png",
+          "description": "快速生成「母婴行业」下各类场景的卖点文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "578ba993e8e59e3a0fc8835d9731dd05",
+          "chat_type": 2,
+          "nickname": "露营",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dd514a78e5818b40c834e6400807d228.png",
+          "description": "可根据需求为「露营」所需的产品生成卖点文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "63bd9b91377d78019d1787932a2a7b6e",
+          "chat_type": 2,
+          "nickname": "茶饮",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/471036d5afdf26695a01b5ddd1ba9587.png",
+          "description": "让茶饮销售更简单，快速生成各类型茶饮卖点营销文案，助力您的茶饮店铺更上一层楼！",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "行业推广",
+      "isExpanded": false
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/5b14be364a1876a9ee5e31fc3cba3f74.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/a3b50b323f84de5d5b0913a3442c4804.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/c2394bd066ab22ef6bc97df126a6f0fa.png",
+      "list": [
+        {
+          "uid": "8e6c399699748cf04e5f7dc9e2d6d402",
+          "chat_type": 2,
+          "nickname": "企业宣传片脚本",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/3fee0a2defbb29abfbddcfb0738c8889.png",
+          "description": "一键生成不同类型企业及机构的宣传片视频脚本",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "444a922756ed77aa08736108f3740cd6",
+          "chat_type": 2,
+          "nickname": "拍摄剧本",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1edfba17ebde4c33fca9341288f5f952.jpg",
+          "description": "提供给用户不同的剧情走向选择，快速生成不同风格视频的剧本文案，提升剧本的创意",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "b044636238c752b78a945a933345ab51",
+          "chat_type": 2,
+          "nickname": "直播脚本",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/5673b589734e69e9d88c0c63e829f4b4.png",
+          "description": "帮您快速生成直播到货脚本，多种商品场景类型供您选择！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "b2f34c7d295aa4e82d238702de278a72",
+          "chat_type": 2,
+          "nickname": "抖音视频脚本",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/97b8019734ae849b6e1eac243f3fee70.png",
+          "description": "根据拍摄主题，生成分镜脚本和内容，扩展拍摄思路",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "db02fec6b7f1070293ea707f5b64c4be",
+          "chat_type": 2,
+          "nickname": "抖音视频介绍",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/97b8019734ae849b6e1eac243f3fee70.png",
+          "description": "打造吸睛抖音视频，生成多风格介绍文案，赢得更多关注和点赞！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d39b145e04dee46eebf59a965f267a46",
+          "chat_type": 9,
+          "nickname": "抖音口播脚本改写",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/97b8019734ae849b6e1eac243f3fee70.png",
+          "description": "打造吸睛抖音视频，一键改写抖音多风格口播脚本，赢得更多关注和点赞！",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "视频文案",
+      "isExpanded": false
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1b95c121781aeb742982ee4801e5a785.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/06310f1691a29a1d60278589c3dbfb6e.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/ba7ef69dd382fdbc2a586045bb4887f6.png",
+      "list": [
+        {
+          "uid": "b533d5f0323110d6ccfd1d9d7b4ce77d",
+          "chat_type": 2,
+          "nickname": "电商产品描述",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1bf2767a4004dd8392ff97dd14a039f3.png",
+          "description": "在多场景下为电商产品一键生成多种文案风格的商品描述文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "5c61675fc68e39c80191a0254e975d2f",
+          "chat_type": 2,
+          "nickname": "海报文案",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/ffece36f45985def09c4a006a0ec68a9.png",
+          "description": "一键生成不同类型的电商海报文案，为您提升品牌形象，增加点击率",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d7b13d41949e3c1ab5cfad9fcffc51e5",
+          "chat_type": 2,
+          "nickname": "店铺介绍",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/9f309a103566f4c3760d79ae2b943d1d.png",
+          "description": "快速生成多种不同类型的店铺介绍文案，文案可适用国内的电商平台",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "d5a683c9ce31062a2d0ae78c640c7b5d",
+          "chat_type": 2,
+          "nickname": "售后说明",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/8ba2a5cfa2a9a75db86a451cfc879dfa.png",
+          "description": "根据不同商品类型快速生成售后说明文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "90048149ee23fb795f6afb43b9bc1ebc",
+          "chat_type": 2,
+          "nickname": "电商售后评论",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d384324c7473e03eba885e67978cfd65.jpg",
+          "description": "快速生成大量不重复的用户售后评价，可包含好评和差评哦～",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "电商文案",
+      "isExpanded": false
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/b7124a28869dba020612225d98bf4533.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/9a5bbb6f271356b2633cb7ad2f2ee52b.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/2d5f61d706f43f6daa90b3e726ae671d.png",
+      "list": [
+        {
+          "uid": "cff83e9b1cf0c8fc5bdd26ae31edfb3d",
+          "chat_type": 2,
+          "nickname": "营销节点推广",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1d062281f36624ce79799e34d0b2ac0f.png",
+          "description": "为产品快速生成各种市场节点下的多元风格营销推广文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "31a69de5b68b3cc27ee8056549c6af29",
+          "chat_type": 2,
+          "nickname": "广告slogan",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a33d6114c453b6215aa96eca42168d22.jpg",
+          "description": "为不同场景下的产品快速生成多种风格的广告口号！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "a2e9e076ab514864dc2021b7e0f25108",
+          "chat_type": 2,
+          "nickname": "品牌介绍",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/e6c5838b177b50444e7c15e8710dd0ae.jpg",
+          "description": "快速生成不同行业的品牌介绍、品牌故事等文案",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "fd7284f57c6baca1fac4dea552da5f27",
+          "chat_type": 2,
+          "nickname": "公司介绍",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/11a63cba0acfd9404e2b47ad523f9133.png",
+          "description": "公司形象代表实力，一键生成不同行业公司介绍，让您在众多竞争者中脱颖而出，展现专业形象！",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "市场文案",
+      "isExpanded": false
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0fe171031907da762de682364fb52e68.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/9240a7f7f6ad0368a442638f8c8cd73a.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/dd3c078f69a8c5b9d9d1403a8999b516.png",
+      "list": [
+        {
+          "uid": "0b491c617825cf9272d93dd391b7f772",
+          "chat_type": 2,
+          "nickname": "时事政治",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/26fcdda8e86b88bc90e6956aa60c7a24.png",
+          "description": "快速生成不同场景下不同风格的时政新闻，帮助您提高工作效率！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "ade7352932175498bf2abe220377bfc4",
+          "chat_type": 2,
+          "nickname": "商业新闻",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/7ca0d092a3343c4c2b5d4214dd70c354.png",
+          "description": "快速生成不同场景不同风格的商业新闻，有效提升您的工作效率！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "150aef688bb59280252d566d6eca5665",
+          "chat_type": 2,
+          "nickname": "科技新闻",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/08f8d02065e30bf69e6f831672982f8a.png",
+          "description": "快速生成不同场景下不同风格的科技新闻，帮助您提高工作效率！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "364bc2e3fbaae6b180802db893e32614",
+          "chat_type": 2,
+          "nickname": "体育新闻",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/fc43380e67035b8920347577011f74e0.png",
+          "description": "快速生成不同场景下不同风格的体育新闻，帮助您提高工作效率！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "c75128478685f6c62ec0a6d542c01cfa",
+          "chat_type": 2,
+          "nickname": "娱乐新闻",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/563ca5bc18f5fd1e3b75b39175516a71.png",
+          "description": "快速生成不同场景下不同风格的娱乐新闻，帮助您提高工作效率！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "a067d63504c5f4fbcf03ad440f33423d",
+          "chat_type": 2,
+          "nickname": "财经通讯",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/2650235b25cf99e949573162926c5c69.png",
+          "description": "快速生成不同场景下不同风格的财经新闻，帮助您提高工作效率！",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "社媒文案",
+      "isExpanded": false
+    },
+    {
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/bcfe0aef8d031f3680d8bfb712b7d637.png",
+      "icon_hover": "https://cloud.zhaomi.cn/cody_admin/prod/516e5da3239e7a01155bcf44be4d25d7.png",
+      "icon_small": "https://cloud.zhaomi.cn/cody_admin/prod/632d9fa3c448cadb3133a6f23f0c6a3a.png",
+      "list": [
+        {
+          "uid": "972fec70b19d095cc731f43d51d7e076",
+          "chat_type": 2,
+          "nickname": "AliExpress",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/661fcc7af1542fb802280552b2219bb0.png",
+          "description": "快速生成符合速卖通平台海外商品卖点描述的文案，帮助您提高工作效率！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "ed4f69332dd8eeb8ce31747279269739",
+          "chat_type": 2,
+          "nickname": "Quora Answer",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1f7697c2896d9c0568ef457835487b5f.png",
+          "description": "针对美国版知乎「Quora」平台快速生成各类问题回答，并在回答中软植入营销诉求",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "58bc0c086abb1f746f10f5c8cbef7eca",
+          "chat_type": 2,
+          "nickname": "Amazon",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/96b7b53d27657a3b5ecdfd22459f25d1.png",
+          "description": "快速生成「亚马逊」平台的多种品类产品的五行描述，支持多国语言",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "9b29cd2acea26312ce1004820d285aef",
+          "chat_type": 2,
+          "nickname": "Google Ad.",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/ebea0fcd600387ef18e87e89d5ea2427.png",
+          "description": "快速生成「Google」搜索页的广告文案，帮助您提高点击转化率，快速切中用户痛点！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "6c618fad68233d61368e36a6488f575d",
+          "chat_type": 2,
+          "nickname": "Twitter Post",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/74436a6ff2f324537e8b36e82392cac0.png",
+          "description": "针对「Twitter」平台，为不同品牌快速生成符合社交媒体特性的推文！",
+          "is_wish": 0,
+          "topics": 0
+        },
+        {
+          "uid": "978a53420e1a97670e39eebbe2e64c2b",
+          "chat_type": 2,
+          "nickname": "Pinterest Post",
+          "icon": "https://cloud.zhaomi.cn/cody_admin/prod/e12b7c2c2e4bfe8d70cdc1d465db4bf5.webp",
+          "description": "快速生成针对「Pinterest」平台不同推广诉求的描述文案",
+          "is_wish": 0,
+          "topics": 0
+        }
+      ],
+      "title": "出海文案",
+      "isExpanded": false
+    }
+  ],
+  "history": {
+    "icon": "https://cloud.zhaomi.cn/character_robot/icon/history.png",
+    "icon_hover": "https://cloud.zhaomi.cn/character_robot/icon/history_blue.png",
+    "icon_small": "https://cloud.zhaomi.cn/character_robot/icon/history_small.png",
+    "list": [
+      {
+        "uid": "d1df35e17ce0cc3b2b0edd2abab83f6f",
+        "chat_type": 2,
+        "nickname": "朋友圈文案",
+        "icon": "https://cloud.zhaomi.cn/cody_admin/prod/972722e8dbbb6dcb3733f2b9783e8346.jpg",
+        "description": "针对定制营销事件，帮你创作多样风格的朋友圈营销文案！",
+        "is_wish": 1,
+        "topics": 0
+      }
+    ],
+    "title": "最近使用",
+    "isExpanded": false
+  },
+  "wish": {
+    "icon": "https://cloud.zhaomi.cn/character_robot/icon/wish.png",
+    "icon_hover": "https://cloud.zhaomi.cn/character_robot/icon/wish_blue.png",
+    "icon_small": "https://cloud.zhaomi.cn/character_robot/icon/wish_small.png",
+    "list": [
+      {
+        "uid": "f16f93b52ac23979fc1af04561da5d79",
+        "chat_type": 2,
+        "nickname": "金融保险",
+        "icon": "https://cloud.zhaomi.cn/cody_admin/prod/777d4dbde7a74aba386240d81059bf59.jpg",
+        "description": "快速生成产品介绍、活动推广、品牌宣传、服务介绍等文案，满足各类金融保险行业的业务需求，满足金融保险行业的业务需求",
+        "is_wish": 1,
+        "topics": 0
+      },
+      {
+        "uid": "4ae7bc479efd7f2fdbc3a8aee38b8e20",
+        "chat_type": 2,
+        "nickname": "大众点评",
+        "icon": "https://cloud.zhaomi.cn/cody_admin/prod/2d06fc601daddfd8ef7b6c53f3532a6f.png",
+        "description": "可为大众点评场景下的店铺或生成好、中、差评",
+        "is_wish": 1,
+        "topics": 0
+      },
+      {
+        "uid": "d1df35e17ce0cc3b2b0edd2abab83f6f",
+        "chat_type": 2,
+        "nickname": "朋友圈文案",
+        "icon": "https://cloud.zhaomi.cn/cody_admin/prod/972722e8dbbb6dcb3733f2b9783e8346.jpg",
+        "description": "针对定制营销事件，帮你创作多样风格的朋友圈营销文案！",
+        "is_wish": 1,
+        "topics": 0
+      }
+    ],
+    "title": "我的收藏",
+    "isExpanded": false
+  },
+  "details": {
+    "d1df35e17ce0cc3b2b0edd2abab83f6f": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/972722e8dbbb6dcb3733f2b9783e8346.jpg",
+      "list": [
+        {
+          "default": ["Nike篮球鞋"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: Nike篮球鞋",
+          "title": "营销对象"
+        },
+        {
+          "default": ["Nike篮球鞋包裹性强，耐磨性好，防滑"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_100",
+          "placeholder": "示例: Nike篮球鞋包裹性强，耐磨性好，防滑",
+          "title": "内容描述"
+        },
+        {
+          "default": ["活泼"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["专业", "伤感", "文艺", "土味", "诗意"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "文案风格"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "朋友圈文案"
+    },
+    "4ae7bc479efd7f2fdbc3a8aee38b8e20": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/2d06fc601daddfd8ef7b6c53f3532a6f.png",
+      "list": [
+        {
+          "default": ["火锅"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 火锅",
+          "title": "店家/商家"
+        },
+        {
+          "default": ["美食"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["美食", "婚庆", "丽人", "酒店", "亲子", "购物", "家装", "爱车", "宠物", "周边游", "休闲娱乐", "运动健身", "学习培训", "生活服务", "医疗健康", "电子商品", "电影演出赛事"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "场景分类"
+        },
+        {
+          "default": ["好评"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["好评", "中评", "差评"],
+          "placeholder": "",
+          "title": "评论等级"
+        },
+        {
+          "default": [],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "关键信息"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "大众点评"
+    },
+    "97937613bab8f213d4dd542841567102": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d59a04ec0ba97861dbbc121366b7f4e8.png",
+      "list": [
+        {
+          "default": ["Emily"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: Emily",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["美妆个护"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["家用电器", "数码产品", "服装鞋帽", "图书音像", "居家日用", "母婴玩具", "美妆个护", "五金家装", "户外运动", "钟表眼镜"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["Effective", "UV protection", "Broad spectrum", "waterproof"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "Facebook Ad."
+    },
+    "d1f817f7f57a75f1dbab3fd16a38c71c": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/affc05aca0f8224c58d66a670edca3a2.jpg",
+      "list": [
+        {
+          "default": ["热点新闻"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 热点新闻",
+          "title": "营销对象"
+        },
+        {
+          "default": ["热点"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["军事", "历史", "财经", "科技", "国际", "旅游", "美食", "热点", "时尚", "数码", "体育", "养生"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "内容场景"
+        },
+        {
+          "default": ["“乌镇时间”即将开启！"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_100",
+          "placeholder": "示例: “乌镇时间”即将开启！",
+          "title": "内容描述"
+        },
+        {
+          "default": ["分享型"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["干货型", "故事型", "悬念型", "揭秘型", "分享型", "情感型", "争议型", "促销型", "诱惑型", "炒作型", "新闻事件型"],
+          "placeholder": "",
+          "title": "内容风格"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "今日头条"
+    },
+    "4f4c499da99b41dda157ef8ff53e220d": {
+      "extra": {
+        "chain_no": "26"
+      },
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+      "list": [
+        {
+          "default": ["润培护手霜"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "name",
+          "input_type": "text_30",
+          "placeholder": "示例: 润培护手霜",
+          "title": "产品名称"
+        },
+        {
+          "default": ["护手霜"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "category",
+          "input_type": "text_30",
+          "placeholder": "示例: 护手霜",
+          "title": "产品分类"
+        },
+        {
+          "default": ["颜值高、性价比高、香氛高级"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "special",
+          "input_type": "text_100",
+          "placeholder": "示例: 颜值高、性价比高、香氛高级",
+          "title": "特殊要求"
+        }
+      ],
+      "support_flow": 1,
+      "support_ind_report": 0,
+      "title": "小红书文案"
+    },
+    "de7dfd55f9827da024a2fb37764d9e79": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1802a6497b64c4ab2e19d75cfd58ebc7.jpeg",
+      "list": [
+        {
+          "default": ["AI数字员工写作"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: AI数字员工写作",
+          "title": "文案主题/主体"
+        },
+        {
+          "default": ["教育培训"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["新闻资讯", "品牌宣传", "教育培训", "娱乐休闲", "电商服务", "公益慈善", "健康养生", "金融理财", "旅游推荐", "政治宣传"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "文案场景"
+        },
+        {
+          "default": ["自动识别用户输入的信息，结合大模型，使AI数字员工创作登上新台阶"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_100",
+          "placeholder": "示例: 自动识别用户输入的信息，结合大模型，使AI数字员工创作登上新台阶",
+          "title": "内容描述"
+        },
+        {
+          "default": ["感性风格"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["幽默风格", "温馨风格", "教育风格", "爆点风格", "感性风格", "知识风格", "清新风格", "文艺风格"],
+          "placeholder": "示例：感性风格",
+          "title": "文案风格"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "公众号文案"
+    },
+    "c676add0b785edc4b0fc1db0771e5b17": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/161e9ec472a1eb4f6c607340e2b238c7.png",
+      "list": [
+        {
+          "default": ["sunscreen cream"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: sunscreen cream",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["美妆个护"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["家用电器", "数码产品", "服装鞋帽", "图书音像", "居家日用", "母婴玩具", "美妆各护", "五金家装", "户外运动", "钟表眼镜"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["Effective", "UV protection", "Broad spectrum", "waterproof"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "Instagram"
+    },
+    "1a5bda178fb58add915c3d8508a05343": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/bd2086a380d1af2628e887104c9c52d6.png",
+      "list": [
+        {
+          "default": ["艾美丽"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 艾美丽",
+          "title": "品牌"
+        },
+        {
+          "default": ["个性化妆"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["办公设备", "电脑数码", "服饰鞋包", "个性化妆", "家居家装", "金融服务", "母婴用品", "配饰腕表", "汽车消费", "食品生鲜", "图书音像", "玩模乐器", "艺术收藏", "运动户外", "日用百货"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "行业"
+        },
+        {
+          "default": ["面部护理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_30",
+          "placeholder": "示例: 面部护理",
+          "title": "产品类型"
+        },
+        {
+          "default": ["去角质，去黑头"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_100",
+          "placeholder": "示例: 去角质，去黑头",
+          "title": "产品介绍"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "什么值得买"
+    },
+    "0771d45752ff68be17521e672e31ba6b": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+      "list": [
+        {
+          "default": ["护目神牌护眼灯"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_20",
+          "placeholder": "请输入营销产品名称",
+          "title": "营销产品"
+        },
+        {
+          "default": ["学生党护眼必备神器"],
+          "err_msg": "请输入正确的关键词",
+          "input_name": "inputname_2",
+          "input_type": "text_100",
+          "placeholder": "请输入营销关键词",
+          "title": "内容关键词"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_20",
+          "placeholder": "请输入小红书文案标题",
+          "title": "原文标题"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入小红书原文",
+          "input_name": "inputname_4",
+          "input_type": "text_1200",
+          "placeholder": "输入小红书原文",
+          "title": "原文正文"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "小红书文案改写"
+    },
+    "a35d16e4b6a748c8b97034bb24ddf671": {
+      "extra": {
+        "chain_no": "27"
+      },
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/413e05ae1aa705d1236df201e4119c38.png",
+      "list": [
+        {
+          "default": ["你会选择裸辞吗？"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 你会选择裸辞吗？",
+          "title": "营销内容"
+        },
+        {
+          "default": ["职场"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["ACG", "财税", "宠物", "法律", "工程技术", "互联网", "家居生活", "健康", "教育", "金融", "经济", "科技", "旅行", "美食", "母婴", "汽车", "情感", "人文", "商业", "社会科学", "时尚", "数码", "体育", "心理学", "艺术", "音乐", "影视", "游戏", "娱乐", "运动健身", "职场", "自然科学"],
+          "placeholder": "示例: 职场",
+          "prompt_flag": 1,
+          "title": "内容场景"
+        },
+        {
+          "default": ["当代人对裸辞的看法是怎样的"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_100",
+          "placeholder": "示例: 当代人对裸辞的看法是怎样的",
+          "title": "问题描述"
+        },
+        {
+          "default": ["见解型回答"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["经历型回答", "故事型回答", "干货型回答", "见解型回答"],
+          "placeholder": "示例:见解型回答",
+          "title": "文案类型"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "示例:长文案",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 1,
+      "support_ind_report": 0,
+      "title": "知乎"
+    },
+    "245e2043d35337c78f68a48df2c3b0fc": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+      "list": [
+        {
+          "default": [],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "",
+          "title": "内容/主题"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "小红书爆款标题"
+    },
+    "ee35b49704e4982cf6c062400c947bb5": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d11e95bc54608ef9c031fe7dc7afb16c.jpg",
+      "list": [
+        {
+          "default": ["职场新人"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 职场新人",
+          "title": "发文人设"
+        },
+        {
+          "default": ["ABC折叠屏手机"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: ABC折叠屏手机",
+          "title": "产品名称"
+        },
+        {
+          "default": ["大屏幕，优秀的相机性能"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_100",
+          "placeholder": "示例: 大屏幕，优秀的相机性能",
+          "title": "产品特点"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入范文",
+          "input_name": "inputname_4",
+          "input_type": "text_1000",
+          "placeholder": "输入范文",
+          "title": "参考范文"
+        },
+        {
+          "accept": "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "btn_text": "上传文档",
+          "default": [],
+          "err_msg": "仅支持Word或PDF格式",
+          "input_name": "inputname_5",
+          "input_type": "file_50",
+          "loading_text": "上传中...",
+          "max_size": "50",
+          "placeholder": "支持Word或PDF格式",
+          "title": "参考文档"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "热门电子产品推荐文案"
+    },
+    "d86a1c41888e8dfada3466019be52191": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/db72a4db9b004ff585cd2d4e5a2a7aba.jpg",
+      "list": [
+        {
+          "default": ["武当山"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 武当山",
+          "title": "景点名称"
+        },
+        {
+          "default": ["秋季"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 秋季",
+          "title": "推荐季节"
+        },
+        {
+          "default": ["72峰、36岩、24涧、11洞、3潭、9泉、10石、9井、10池、9台"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_100",
+          "placeholder": "示例: 72峰、36岩、24涧、11洞、3潭、9泉、10石、9井、10池、9台",
+          "title": "景点特色"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入范文",
+          "input_name": "inputname_4",
+          "input_type": "text_1000",
+          "placeholder": "输入范文",
+          "title": "参考范文"
+        },
+        {
+          "accept": "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "btn_text": "上传文档",
+          "default": [],
+          "err_msg": "仅支持Word或PDF格式",
+          "input_name": "inputname_5",
+          "input_type": "file_50",
+          "loading_text": "上传中...",
+          "max_size": "50",
+          "placeholder": "支持Word或PDF格式",
+          "title": "参考文档"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "小红书旅游攻略"
+    },
+    "b0ab297dac53d81643124412df88f321": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/c108400a1b2efebb3aeb7bfd2a05ba73.jpg",
+      "list": [
+        {
+          "default": ["职场白领"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 职场白领",
+          "title": "发文人设"
+        },
+        {
+          "default": ["ABC精华粉底液"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: ABC精华粉底液",
+          "title": "商品名称"
+        },
+        {
+          "default": ["粉底液质地轻薄，易涂抹"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_100",
+          "placeholder": "示例: 粉底液质地轻薄，易涂抹",
+          "title": "营销特点"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入范文",
+          "input_name": "inputname_4",
+          "input_type": "text_1000",
+          "placeholder": "输入范文",
+          "title": "参考范文"
+        },
+        {
+          "accept": "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "btn_text": "上传文档",
+          "default": [],
+          "err_msg": "仅支持Word或PDF格式",
+          "input_name": "inputname_5",
+          "input_type": "file_50",
+          "loading_text": "上传中...",
+          "max_size": "50",
+          "placeholder": "支持Word或PDF格式",
+          "title": "参考文档"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "美妆超级种草文案"
+    },
+    "aa841a5e70010b0782b6b4e5efb3e3b6": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/9d25d291a8da1b486285c253bcf970fb.jpg",
+      "list": [
+        {
+          "default": ["职场白领"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 职场白领",
+          "title": "发文人设"
+        },
+        {
+          "default": ["卡地亚对戒"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 卡地亚对戒",
+          "title": "产品名称"
+        },
+        {
+          "default": ["形态多样，款式丰富，造型迷人"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_100",
+          "placeholder": "示例: 形态多样，款式丰富，造型迷人",
+          "title": "产品特点"
+        },
+        {
+          "default": ["600"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_100",
+          "placeholder": "示例: 600",
+          "title": "字数"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入范文",
+          "input_name": "inputname_5",
+          "input_type": "text_1000",
+          "placeholder": "输入范文",
+          "title": "参考范文"
+        },
+        {
+          "accept": "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "btn_text": "上传文档",
+          "default": [],
+          "err_msg": "仅支持Word或PDF格式",
+          "input_name": "inputname_6",
+          "input_type": "file_50",
+          "loading_text": "上传中...",
+          "max_size": "50",
+          "placeholder": "支持Word或PDF格式",
+          "title": "参考文档"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "小红书首饰推荐文案"
+    },
+    "44d6abaac1df718c188631290b619850": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+      "list": [
+        {
+          "default": ["旅行达人"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "name",
+          "input_type": "text_30",
+          "placeholder": "示例: 旅行达人",
+          "title": "发文人设"
+        },
+        {
+          "default": ["400"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "category",
+          "input_type": "text_30",
+          "placeholder": "示例: 400",
+          "title": "字数"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "小红书穿搭攻略"
+    },
+    "c470560759785e5bc74ba7f53442ca5a": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+      "list": [
+        {
+          "default": ["5"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 5",
+          "title": "CPM（千人展现成本）"
+        },
+        {
+          "default": ["20"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 20",
+          "title": "CPC（点击成本）"
+        },
+        {
+          "default": ["10"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_30",
+          "placeholder": "示例: 10",
+          "title": "CPE（互动成本）"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入范文",
+          "input_name": "inputname_4",
+          "input_type": "text_1000",
+          "placeholder": "输入范文",
+          "title": "参考范文"
+        },
+        {
+          "accept": "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "btn_text": "上传文档",
+          "default": [],
+          "err_msg": "仅支持Word或PDF格式",
+          "input_name": "inputname_5",
+          "input_type": "file_50",
+          "loading_text": "上传中...",
+          "max_size": "50",
+          "placeholder": "支持Word或PDF格式",
+          "title": "参考文档"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "小红书投放分析"
+    },
+    "053b3011ffdbe0ff7da97c66e109b52a": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d45dc46192ae0c759c34bd301c64a0ee.png",
+      "list": [
+        {
+          "default": ["纪梵希口红"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 纪梵希口红",
+          "title": "商品名称"
+        },
+        {
+          "default": ["个护化妆"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 个护化妆",
+          "title": "行业"
+        },
+        {
+          "default": ["纪梵希"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_30",
+          "placeholder": "示例: 纪梵希",
+          "title": "品牌"
+        },
+        {
+          "default": ["轻松幽默"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_30",
+          "placeholder": "示例: 轻松幽默",
+          "title": "语气风格"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入范文",
+          "input_name": "inputname_5",
+          "input_type": "text_1000",
+          "placeholder": "输入范文",
+          "title": "参考范文"
+        },
+        {
+          "accept": "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "btn_text": "上传文档",
+          "default": [],
+          "err_msg": "仅支持Word或PDF格式",
+          "input_name": "inputname_6",
+          "input_type": "file_50",
+          "loading_text": "上传中...",
+          "max_size": "50",
+          "placeholder": "支持Word或PDF格式",
+          "title": "参考文档"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "小红书商品种草文"
+    },
+    "b0b39b3422aa276c9077e1caebdae2dd": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/bc31091410e22957995f93a6fe96a339.png",
+      "list": [
+        {
+          "default": ["花粉"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例:花粉",
+          "title": "营销对象"
+        },
+        {
+          "default": ["HUAWEI Mate60 Pro 遥遥领先"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_100",
+          "placeholder": "示例: HUAWEI Mate60 Pro 遥遥领先",
+          "title": "热点内容"
+        },
+        {
+          "default": ["科技数码"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["财经", "时尚", "时政", "情感", "娱乐", "文化", "美食", "旅行", "生活", "亲子", "体育", "教育", "才艺", "科技数码", "萌宠", "游戏", "动漫", "影视", "广告营销", "汽车", "设计美学"],
+          "placeholder": "",
+          "title": "内容场景"
+        },
+        {
+          "default": ["微博长文"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["微博推文", "微博长文"],
+          "placeholder": "",
+          "title": "博文类型"
+        },
+        {
+          "default": ["博主"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["品牌方", "博主"],
+          "placeholder": "",
+          "title": "推文口吻"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "微博"
+    },
+    "f16f93b52ac23979fc1af04561da5d79": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/777d4dbde7a74aba386240d81059bf59.jpg",
+      "list": [
+        {
+          "default": ["北京银行"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 北京银行",
+          "title": "机构品牌"
+        },
+        {
+          "default": ["金融理财保险业务"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 金融理财保险业务",
+          "title": "主营业务"
+        },
+        {
+          "default": ["业务推广"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["活动推广", "服务介绍", "产品介绍", "品牌宣传"],
+          "placeholder": "",
+          "title": "文案类型"
+        },
+        {
+          "default": ["购买金融保险，保你幸福平安"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_100",
+          "placeholder": "示例: 购买金融保险，保你幸福平安",
+          "title": "详情描述"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "金融保险"
+    },
+    "d0e90128880cd9c08d87fc7711991150": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/45b10c47dbcc9e0927bcdb362a81b4ae.jpg",
+      "list": [
+        {
+          "default": ["网红多功能料理锅"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 网红多功能料理锅",
+          "title": "营销主题/主题"
+        },
+        {
+          "default": ["烹饪锅具"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["家纺床品", "杯壶餐具", "烹饪锅具", "日用/纸品", "收纳晾晒"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["不粘性强", "多功能", "耐高温", "大容量", "超强火力"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "居家用品"
+    },
+    "039d689d2d0b12c4c1208595083267c2": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/9946b1caf8ae50da38ae061dee195d13.jpg",
+      "list": [
+        {
+          "default": ["茅台"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 茅台",
+          "title": "营销主题/主题"
+        },
+        {
+          "default": ["白酒"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["啤酒", "白酒", "葡萄酒", "黄酒", "果酒", "清酒", "起泡酒", "鸡尾酒", "烈酒"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["传统酿造", "口感醇厚", "健康", "珍贵", "礼仪"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "酒水"
+    },
+    "d136df7fa1234bda8a1a5245ed4cc56c": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/ba50422c76e8e2472bca2f799cd004e3.png",
+      "list": [
+        {
+          "default": ["红烧肉"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例:红烧肉",
+          "title": "营销主题/主题"
+        },
+        {
+          "default": ["肉类"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["肉类", "海鲜", "蔬菜", "水果", "面粉制品", "谷物", "调味料", "坚果与干果"],
+          "placeholder": "",
+          "title": "食材属性"
+        },
+        {
+          "default": ["色香味具佳", "香气扑鼻", "入口即化", "肥而不腻"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["短文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "餐饮行业"
+    },
+    "47ad1a2af30ed71f5077e6d6259ad149": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/8ef62b49eba5b54e31abe63db06eab17.png",
+      "list": [
+        {
+          "default": ["奶粉"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 奶粉",
+          "title": "营销主题/主题"
+        },
+        {
+          "default": ["生育相关"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["食品", "医疗", "金融", "教育", "衣物类", "易耗品", "耐用品", "丽人服务", "生育相关", "非生育相关", "娱乐及出行"],
+          "placeholder": "",
+          "title": "商品类型"
+        },
+        {
+          "default": ["婴童"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["婴童", "孕产妇"],
+          "placeholder": "",
+          "title": "目标群体"
+        },
+        {
+          "default": ["营养丰富", "品质保证", "安全有保障", "方便易用"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "母婴"
+    },
+    "578ba993e8e59e3a0fc8835d9731dd05": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dd514a78e5818b40c834e6400807d228.png",
+      "list": [
+        {
+          "default": ["帐篷"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 帐篷",
+          "title": "营销主体"
+        },
+        {
+          "default": ["用餐设备"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["照明设备", "供电设备", "导航设备", "储存设备", "防雨设备", "净水设备", "用餐设备", "安全设备", "娱乐设备", "睡眠设备", "住宿设备", "个人护理用品"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["描述性"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["专业性", "描述性", "实际", "幽默"],
+          "placeholder": "",
+          "title": "文案风格"
+        },
+        {
+          "default": ["舒适性", "防水性", "保暖性", "私密性"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "露营"
+    },
+    "63bd9b91377d78019d1787932a2a7b6e": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/471036d5afdf26695a01b5ddd1ba9587.png",
+      "list": [
+        {
+          "default": ["乌龙茶"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 乌龙茶",
+          "title": "营销主体"
+        },
+        {
+          "default": ["绿茶"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["绿茶", "黑茶", "红茶", "白茶", "黄茶", "乌龙茶", "花果茶", "奶茶", "水果茶", "冰茶"],
+          "placeholder": "",
+          "title": "茶饮类型"
+        },
+        {
+          "default": ["清新口感", "健康饮品", "很香"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "茶饮"
+    },
+    "8e6c399699748cf04e5f7dc9e2d6d402": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/3fee0a2defbb29abfbddcfb0738c8889.png",
+      "list": [
+        {
+          "default": ["帮我写一个摄影工作室的宣传片脚本"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 帮我写一个摄影工作室的宣传片脚本",
+          "title": "宣传主体/主题"
+        },
+        {
+          "default": ["企业宣传片"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["企业形象片", "企业文化片", "企业招商片", "企业产品片", "企业访谈片", "企业宣传片", "企业纪录片"],
+          "placeholder": "",
+          "title": "宣传片类型"
+        },
+        {
+          "default": ["3分钟及以内"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["3分钟及以内", "3-5分钟", "5-10分钟", "10分钟及以上"],
+          "placeholder": "",
+          "title": "宣传片时长"
+        },
+        {
+          "default": [],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "关键词"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "企业宣传片脚本"
+    },
+    "444a922756ed77aa08736108f3740cd6": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1edfba17ebde4c33fca9341288f5f952.jpg",
+      "list": [
+        {
+          "default": ["使用AI数字员工解决工作难题"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 使用AI数字员工解决工作难题",
+          "title": "剧本主题"
+        },
+        {
+          "default": ["生活工作"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["娱乐高效", "知识培训", "生活工作", "网络科技", "情感偶像"],
+          "placeholder": "",
+          "title": "题材类型"
+        },
+        {
+          "default": ["AI数字员工帮助我提升工作效率"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "text_100",
+          "placeholder": "示例:AI数字员工帮助我提升工作效率",
+          "title": "内容摘要"
+        },
+        {
+          "default": [],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "关键词"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "拍摄剧本"
+    },
+    "b044636238c752b78a945a933345ab51": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/5673b589734e69e9d88c0c63e829f4b4.png",
+      "list": [
+        {
+          "default": ["创意经营类手游推广"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 创意经营类手游推广",
+          "title": "直播主题"
+        },
+        {
+          "default": ["游戏推广"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["彩妆", "厨卫用品", "数码电器", "家用电器", "洗护产品", "护肤护理", "服装鞋包", "特色美食", "装饰饰品", "家居好物", "教育培训", "游戏推广"],
+          "placeholder": "",
+          "title": "商品类型"
+        },
+        {
+          "default": ["单品脚本"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["单品场景", "整场脚本"],
+          "placeholder": "",
+          "title": "脚本类型"
+        },
+        {
+          "default": ["创意经营类手游全新上线"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "text_100",
+          "placeholder": "示例:创意经营类手游全新上线",
+          "title": "内容摘要"
+        },
+        {
+          "default": ["经营思维", "简单好玩"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "关键词"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_6",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "直播脚本"
+    },
+    "b2f34c7d295aa4e82d238702de278a72": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/97b8019734ae849b6e1eac243f3fee70.png",
+      "list": [
+        {
+          "default": ["AI数字员工介绍"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: AI数字员工介绍",
+          "title": "视频主题"
+        },
+        {
+          "default": ["情景剧"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["情景剧", "美妆", "母婴", "教育", "情感", "萌宠", "美食", "恶搞", "纪录片", "网红", "搞笑", "音乐舞蹈", "街头采访", "创意剪辑", "科技数码", "其他"],
+          "placeholder": "",
+          "title": "视频类型"
+        },
+        {
+          "default": ["剧情反转"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "text_100",
+          "placeholder": "示例: 剧情反转",
+          "title": "剧情风格"
+        },
+        {
+          "default": ["AI数字员工帮助你提高工作效率"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "text_100",
+          "placeholder": "示例: AI数字员工帮助你提高工作效率",
+          "title": "视频摘要"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "抖音视频脚本"
+    },
+    "db02fec6b7f1070293ea707f5b64c4be": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/97b8019734ae849b6e1eac243f3fee70.png",
+      "list": [
+        {
+          "default": ["持妆粉底液特惠"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 持妆粉底液特惠",
+          "title": "视频主题"
+        },
+        {
+          "default": ["视频简介"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["视频简介", "图文文案", "直播间简介"],
+          "placeholder": "",
+          "title": "文案类型"
+        },
+        {
+          "default": ["友好"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["幽默", "接地气", "调侃", "诗意", "八卦", "感性", "阳光", "客观", "伤感", "可爱", "豪爽", "友好"],
+          "placeholder": "",
+          "title": "文案语气"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "抖音视频介绍"
+    },
+    "d39b145e04dee46eebf59a965f267a46": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/97b8019734ae849b6e1eac243f3fee70.png",
+      "list": [
+        {
+          "default": ["护目神牌护眼灯"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "请输入营销产品名称",
+          "title": "营销产品"
+        },
+        {
+          "default": ["学生党护眼必备神器"],
+          "err_msg": "请输入正确的关键词",
+          "input_name": "inputname_2",
+          "input_type": "text_100",
+          "placeholder": "示例: 学生党护眼必备神器",
+          "title": "内容关键词"
+        },
+        {
+          "accept": "video/*",
+          "btn_text": "上传视频",
+          "default": [],
+          "err_msg": "视频最大200M",
+          "input_name": "inputname_3",
+          "input_type": "file_200",
+          "loading_text": "上传中...",
+          "max_size": "200",
+          "placeholder": "视频最大200M",
+          "title": "抖音视频导入"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "抖音口播脚本改写"
+    },
+    "b533d5f0323110d6ccfd1d9d7b4ce77d": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1bf2767a4004dd8392ff97dd14a039f3.png",
+      "list": [
+        {
+          "default": ["茅台"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 茅台",
+          "title": "营销主题/主题"
+        },
+        {
+          "default": ["酒水"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["服装", "美妆", "家电", "家居", "数码", "食品", "酒水", "文具", "其他"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["口感醇厚", "健康", "珍贵", "礼仪"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "电商产品描述"
+    },
+    "5c61675fc68e39c80191a0254e975d2f": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/ffece36f45985def09c4a006a0ec68a9.png",
+      "list": [
+        {
+          "default": ["优衣库"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 优衣库",
+          "title": "营销主题/主题"
+        },
+        {
+          "default": ["服装"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["服装", "美妆", "家居", "数码", "食品", "酒水", "文具", "其他"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "产品类型"
+        },
+        {
+          "default": ["节日优惠", "个性化定制", "限量销售", "节日款"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "海报文案"
+    },
+    "d7b13d41949e3c1ab5cfad9fcffc51e5": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/9f309a103566f4c3760d79ae2b943d1d.png",
+      "list": [
+        {
+          "default": ["艾美丽商店"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 艾美丽商店",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["服装"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["服装", "美妆", "家居", "数码", "食品", "酒水", "文具", "其他"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "产品类型"
+        },
+        {
+          "default": ["天猫"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["天猫", "京东", "苏宁易购", "唯品会", "淘宝网", "国美", "1号电", "其他"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "电商平台"
+        },
+        {
+          "default": ["节日优惠", "个性化定制", "限量销售", "粉丝专属"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "店铺介绍"
+    },
+    "d5a683c9ce31062a2d0ae78c640c7b5d": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/8ba2a5cfa2a9a75db86a451cfc879dfa.png",
+      "list": [
+        {
+          "default": ["艾美丽防晒霜"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 艾美丽防晒霜",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["洗护用品"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["服装", "美妆", "家电", "家居", "数码", "食品", "洗护用品", "文具", "其他"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "产品类型"
+        },
+        {
+          "default": ["艾美丽防晒霜"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_300",
+          "placeholder": "示例: 产品特点、使用方法、保质期等",
+          "title": "产品信息"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "售后说明"
+    },
+    "90048149ee23fb795f6afb43b9bc1ebc": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/d384324c7473e03eba885e67978cfd65.jpg",
+      "list": [
+        {
+          "default": ["艾美丽防晒霜"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 艾美丽防晒霜",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["美妆"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["服装", "美妆", "家电", "家居", "数码", "食品", "酒水", "文具", "其他"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "产品类型"
+        },
+        {
+          "default": ["好评"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["好评", "中评", "差评"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "评价类型"
+        },
+        {
+          "default": ["皮肤变嫩", "防晒效果好", "用了两年", "服务态度好"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "关键词"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "电商售后评论"
+    },
+    "cff83e9b1cf0c8fc5bdd26ae31edfb3d": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1d062281f36624ce79799e34d0b2ac0f.png",
+      "list": [
+        {
+          "default": ["小马开疆科技有限公司"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 小马开疆科技有限公司",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["春节"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["春节", "中秋节", "元旦", "教师节", "清明节", "儿童节", "西方情人节", "七夕", "妇女节", "母亲节", "父亲节", "520", "端午节", "国庆节", "万圣节", "双十一", "圣诞节", "跨年夜", "其他"],
+          "placeholder": "",
+          "title": "节日类型"
+        },
+        {
+          "default": ["元宇宙", "N世界", "数字孪生"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "",
+          "title": "关键信息"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "营销节点推广"
+    },
+    "31a69de5b68b3cc27ee8056549c6af29": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a33d6114c453b6215aa96eca42168d22.jpg",
+      "list": [
+        {
+          "default": ["大众汽车"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 大众汽车",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["汽车"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["IT", "广告", "机械", "建设工程", "教育", "金融", "零售", "旅游", "能源", "农业牧渔", "汽车", "物流", "医疗健康", "其他"],
+          "placeholder": "",
+          "title": "行业"
+        },
+        {
+          "default": ["驭变", "创新"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "",
+          "title": "关键信息"
+        },
+        {
+          "default": ["短文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "广告slogan"
+    },
+    "a2e9e076ab514864dc2021b7e0f25108": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/e6c5838b177b50444e7c15e8710dd0ae.jpg",
+      "list": [
+        {
+          "default": ["小马开疆科技有限公司"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 小马开疆科技有限公司",
+          "title": "品牌名称"
+        },
+        {
+          "default": ["IT"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["IT", "广告", "机械", "建设工程", "教育", "金融", "零售", "旅游", "能源", "农业牧渔", "汽车", "物流", "医疗健康", "其他"],
+          "placeholder": "",
+          "title": "行业"
+        },
+        {
+          "default": ["品牌简介"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["品牌故事", "品牌释义", "品牌历程", "品牌理念", "品牌使命"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "文案类型"
+        },
+        {
+          "default": ["元宇宙", "N世界", "人类文明"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "tab",
+          "placeholder": "",
+          "title": "关键信息"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "品牌介绍"
+    },
+    "fd7284f57c6baca1fac4dea552da5f27": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/11a63cba0acfd9404e2b47ad523f9133.png",
+      "list": [
+        {
+          "default": ["灵感无限设计有限公司"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 灵感无限设计有限公司",
+          "title": "公司名称"
+        },
+        {
+          "default": ["广告"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["IT", "广告", "机械", "建设工程", "教育", "金融", "零售", "旅游", "能源", "农业牧渔", "汽车", "物流", "医疗健康", "其他"],
+          "placeholder": "",
+          "title": "行业"
+        },
+        {
+          "default": ["专业团队", "创新精神", "服务至上"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "",
+          "title": "关键信息"
+        },
+        {
+          "default": ["短文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "公司介绍"
+    },
+    "0b491c617825cf9272d93dd391b7f772": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/26fcdda8e86b88bc90e6956aa60c7a24.png",
+      "list": [
+        {
+          "default": ["巴以冲突最新消息"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 巴以冲突最新消息",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["时政新闻"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["时政新闻", "财经新闻", "法律新闻", "军事新闻", "文教新闻"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "场景类型"
+        },
+        {
+          "default": ["新闻性风格"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["新闻性风格", "叙事性风格", "描述性风格", "感性风格", "论述性风格", "探究性风格", "散文性风格", "其他"],
+          "placeholder": "示例：新闻性风格",
+          "title": "文案风格"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "时事政治"
+    },
+    "ade7352932175498bf2abe220377bfc4": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/7ca0d092a3343c4c2b5d4214dd70c354.png",
+      "list": [
+        {
+          "default": ["中国股市发展走向"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 中国股市发展走向",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["行业新闻"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["企业新闻", "行业新闻", "创新与科技新闻", "商业政策新闻", "商业领袖新闻"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "场景类型"
+        },
+        {
+          "default": ["新闻性风格"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["新闻性风格", "叙事性风格", "描述性风格", "感性风格", "论述性风格", "探究性风格", "散文性风格", "其他"],
+          "placeholder": "示例：新闻性风格",
+          "title": "文案风格"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "商业新闻"
+    },
+    "150aef688bb59280252d566d6eca5665": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/08f8d02065e30bf69e6f831672982f8a.png",
+      "list": [
+        {
+          "default": ["AI行业发展前景"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例:AI行业发展前景",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["科技趋势"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["科技趋势", "科技政策与法规", "创新与研究", "展会与活动", "企业特写"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "场景类型"
+        },
+        {
+          "default": ["新闻性风格"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["新闻性风格", "叙事性风格", "描述性风格", "感性风格", "论述性风格", "探究性风格", "散文性风格", "其他"],
+          "placeholder": "示例：新闻性风格",
+          "title": "文案风格"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "科技新闻"
+    },
+    "364bc2e3fbaae6b180802db893e32614": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/fc43380e67035b8920347577011f74e0.png",
+      "list": [
+        {
+          "default": ["篮球亚运会"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 篮球亚运会",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["体育人物报道"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["体育人物报道", "赛事新闻", "社会体育", "休闲体育", "综合体育"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "场景类型"
+        },
+        {
+          "default": ["新闻性风格"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["新闻性风格", "叙事性风格", "描述性风格", "感性风格", "论述性风格", "探究性风格", "散文性风格", "其他"],
+          "placeholder": "示例：新闻性风格",
+          "title": "文案风格"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "体育新闻"
+    },
+    "c75128478685f6c62ec0a6d542c01cfa": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/563ca5bc18f5fd1e3b75b39175516a71.png",
+      "list": [
+        {
+          "default": ["艾美丽"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 艾美丽",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["明星动态"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["明星动态", "影视新闻", "娱乐八卦", "文娱节目", "时尚新闻"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "场景类型"
+        },
+        {
+          "default": ["新闻性风格"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["新闻性风格", "叙事性风格", "描述性风格", "感性风格", "论述性风格", "探究性风格", "散文性风格", "其他"],
+          "placeholder": "示例：新闻性风格",
+          "title": "文案风格"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "娱乐新闻"
+    },
+    "a067d63504c5f4fbcf03ad440f33423d": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/2650235b25cf99e949573162926c5c69.png",
+      "list": [
+        {
+          "default": ["市场下行"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 市场下行",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["银行新闻"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["证券新闻", "保险新闻", "投资新闻", "基金新闻", "国民经济", "国际经济", "行业经济", "货币新闻", "区域经济"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "场景类型"
+        },
+        {
+          "default": ["新闻性风格"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["新闻性风格", "叙事性风格", "描述性风格", "感性风格", "论述性风格", "探究性风格", "散文性风格", "其他"],
+          "placeholder": "示例：新闻性风格",
+          "title": "文案风格"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "财经通讯"
+    },
+    "972fec70b19d095cc731f43d51d7e076": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/661fcc7af1542fb802280552b2219bb0.png",
+      "list": [
+        {
+          "default": ["Emily"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: Emily",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["美妆个护"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["家用电器", "数码产品", "服装鞋帽", "图书音像", "居家日用", "母婴玩具", "美妆各护", "五金家装", "户外运动", "钟表眼镜"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["Effective", "UV protection", "Broad spectrum", "waterproof"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "AliExpress"
+    },
+    "ed4f69332dd8eeb8ce31747279269739": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1f7697c2896d9c0568ef457835487b5f.png",
+      "list": [
+        {
+          "default": ["sunscreen cream"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: sunscreen cream",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["美妆个护"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["家用电器", "数码产品", "服装鞋帽", "图书音像", "居家日用", "母婴玩具", "美妆个护", "五金家装", "户外运动", "钟表眼镜"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["Effective", "UV protection", "Broad spectrum", "waterproof"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "Quora Answer"
+    },
+    "58bc0c086abb1f746f10f5c8cbef7eca": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/96b7b53d27657a3b5ecdfd22459f25d1.png",
+      "list": [
+        {
+          "default": ["sunscreen cream"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: sunscreen cream",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["美妆个护"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["家用电器", "数码产品", "服装鞋帽", "图书音像", "居家日用", "母婴玩具", "美妆个护", "五金家装", "户外运动", "钟表眼镜"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["Effective", "UV protection", "Broad spectrum", "waterproof"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["英语"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["英语", "汉语", "印地语", "韩语", "法语", "俄语", "西班牙语", "阿拉伯语", "葡萄牙语"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "语言类型"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_5",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "Amazon"
+    },
+    "9b29cd2acea26312ce1004820d285aef": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/ebea0fcd600387ef18e87e89d5ea2427.png",
+      "list": [
+        {
+          "default": ["Waterproof sunscreen for sale"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: Waterproof sunscreen for sale",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["美妆个护"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["家用电器", "数码产品", "服装鞋帽", "图书音像", "居家日用", "母婴玩具", "美妆各护", "五金家装", "户外运动", "钟表眼镜"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["Effective", "UV protection", "Broad spectrum", "waterproof"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "Google Ad."
+    },
+    "6c618fad68233d61368e36a6488f575d": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/74436a6ff2f324537e8b36e82392cac0.png",
+      "list": [
+        {
+          "default": ["sunscreen cream"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: sunscreen cream",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["美妆个护"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["家用电器", "数码产品", "服装鞋帽", "图书音像", "居家日用", "母婴玩具", "美妆各护", "五金家装", "户外运动", "钟表眼镜"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["Effective", "UV protection", "Broad spectrum", "waterproof"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "Twitter Post"
+    },
+    "978a53420e1a97670e39eebbe2e64c2b": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/e12b7c2c2e4bfe8d70cdc1d465db4bf5.webp",
+      "list": [
+        {
+          "default": ["sunscreen cream"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: sunscreen cream",
+          "title": "营销主体/主题"
+        },
+        {
+          "default": ["美妆个护"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["家用电器", "数码产品", "服装鞋帽", "图书音像", "居家日用", "母婴玩具", "美妆各护", "五金家装", "户外运动", "钟表眼镜"],
+          "placeholder": "",
+          "title": "产品类型"
+        },
+        {
+          "default": ["Effective", "UV protection", "Broad spectrum", "waterproof"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "核心卖点"
+        },
+        {
+          "default": ["长文案"],
+          "err_msg": "",
+          "input_name": "inputname_4",
+          "input_type": "select",
+          "option": ["长文案", "中文案", "短文案"],
+          "placeholder": "",
+          "title": "文案长度"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "Pinterest Post"
+    }
+  }
+}
