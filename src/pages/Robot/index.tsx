@@ -29,6 +29,7 @@ import TextArea from 'antd/es/input/TextArea'
 import ExcelPreview from '@/components/Excel'
 import WordPreview from '@/components/Docx'
 import CSVPreview from '@/components/Csv'
+import { handleCopyClick } from '@/components/Dialogue'
 
 type Props = {
   right?: number
@@ -268,14 +269,6 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
         // 清空输入框
         setSendValue('')
       }
-    }
-  }
-  // 复制事件
-  const handleCopyClick = async (text: string) => {
-    if (copy(text)) {
-      Toast.notify({ type: 'success', message: '复制成功' })
-    } else {
-      Toast.notify({ type: 'error', message: '复制失败' })
     }
   }
   // 定义markdown解析

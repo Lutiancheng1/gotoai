@@ -24,6 +24,7 @@ import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css'
 import { imgLazyload } from '@mdit/plugin-img-lazyload'
 import { list } from 'radash'
+import { handleCopyClick } from '@/components/Dialogue'
 type CreativityDetailProps = {}
 let sse = false
 let currentMenuKey = 8
@@ -310,13 +311,6 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
     )
   }
   // 复制事件
-  const handleCopyClick = async (text: string) => {
-    if (copy(text)) {
-      Toast.notify({ type: 'success', message: '复制成功' })
-    } else {
-      Toast.notify({ type: 'error', message: '复制失败' })
-    }
-  }
   useMount(() => {
     const state = location.state
     if (!state) return
@@ -616,7 +610,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
                           ></div>
                           <div className="flex items-center mt-[15px] pt-[15px] text-14 border-dashed border-t-[1px] border-[rgba(105,117,126,0.3)] justify-end">
                             <div onClick={() => handleCopyClick(item.content)} className="flex justify-center items-center w-[76px] h-[32px] text-[#0E6CF2] rounded-[4px] cursor-pointer border-[1px] border-[#0E6CF2] group hover:bg-[#0E6CF2] hover:text-[#fff] bg-[#fff]">
-                              <i className="iconfont icon-fuzhi !mr-[5px]"></i>
+                              <i className="iconfont icon-icon_fuzhi !mr-[5px]"></i>
                               复制
                             </div>
                           </div>

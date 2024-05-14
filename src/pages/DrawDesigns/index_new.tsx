@@ -92,7 +92,30 @@ const adjustString = (str: string) => {
   const regex = /(--iw (\d+))(.*)?(--v (\d+\.\d+))/
   return str.replace(regex, '$4$3$1')
 }
-
+// 下载图片
+export const downloadImage = async (url: string) => {
+  if (!url) return
+  try {
+    const response = await fetch(url) // 替换为你的图片 URL
+    if (!response.ok) {
+      return Toast.notify({ type: 'error', message: '下载失败' })
+    }
+    const blob = await response.blob()
+    const path = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = path
+    link.download = `image_${new Date().getTime()}.jpg` // 替换为你想要的文件名
+    link.click()
+    // 移除按钮
+    link.remove()
+    // 释放内存
+    URL.revokeObjectURL(url)
+    Toast.notify({ type: 'success', message: '下载成功,请查看浏览器下载页' })
+  } catch (error) {
+    Toast.notify({ type: 'error', message: '下载失败' })
+    console.error(error)
+  }
+}
 const DrawDesigns = () => {
   // 大模型
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -225,10 +248,13 @@ const DrawDesigns = () => {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
-  const menuClick = (key: ITab) => {
-    console.log(key, 'key')
+  const menuClick = (key: ITab, prompt?: string) => {
+    // console.log(key, prompt, 'key')
     setCurrentTab(key)
     setIsFold(false)
+    if (prompt) {
+      setPrompt(prompt)
+    }
   }
   const promptChange = (value: string) => {
     setPrompt(value.replace('/imagine prompt: ', ''))
@@ -414,30 +440,7 @@ const DrawDesigns = () => {
   const delTask = (id: string) => {
     // console.log(id)
   }
-  // 下载图片
-  const downloadImage = async (url: string) => {
-    if (!url) return
-    try {
-      const response = await fetch(url) // 替换为你的图片 URL
-      if (!response.ok) {
-        return Toast.notify({ type: 'error', message: '下载失败' })
-      }
-      const blob = await response.blob()
-      const path = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = path
-      link.download = `image_${new Date().getTime()}.jpg` // 替换为你想要的文件名
-      link.click()
-      // 移除按钮
-      link.remove()
-      // 释放内存
-      URL.revokeObjectURL(url)
-      Toast.notify({ type: 'success', message: '下载成功,请查看浏览器下载页' })
-    } catch (error) {
-      Toast.notify({ type: 'error', message: '下载失败' })
-      console.error(error)
-    }
-  }
+
   // Save JSON
   const downloadJson = async () => {
     try {
@@ -828,7 +831,7 @@ const DrawDesigns = () => {
                         {tabs.map((item) => {
                           return (
                             <li className="mr-2" key={item} onClick={() => menuClick(item as ITab)}>
-                              <button disabled={item !== 'imageCreation'} className={`${item === currentTab ? 'active' : ''}`}>
+                              <button disabled={item === 'imageProcessing'} className={`${item === currentTab ? 'active' : ''}`}>
                                 {tabsWarp[item]}
                               </button>
                             </li>
@@ -1740,7 +1743,7 @@ const DrawDesigns = () => {
             />
           </>
         )}
-        {currentTab === 'gallery' && <Gallery />}
+        {currentTab === 'gallery' && <Gallery itemClick={menuClick} />}
       </section>
     </div>
   )

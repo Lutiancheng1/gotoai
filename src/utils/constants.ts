@@ -4,12 +4,12 @@
 export const menuConfig = [
   {
     key: 'talk',
-    icon: 'icon-message',
+    icon: 'icon-008duihuakuang-8',
     label: '对话'
   },
   {
     key: 'document',
-    icon: 'icon-wendang',
+    icon: 'icon-wendang1',
     label: '文档'
   },
   {
@@ -24,19 +24,18 @@ export const menuConfig = [
   },
   {
     key: 'dataAnalysis',
-    icon: 'icon-shujufenxi',
+    icon: 'icon-shujufenxi1',
     label: '数据分析'
   },
   {
     key: 'drawDesigns',
     icon: 'icon-hf_zxphuatu',
-    label: '画图'
+    label: '图像创作'
   },
   {
     key: 'video',
-    icon: 'icon-movie',
-    label: '视频',
-    disabled: true
+    icon: 'icon-fabudankuang-shipinchuangzuo',
+    label: '视频创作'
   },
   {
     key: 'marketingCreativity',
@@ -60,7 +59,7 @@ export const menuConfig = [
   // },
   {
     key: 'application',
-    icon: 'icon-applications',
+    icon: 'icon-yingyong',
     label: '应用'
   }
 ] as {

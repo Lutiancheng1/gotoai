@@ -56,6 +56,13 @@ type ChatError = {
   code: string
   param: string | null
 }
+export const handleCopyClick = async (text: string) => {
+  if (copy(text)) {
+    Toast.notify({ type: 'success', message: '复制成功' })
+  } else {
+    Toast.notify({ type: 'error', message: '复制失败' })
+  }
+}
 type Props = {
   onSendMessage?: (prompt: string, message: string) => void
   placeholder?: string
@@ -396,13 +403,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     }
   }
   // 复制事件
-  const handleCopyClick = async (text: string) => {
-    if (copy(text)) {
-      Toast.notify({ type: 'success', message: '复制成功' })
-    } else {
-      Toast.notify({ type: 'error', message: '复制失败' })
-    }
-  }
+
   // 定义markdown解析
   const md: MarkdownIt = new MarkdownIt({
     html: true,

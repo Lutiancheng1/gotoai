@@ -667,7 +667,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
                     hasUploadBtn={false}
                     ref={dialogueRef}
                     autoToBottom={false}
-                    sse={false}
+                    sse={true}
                     initChildren={
                       currentFile && (
                         <div className="init-page mb-5">

@@ -83,22 +83,11 @@ const MarketingCreativity: React.FC<MarketingCreativityProps> = () => {
     Toast.notify({ type: 'success', message: '删除成功' })
   }
   // 添加最近使用
-  const handleAddHistory = (item: List, type: string) => {
+  const toDetail = (item: List, type: string) => {
     location.hash = ''
     navigate(`${item.uid}`, {
       state: { type }
     })
-    // 如果已经存在
-    if (CreativityData.history.list.find((historyItem) => historyItem.uid === item.uid)) return
-    dispatch(
-      updateCreativityData({
-        ...CreativityData,
-        history: {
-          ...CreativityData.history,
-          list: [item, ...CreativityData.history.list]
-        }
-      })
-    )
   }
   // 搜索筛选
   const handleSearch = (value: string) => {
@@ -185,7 +174,7 @@ const MarketingCreativity: React.FC<MarketingCreativityProps> = () => {
                 <div className="flex flex-wrap">
                   {CreativityData.history.list.map((list) => {
                     return (
-                      <div key={list.uid} title={list.description} onClick={() => handleAddHistory(list, 'history')}>
+                      <div key={list.uid} title={list.description} onClick={() => toDetail(list, 'history')}>
                         <div className="creative-card flex flex-col relative group w-[216px] h-[116px] mr-[18px] mt-[18px] p-[20px] bg-[#fff] rounded-lg cursor-pointer">
                           <div className="flex absolute right-[10px] top-[8px]">
                             <i
@@ -224,7 +213,7 @@ const MarketingCreativity: React.FC<MarketingCreativityProps> = () => {
                 <div className="flex flex-wrap">
                   {CreativityData.wish.list.map((list) => {
                     return (
-                      <div key={list.uid} title={list.description} onClick={() => handleAddHistory(list, 'wish')}>
+                      <div key={list.uid} title={list.description} onClick={() => toDetail(list, 'wish')}>
                         <div className="creative-card flex flex-col relative group w-[216px] h-[116px] mr-[18px] mt-[18px] p-[20px] bg-[#fff] rounded-lg cursor-pointer">
                           <div className="flex absolute right-[10px] top-[8px]">
                             <i
@@ -259,7 +248,7 @@ const MarketingCreativity: React.FC<MarketingCreativityProps> = () => {
                     <div className="flex flex-wrap">
                       {item.list.map((list) => {
                         return (
-                          <div key={list.uid} title={list.description} onClick={() => handleAddHistory(list, item.title)}>
+                          <div key={list.uid} title={list.description} onClick={() => toDetail(list, item.title)}>
                             <div className="creative-card flex flex-col relative group w-[216px] h-[116px] mr-[18px] mt-[18px] p-[20px] bg-[#fff] rounded-lg cursor-pointer">
                               <div className="flex absolute right-[10px] top-[8px]">
                                 <i
