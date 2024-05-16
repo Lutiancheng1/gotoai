@@ -34,7 +34,19 @@ module.exports = {
           /node_modules\/@microsoft\/fetch-event-source/ // 排除@microsoft/fetch-event-source
         ]
       })
-
+      // // 添加处理 mp3 文件的规则
+      // webpackConfig.module.rules.push({
+      //   test: /\.mp3$/,
+      //   use: [
+      //     {
+      //       loader: 'file-loader',
+      //       options: {
+      //         name: '[path][name].[ext]',
+      //         esModule: false // 这是关键
+      //       }
+      //     }
+      //   ]
+      // })
       return webpackConfig
     },
     plugins: [

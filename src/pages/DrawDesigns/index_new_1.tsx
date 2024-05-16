@@ -4,11 +4,11 @@ import { Button, ConfigProvider, Input, InputNumber, InputNumberProps, List, Sel
 import { InfoCircleOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons'
 import Toast from '@/components/Toast'
 import TextArea from 'antd/es/input/TextArea'
-import { useBoolean, useMount, useRequest, useUnmount, useUpdateEffect } from 'ahooks'
+import { useAsyncEffect, useBoolean, useMount, useRequest, useUnmount, useUpdateEffect } from 'ahooks'
 import MJIcon from '@/assets/images/mj.jpg'
 import NIJIIcon from '@/assets/images/niji.jpg'
 import { ITab, pictureRatioWarp, modelVersions, qualityLevels, tabs, tabsWarp, modalWarp, stylizationWarp, stylesWarp, mosaicRatioWarp, mode } from './constant'
-import { DimensionsType, getTaskList, getTaskQueue, submitBlend, submitDescribe, submitDrawAction, submitDrawImagine, submitModal, submitShorten, TaskListResponse } from '@/api/MJAIgcAPi'
+import { deleteTask, DimensionsType, getTaskList, getTaskQueue, submitBlend, submitDescribe, submitDrawAction, submitDrawImagine, submitModal, submitShorten, TaskListResponse } from '@/api/MJself'
 import axios from 'axios'
 import { MD5 } from '@/utils/md5'
 import { dateFormat } from '@/utils/libs'
@@ -41,6 +41,7 @@ export interface Mjbutton {
 
 export interface TaskList {
   id: string
+  taskId: string
   action: string
   prompt: string
   promptEn: string
@@ -153,13 +154,17 @@ const DrawDesigns = () => {
   const controllerRef = useRef<HTMLDivElement>(null)
   // taskList
   const [taskList, setTaskList] = useState<TaskListResponse>({
-    totalNum: 0,
-    records: []
+    pageCount: 0,
+    pageIndex: 0,
+    recordCount: 0,
+    rows: []
   })
   // 当前正在进行任务队列
   const [TaskQueueList, setTaskQueueList] = useState<TaskListResponse>({
-    totalNum: 0,
-    records: []
+    pageCount: 0,
+    pageIndex: 0,
+    recordCount: 0,
+    rows: []
   })
   // 创建按钮loading
   const [submitLoading, setSubmitLoading] = useState(false)
@@ -290,14 +295,16 @@ const DrawDesigns = () => {
     setTrueWithParams()
   }
   const usePolling = () => {
+    //
+    useUpdateEffect(() => {
+      setTimeout(() => {
+        getTaskLists()
+      }, 3000)
+    }, [TaskQueueList.recordCount])
+
     const pollingTaskQueueInterval = useRef<NodeJS.Timeout | null>(null)
-    const pollingTaskListInterval = useRef<NodeJS.Timeout | null>(null)
 
-    const { data: taskQueueData, runAsync: getTaskQueueList } = useRequest(getTaskQueue, {
-      manual: true
-    })
-
-    const { runAsync: getTaskListData } = useRequest(getTaskList, {
+    const { runAsync: getTaskQueueList } = useRequest(getTaskQueue, {
       manual: true
     })
 
@@ -314,46 +321,24 @@ const DrawDesigns = () => {
           const data = await getTaskQueueList()
           if (data) {
             setTaskQueueList(data)
-            if (data.records.length === 0 || data.records.every((task) => task.progress === '100%')) {
+            // 更新 taskList 中的任务状态
+            setTaskList((prevTaskList) => {
+              const updatedRows = prevTaskList.rows.map((task) => {
+                const foundTask = data.rows.find((queueTask) => queueTask.taskId === task.taskId)
+                return foundTask ? foundTask : task
+              })
+              return { ...prevTaskList, rows: updatedRows }
+            })
+            if (data.rows.length === 0 || data.rows.filter((task) => task.status !== 'FAILURE').every((task) => task.progress === '100%')) {
               stopPollingTaskQueue() // 队列为空时停止轮询任务队列
-              stopPollingTaskList()
-              const data = await getTaskList()
-              if (data) setTaskList(data)
-            } else {
-              startPollingTaskList() // 开始轮询任务列表
             }
           } else {
             stopPollingTaskQueue()
-            stopPollingTaskList()
           }
         }
-        pollImmediatelyAndStartInterval(pollFunction, 8000, pollingTaskQueueInterval) // 每8秒轮询一次任务队列
+        pollImmediatelyAndStartInterval(pollFunction, 9000, pollingTaskQueueInterval) // 轮询
       }
     }
-
-    // 开始轮询任务列表
-    const startPollingTaskList = () => {
-      if (pollingTaskListInterval.current === null) {
-        const pollFunction = async () => {
-          const data = await getTaskListData()
-          if (data) {
-            setTaskList(data)
-            if (data.records.filter((task) => task.status !== 'FAILURE').every((task) => task.progress === '100%')) {
-              setTaskQueueList({
-                totalNum: 0,
-                records: []
-              })
-              stopPollingTaskList()
-              stopPollingTaskQueue()
-              const data = await getTaskList()
-              if (data) setTaskList(data)
-            }
-          }
-        }
-        pollImmediatelyAndStartInterval(pollFunction, 4000, pollingTaskListInterval) // 每4秒轮询一次任务列表
-      }
-    }
-
     // 停止轮询任务队列
     const stopPollingTaskQueue = () => {
       if (pollingTaskQueueInterval.current) {
@@ -362,31 +347,19 @@ const DrawDesigns = () => {
       }
     }
 
-    // 停止轮询任务列表
-    const stopPollingTaskList = () => {
-      if (pollingTaskListInterval.current) {
-        clearInterval(pollingTaskListInterval.current)
-        pollingTaskListInterval.current = null
-      }
-    }
-
     useUnmount(() => {
       // 组件卸载时清理轮询
       stopPollingTaskQueue()
-      stopPollingTaskList()
     })
 
     return {
       startPollingTaskQueue,
-      stopPollingTaskQueue,
-      startPollingTaskList,
-      stopPollingTaskList,
-      taskQueueData
+      stopPollingTaskQueue
     }
   }
 
   // 使用usePolling
-  const { startPollingTaskQueue, stopPollingTaskQueue, startPollingTaskList } = usePolling()
+  const { startPollingTaskQueue, stopPollingTaskQueue } = usePolling()
   const inputNumberonChange: InputNumberProps['onChange'] = (value) => {
     setStylization(value as number)
   }
@@ -426,9 +399,8 @@ const DrawDesigns = () => {
       setSubmitLoading(false)
       setTstBase64List([])
       setTrueWithParams()
-      if (res.code === 1) {
-        await startPollingTaskList()
-        startPollingTaskQueue()
+      if (res.code === 0) {
+        await getTaskLists()
       }
     } catch (error) {
       console.log(error)
@@ -437,14 +409,18 @@ const DrawDesigns = () => {
     }
   }
   //  删除任务
-  const delTask = (id: string) => {
-    // console.log(id)
+  const delTask = async (taskId: string) => {
+    const res = await deleteTask(taskId)
+    if (res.code === 200) {
+      Toast.notify({ type: 'success', message: '删除成功' })
+      setTaskList({ ...taskList, rows: taskList.rows.filter((task) => task.taskId !== taskId) })
+    }
   }
 
   // Save JSON
   const downloadJson = async () => {
     try {
-      const formattedTaskList = taskList.records
+      const formattedTaskList = taskList.rows
         .filter((task) => task.status !== 'FAILURE')
         .map((task) => ({
           actionTypeName: task.action || '',
@@ -469,29 +445,53 @@ const DrawDesigns = () => {
       console.error(error)
     }
   }
+
   const changePagination = (page: number, pageSize?: number) => {
     setCurrentPage(page)
     setPageSize(pageSize || 12)
+    getTaskLists(true, page, pageSize)
   }
-  const getTaskLists = async () => {
-    setIsLoading(true)
-    const data = await getTaskList()
-    setIsLoading(false)
+  const getTaskLists = async (needLoading?: boolean, page?: number, size?: number) => {
+    needLoading && setIsLoading(true)
+    const data = await getTaskList({
+      page: page ? page : currentPage,
+      pageSize: size ? size : pageSize
+    })
+    needLoading && setIsLoading(false)
+    console.log(data, 'getTaskLists')
     if (!data) return
-    setTaskList(data)
-    if (data.records.some((task) => task.status !== 'FAILURE' && task.progress !== '100%')) {
+
+    // 如果任务队列中有正在进行的任务，使用任务队列中的任务值
+    if (TaskQueueList.rows.length > 0 && TaskQueueList.rows.some((task) => task.status !== 'FAILURE' && task.progress !== '100%')) {
+      const updatedRows = data.rows.map((task) => {
+        const foundTask = TaskQueueList.rows.find((queueTask) => queueTask.id === task.id)
+        return foundTask ? foundTask : task
+      })
+      setTaskList({ ...data, rows: updatedRows })
+    } else {
+      setTaskList(data)
+    }
+
+    if (data.rows.some((task) => task.status !== 'FAILURE' && task.progress !== '100%')) {
       // 有任务进行中 开始监听
-      startPollingTaskList()
       startPollingTaskQueue()
     }
   }
   const getTaskQueueList = async () => {
     const data = await getTaskQueue()
     if (!data) return
-    if (data.records.length === 0) return
+    if (data.pageCount === 0) return
     setTaskQueueList(data)
     startPollingTaskQueue()
-    startPollingTaskList()
+
+    // 更新 taskList 中的任务状态
+    setTaskList((prevTaskList) => {
+      const updatedRows = prevTaskList.rows.map((task) => {
+        const foundTask = data.rows.find((queueTask) => queueTask.id === task.taskId)
+        return foundTask ? foundTask : task
+      })
+      return { ...prevTaskList, rows: updatedRows }
+    })
   }
   const translate = async (target: string) => {
     const AppId = '20240506002043542'
@@ -542,9 +542,8 @@ const DrawDesigns = () => {
           customId,
           taskId
         })
-        if (data.code === 1) {
-          startPollingTaskList()
-          startPollingTaskQueue()
+        if (data.code === 0) {
+          getTaskLists()
         }
       }
     })
@@ -569,19 +568,18 @@ const DrawDesigns = () => {
         const data = await submitDrawAction({
           mode,
           customId: b.customId,
-          taskId: task.id
+          taskId: task.taskId
         })
 
-        if (data.code === 1) {
-          startPollingTaskList()
-          startPollingTaskQueue()
+        if (data.code === 0) {
+          getTaskLists()
         }
       }
     })
   }
   // 初始化获取任务队列列表
   useMount(async () => {
-    await getTaskLists()
+    await getTaskLists(true)
   })
   useUpdateEffect(() => {
     const shouldSetWithParamsPrompt = !withParams || regexp.test(prompt)
@@ -679,9 +677,8 @@ const DrawDesigns = () => {
     setTsWLoading(false)
     setTsWBase64List([])
     setIsShowTsW(false)
-    if (res.code === 1) {
-      startPollingTaskList()
-      startPollingTaskQueue()
+    if (res.code === 0) {
+      getTaskLists()
     }
   }
   // 融图ok
@@ -696,9 +693,8 @@ const DrawDesigns = () => {
     setRtLoading(false)
     setRtBase64List([])
     setIsShowRt(false)
-    if (res.code === 1) {
-      startPollingTaskList()
-      startPollingTaskQueue()
+    if (res.code === 0) {
+      getTaskLists()
     }
   }
   // canvas open
@@ -719,19 +715,18 @@ const DrawDesigns = () => {
       const data = await submitDrawAction({
         mode,
         customId: b.customId,
-        taskId: task.id
+        taskId: task.taskId
       })
-      if (data.code === 21) {
+      if (data.code === 200) {
         const res = await submitModal({
           maskBase64: imageData,
           prompt,
-          taskId: data.result
+          taskId: data.data
         })
-        if (res.code === 1) {
+        if (res.code === 0) {
           setCanvasLoading(false)
           setIsShowCanvas(false)
-          startPollingTaskList()
-          startPollingTaskQueue()
+          getTaskLists()
         }
       }
     } catch (error) {
@@ -747,7 +742,7 @@ const DrawDesigns = () => {
       task
     })
     setIsShowZoom(true)
-    setZoomInputValue(task.imageUrl + adjustString(task.promptEn) + ' --zoom 2')
+    setZoomInputValue(`${task.imageUrl}  ${adjustString(task.promptEn)}  --zoom 2`)
   }
   const customZoomOk = async () => {
     if (customizeLoading) return
@@ -758,18 +753,18 @@ const DrawDesigns = () => {
       const data = await submitDrawAction({
         mode,
         customId: b.customId,
-        taskId: task.id
+        taskId: task.taskId
       })
-      if (data.code === 21) {
+      if (data.code === 200) {
         const res = await submitModal({
           prompt: zoomInputValue,
-          taskId: data.result
+          taskId: data.data,
+          maskBase64: ''
         })
-        if (res.code === 1) {
+        if (res.code === 0) {
           setCustomizeLoading(false)
           setIsShowZoom(false)
-          startPollingTaskList()
-          startPollingTaskQueue()
+          getTaskLists()
         }
       }
     } catch (error) {
@@ -788,11 +783,10 @@ const DrawDesigns = () => {
         mode,
         prompt
       })
-      if (data.code === 1) {
+      if (data.code === 0) {
         setPromptOptimizeLoading(false)
         setPrompt('')
-        startPollingTaskList()
-        startPollingTaskQueue()
+        getTaskLists()
       }
     } catch (error) {
       setPromptOptimizeLoading(false)
@@ -1338,7 +1332,7 @@ const DrawDesigns = () => {
                 <List
                   size="small"
                   bordered
-                  dataSource={TaskQueueList.records ? TaskQueueList.records : []}
+                  dataSource={TaskQueueList.rows ? TaskQueueList.rows : []}
                   renderItem={(item, index) => {
                     if (index === 0)
                       return (
@@ -1346,22 +1340,7 @@ const DrawDesigns = () => {
                           <div className="m-auto text-center">
                             <span className="loading loading-spinner loading-md"></span>
                             <div>
-                              <p>当前 {TaskQueueList.totalNum} 个进行中的任务，请耐心等待。</p>
-                              <p>点击后台执行后，仍可手动刷新列表后进行查看...</p>
-                              <p className="mt-2 flex justify-center">
-                                <Button
-                                  type="default"
-                                  onClick={() => {
-                                    setTaskQueueList({
-                                      records: [],
-                                      totalNum: 0
-                                    })
-                                    stopPollingTaskQueue()
-                                  }}
-                                >
-                                  后台执行
-                                </Button>
-                              </p>
+                              <p>当前 {TaskQueueList.recordCount} 个进行中的任务，请耐心等待。</p>
                             </div>
                           </div>
                         </div>
@@ -1378,12 +1357,12 @@ const DrawDesigns = () => {
                 <span className="text-gray-400 text-xs">如遇到进度长时间未更新，请手动点击刷新按钮</span>
               </div>
               <div className="w-full flex justify-between items-center mb-2">
-                <div>总记 : {taskList && taskList.totalNum}</div>
+                <div>总记 : {taskList && taskList.recordCount}</div>
                 <div>
-                  <Button className="mr-2" type="default" icon={<i className="iconfont icon-shuaxin"></i>} onClick={getTaskLists}>
+                  <Button className="mr-2" type="default" icon={<i className="iconfont icon-shuaxin"></i>} onClick={() => getTaskLists(true)}>
                     刷新
                   </Button>
-                  <Popconfirm title="保存绘画记录" description="保存当前页面绘画记录为本地 JSON ？" onConfirm={() => downloadJson()} okText="确认" okButtonProps={{ className: 'bg-[#1890ff] ' }} cancelText="取消">
+                  <Popconfirm title="保存绘画记录" description="保存当前页面绘画记录为本地 JSON ？" onConfirm={downloadJson} okText="确认" okButtonProps={{ className: 'bg-[#1890ff] ' }} cancelText="取消">
                     <Button type="default" icon={<DownloadOutlined />}></Button>
                   </Popconfirm>
                 </div>
@@ -1408,9 +1387,9 @@ const DrawDesigns = () => {
                         width: '100%'
                       }}
                     >
-                      {taskList.records &&
-                        taskList.records.length > 0 &&
-                        taskList.records.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((item) => {
+                      {taskList.rows &&
+                        taskList.rows.length > 0 &&
+                        taskList.rows.map((item) => {
                           return (
                             <div
                               style={{
@@ -1450,7 +1429,7 @@ const DrawDesigns = () => {
                                         }
                                       }}
                                     >
-                                      {item.action !== 'DESCRIBE' && (
+                                      {item.action !== 'DESCRIBE' && item.promptEn && (
                                         <div>
                                           <Tooltip title={item.promptEn && item.promptEn}>
                                             <Button disabled={!item.promptEn} onClick={() => setUsedPromot(item.promptEn && item.promptEn)} type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-huabi"></i>}>
@@ -1465,7 +1444,7 @@ const DrawDesigns = () => {
                                         </Button>
                                       </div>
                                       <div>
-                                        <Popconfirm title="" description="是否删除该任务？" onConfirm={() => delTask(item.id)} okText="确认" okButtonProps={{ className: 'bg-[#1890ff] ' }} cancelText="取消">
+                                        <Popconfirm title="" description="是否删除该任务？" onConfirm={() => delTask(item.taskId)} okText="确认" okButtonProps={{ className: 'bg-[#1890ff] ' }} cancelText="取消">
                                           <Button type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-shanchu1"></i>}>
                                             删除
                                           </Button>
@@ -1534,7 +1513,7 @@ const DrawDesigns = () => {
                                                       .filter((i) => i.label.startsWith('U'))
                                                       .map((i, index) => {
                                                         return (
-                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('U', item.id, i.customId, index + 1)}>
+                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('U', item.taskId, i.customId, index + 1)}>
                                                             {i.label}
                                                           </Button>
                                                         )
@@ -1543,7 +1522,7 @@ const DrawDesigns = () => {
                                                       .filter((i) => i.label === '')
                                                       .map((i) => (
                                                         <Tooltip title={'重新生成'} key={i.customId}>
-                                                          <Button onClick={() => changeImagine('R', item.id, i.customId)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
+                                                          <Button onClick={() => changeImagine('R', item.taskId, i.customId)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
                                                         </Tooltip>
                                                       ))}
                                                   </div>
@@ -1567,7 +1546,7 @@ const DrawDesigns = () => {
                                                       .filter((i) => i.label.startsWith('V'))
                                                       .map((i, index) => {
                                                         return (
-                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('V', item.id, i.customId, index + 1)}>
+                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('V', item.taskId, i.customId, index + 1)}>
                                                             {i.label}
                                                           </Button>
                                                         )
@@ -1598,7 +1577,7 @@ const DrawDesigns = () => {
                                                       .filter((i) => i.label.startsWith('U'))
                                                       .map((i, index) => {
                                                         return (
-                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('U', item.id, i.customId, index + 1)}>
+                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('U', item.taskId, i.customId, index + 1)}>
                                                             {i.label}
                                                           </Button>
                                                         )
@@ -1607,7 +1586,7 @@ const DrawDesigns = () => {
                                                       .filter((i) => i.label === '')
                                                       .map((i) => (
                                                         <Tooltip title={'重新生成'} key={i.customId}>
-                                                          <Button onClick={() => changeImagine('R', item.id, i.customId)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
+                                                          <Button onClick={() => changeImagine('R', item.taskId, i.customId)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
                                                         </Tooltip>
                                                       ))}
                                                   </div>
@@ -1731,7 +1710,7 @@ const DrawDesigns = () => {
               {/* 分页 */}
               {taskList && (
                 <footer className="sticky bottom-0 left-0 right-0 mt-4 bg-[#f6f7f9] py-4 pl-4">
-                  <Pagination onChange={changePagination} pageSizeOptions={['12', '24', '48', '96']} total={taskList.records && taskList.totalNum} showTotal={(total, range) => `第${range[0]}-${range[1]}条 共 ${total} 条`} defaultPageSize={12} defaultCurrent={1} />
+                  <Pagination onChange={changePagination} pageSize={pageSize} current={currentPage} pageSizeOptions={['12', '24', '48', '96']} total={taskList.recordCount} showTotal={(total, range) => `第${range[0]}-${range[1]}条 共 ${total} 条`} />
                 </footer>
               )}
             </div>

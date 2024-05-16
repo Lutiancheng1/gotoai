@@ -1,0 +1,46 @@
+.video-creation {
+  .video_textarea {
+    .ant-input-data-count {
+      position: absolute;
+      bottom: 10px;
+      left: 20px;
+    }
+  }
+
+  .ant-select-selection-item,
+  .ant-color-picker-trigger-text {
+    @apply text-12 2xl:text-16;
+  }
+
+  .ant-color-picker-color-block {
+    @apply 2xl:w-[20px] 2xl:h-[20px] w-[14px] h-[14px] ml-[9px]
+  }
+
+  .item {
+    height: 100%;
+    width: fit-content;
+    align-self: center;
+    background-color: rgb(253 242 248 / 1)
+  }
+
+  @media (min-width: 1024px) {
+    .item {
+      margin-left: 10px;
+      margin-right: 10px
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .item {
+      margin-left: 20px;
+      margin-right: 20px
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .item {
+      margin-left: 54px;
+      margin-right: 54px
+    }
+  }
+}

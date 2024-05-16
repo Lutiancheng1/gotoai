@@ -20,5 +20,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "public/iframe-share.js"]
+  "include": ["src"]
 }

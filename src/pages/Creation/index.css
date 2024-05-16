@@ -1,0 +1,7 @@
+.creation_wrapper {
+  height: 100%;
+
+  .ant-tabs-nav-list:first-child {
+    margin-left: 40px;
+  }
+}

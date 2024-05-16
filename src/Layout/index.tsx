@@ -34,8 +34,8 @@ const Document = React.lazy(() => import('@/pages/Document'))
 const Code = React.lazy(() => import('@/pages/Code'))
 const KnowledgeBase = React.lazy(() => import('@/pages/KnowledgeBase'))
 const DataAnalysis = React.lazy(() => import('@/pages/DataAnalysis'))
-const DrawDesigns = React.lazy(() => import('@/pages/DrawDesigns/index_new'))
-const Video = React.lazy(() => import('@/pages/Video'))
+const DrawDesigns = React.lazy(() => import('@/pages/DrawDesigns/index_new_1'))
+const VideoCreation = React.lazy(() => import('@/pages/Creation'))
 const Application = React.lazy(() => import('@/pages/Application'))
 const MarketingCreativity = React.lazy(() => import('@/pages/MarketingCreativity'))
 const CreativityDetail = React.lazy(() => import('@/pages/MarketingCreativity/CreativityDetail'))
@@ -279,7 +279,7 @@ const Index = ({ loading }: Props) => {
                 <Route path="/knowledgeBase" element={<KnowledgeBase />} />
                 <Route path="/dataAnalysis" element={<DataAnalysis />} />
                 <Route path="/drawDesigns" element={<DrawDesigns />} />
-                <Route path="/video" element={<Video />} />
+                <Route path="/videoCreation" element={<VideoCreation />} />
                 <Route path="/application" element={<Application />} />
                 <Route path="/marketingCreativity" element={<MarketingCreativity />} />
                 <Route path="/marketingCreativity/:robotId" element={<CreativityDetail />} />

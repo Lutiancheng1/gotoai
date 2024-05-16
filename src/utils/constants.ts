@@ -33,7 +33,7 @@ export const menuConfig = [
     label: '图像创作'
   },
   {
-    key: 'video',
+    key: 'videoCreation',
     icon: 'icon-fabudankuang-shipinchuangzuo',
     label: '视频创作'
   },
