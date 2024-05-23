@@ -274,7 +274,7 @@
   padding-top: 16px
 }
 
-.followup-container .loading {
+.followup-container .conversation-loading {
   width: 80px;
   height: 40px;
   background: url('@/assets/images/followup_loading.gif') 100% no-repeat;

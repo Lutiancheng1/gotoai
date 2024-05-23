@@ -33,15 +33,18 @@ const CreationWrapper: React.FC<CreationWrapperProps> = () => {
               Tabs: {
                 /* 这里是你的组件 token */
                 inkBarColor: '#dcddde',
-                itemActiveColor: '',
-                itemSelectedColor: '',
+                itemActiveColor: '#1a2029',
+                itemSelectedColor: '#1a2029',
                 itemHoverColor: '',
-                horizontalMargin: '0px'
+                horizontalMargin: '0px',
+                titleFontSize: 20,
+                horizontalItemPadding: '8px',
+                itemColor: 'rgba(0, 0, 0, 0.25)'
               }
             }
           }}
         >
-          <Tabs activeKey={activeKey} items={tabsWarp} onTabClick={(key) => setActiveKey(key)} />
+          <Tabs className="font-500" style={{ height: '46px' }} activeKey={activeKey} items={tabsWarp} onTabClick={(key) => setActiveKey(key)} />
         </ConfigProvider>
       </section>
       {/* 下方内容区域 */}

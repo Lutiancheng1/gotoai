@@ -1,7 +1,7 @@
-import { useKeyPress, useMount, useUnmount } from 'ahooks'
+import { useAsyncEffect, useKeyPress, useMount, useUnmount, useUpdateEffect } from 'ahooks'
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { initialState as initCreativityData, MarketingJson, updateCollapsed, updateCreativityData } from '@/store/reducers/creativity'
+import { initialState as initCreativityData, initCurrentCategory, updateCollapsed } from '@/store/reducers/creativity'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { Button, Form, Input, Modal, Select, Upload } from 'antd'
 import { CategorysDetail, List, ListDetail } from '../types'
@@ -11,7 +11,6 @@ import './index.css'
 import { RcFile, UploadRequestOption } from 'rc-upload/lib/interface'
 import { formatMap, uploadFile } from '@/api/upload'
 import Toast from '@/components/Toast'
-import copy from 'copy-to-clipboard'
 import { MessageInfo } from '@/store/types'
 import { addChatMessages, AddChatMessagesData, startChat } from '@/store/action/talkActions'
 import { ShartChatResp } from '@/types/app'
@@ -23,25 +22,28 @@ import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css'
 import { imgLazyload } from '@mdit/plugin-img-lazyload'
-import { list } from 'radash'
 import { handleCopyClick } from '@/components/Dialogue'
+import { CategoryChildrenList, CategoryDetailList, getCategoryDetail, getHistoryList, getMarketingCategoryList, getWishList } from '@/store/action/creativityAction'
+import Loading from '@/components/loading'
+import { transformObject } from '@/utils'
+import useForm from 'antd/es/form/hooks/useForm'
 type CreativityDetailProps = {}
-let sse = false
-let currentMenuKey = 8
+let sse = true
+let currentMenuKey = 9
 let currentConversation = {
   conversationId: '',
   chatId: 0
 }
+
 const CreativityDetail: React.FC<CreativityDetailProps> = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useAppDispatch()
+  const [form] = useForm()
   const { robotId } = useParams()
-  const [form] = Form.useForm()
   const [modal, contextHolder] = Modal.useModal()
   const CreativityData = useAppSelector((state) => state.creativitySlice)
   // 当前选中的分类详情
-  const [currentCategoryDetail, setCurrentCategoryDetail] = useState<CategorysDetail>()
   // 当前上传完成的文件
   const [currentFile, setCurrentFile] = useState<{ file: File; url: string } | null>()
   // loading
@@ -55,19 +57,6 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
   const onBack = () => {
     navigate('/marketingCreativity')
   }
-  const handleAddHistory = (item: List) => {
-    // 如果已经存在
-    if (CreativityData.history.list.find((historyItem) => historyItem.uid === item.uid)) return
-    dispatch(
-      updateCreativityData({
-        ...CreativityData,
-        history: {
-          ...CreativityData.history,
-          list: [item, ...CreativityData.history.list]
-        }
-      })
-    )
-  }
   const scrollBottom = () => {
     // 滚动到底部
     if (scrollBox.current) {
@@ -77,14 +66,32 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
       })
     }
   }
+  const restParams = () => {
+    setIsInit(true)
+    setConversitionList([])
+    currentConversation = {
+      conversationId: '',
+      chatId: 0
+    }
+    if (CreativityData && CreativityData.currentCategory && form) {
+      form.resetFields()
+    }
+  }
   // 各分类list 点击
-  const getItemDetail = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, uid: string, type: string) => {
+  const getItemDetail = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: number, type: string) => {
     e.stopPropagation()
-    navigate(`/marketingCreativity/${uid}`, {
+    navigate(`/marketingCreativity/${id}`, {
       state: {
         type
       }
     })
+    dispatch(
+      updateCollapsed({
+        key: type,
+        collapsed: true,
+        closeOthers: true
+      })
+    )
   }
   // 重置
   const onReset = () => {
@@ -110,7 +117,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
     for (let key in values) {
       // 如果某一项没有值，就取它的默认值
       if (!values[key]) {
-        const matchedItem = currentCategoryDetail?.list.find((item) => item.input_name === key)
+        const matchedItem = CreativityData.currentCategory && CreativityData.currentCategory.list.find((item) => item.input_name === key)
         // 如果找到了匹配的项，就使用这一项的 default 值
         if (matchedItem) {
           form.setFieldsValue({
@@ -119,22 +126,14 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
         }
       }
     }
-    console.log(form.getFieldsValue())
-    console.log(currentCategoryDetail)
     setLoading(true)
-    let prompt = '帮我生成一篇' + currentCategoryDetail?.title + '；' + currentCategoryDetail?.list.map((item) => item.title + '：' + form.getFieldValue(item.input_name)).join('；')
-
     if (isInit) {
-      const targetList = initCreativityData.category.flatMap((item) => item.list).find((list) => list.uid === robotId)!
-      handleAddHistory(targetList)
-
       // 创建一个新的会话
       const { payload } = (await dispatch(
         startChat({
           menu: currentMenuKey,
-          prompt:
-            '你是一个精通各大营销平台话术、擅长编写各种类型的文案、广告、营销策略等等；现在请根据用户的需求去识别并帮用户编写各类型文案；帮助用户生成各种营销创意，如广告语、海报设计、视频脚本以及全面的营销方案策划，包括线上线下活动、社交媒体推广等。帮助企业实现营销活动的自动化，提高营销效率，降低人力成本；格式丰富一点的返回给用户；',
-          promptId: 0
+          prompt: '',
+          promptId: CreativityData.currentCategory.id
         })
       )) as { payload: ShartChatResp }
       currentConversation = payload
@@ -173,8 +172,9 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
           },
           body: JSON.stringify({
             conversationId: currentConversation!.conversationId,
-            menu: 8,
-            query: prompt
+            menu: 9,
+            query: '',
+            inputs: transformObject(form.getFieldsValue())
           }),
           onopen(response) {
             // 建立连接的回调
@@ -207,6 +207,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
           onclose() {
             // 正常结束的回调
             newController.abort() // 关闭连接
+            setLoading(false)
           },
           onerror(err) {
             // 连接出现异常回调
@@ -228,7 +229,8 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
           addChatMessages({
             conversationId: currentConversation!.conversationId,
             menu: currentMenuKey,
-            query: prompt
+            query: '',
+            inputs: transformObject(form.getFieldsValue())
           })
         )) as { payload: AddChatMessagesData }
         if (payload) {
@@ -258,6 +260,18 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
           // 滚动到底部
         } else {
           setLoading(false)
+          setConversitionList((prev) => {
+            return prev?.map((item) => {
+              if (item.UUID === uuid) {
+                return {
+                  ...item,
+                  content: '出错了',
+                  isLoading: false
+                }
+              }
+              return item
+            }) as MessageInfo[]
+          })
           return Toast.notify({ type: 'error', message: '出错了' })
         }
       } catch (error) {
@@ -271,7 +285,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
   }
   // 监听回车
   useKeyPress('ctrl.enter', onSubmit)
-  const customRequest = async (options: UploadRequestOption, item: ListDetail) => {
+  const customRequest = async (options: UploadRequestOption, item: CategoryDetailList) => {
     console.log(item)
     const { max_size, input_name, accept } = item
     const types = Object.keys(formatMap).filter((key) => formatMap[key].some((mimeType) => accept.split(',').includes(mimeType)))
@@ -310,41 +324,42 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
       max_size * 1024 * 1024
     )
   }
-  // 复制事件
   useMount(() => {
     const state = location.state
+    if (CreativityData.category.length === 0) {
+      dispatch(getMarketingCategoryList())
+      dispatch(getCategoryDetail(Number(robotId)))
+    }
+    if (CreativityData.wish.list.length === 0) {
+      dispatch(getWishList())
+    }
+    if (CreativityData.history.list.length === 0) {
+      dispatch(getHistoryList())
+    }
     if (!state) return
     const { type } = state
     if (!type) return
     dispatch(
       updateCollapsed({
         key: type,
-        collapsed: true
+        collapsed: true,
+        closeOthers: true
       })
     )
   })
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (!robotId) return
-    MarketingJson.details[robotId] && setCurrentCategoryDetail(MarketingJson.details[robotId])
-    if (currentCategoryDetail) {
-      form.resetFields()
+    const getData = async () => {
+      await dispatch(initCurrentCategory())
+      await dispatch(getCategoryDetail(Number(robotId)))
+      restParams()
     }
-    setIsInit(true)
-    setConversitionList([])
-    currentConversation = {
-      conversationId: '',
-      chatId: 0
-    }
-    dispatch(updateCollapsed({ key: location.state.type, collapsed: true, closeOthers: true }))
-  }, [robotId, currentCategoryDetail, form, dispatch, location.state.type])
-
+    getData()
+  }, [robotId])
   useUnmount(() => {
-    dispatch(
-      updateCreativityData({
-        ...initCreativityData
-      })
-    )
+    dispatch(initCurrentCategory())
+    restParams()
   })
   // 定义markdown解析
   const md: MarkdownIt = new MarkdownIt({
@@ -429,7 +444,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
           {/* 树 */}
           <div className="flex-grow overflow-y-scroll nw-scrollbar mr-[2px] h-[calc(100vh-161px)]">
             {/* 最近使用 */}
-            {CreativityData && CreativityData.history && CreativityData.history.list && CreativityData.history.list.length > 0 && (
+            {CreativityData && CreativityData.category && CreativityData.history && CreativityData.history.list && CreativityData.category.length > 0 && CreativityData.history.list.length > 0 && (
               <div onClick={() => dispatch(updateCollapsed({ key: CreativityData.history.title, collapsed: !CreativityData.history.isExpanded }))} className={`w-full overflow-hidden rounded-[4px] bg-[#fff] cursor-pointer ${CreativityData.history.isExpanded ? 'h-auto' : ' h-10'}`}>
                 <div className="flex items-center h-[40px] bg-[#fff] pl-3 pr-[6px] py-[10px]">
                   <div
@@ -441,9 +456,9 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
                   <div className="flex-grow text-14 text-[#222]">{CreativityData.history.title}</div>
                   <i className={`iconfont ${CreativityData.history.isExpanded ? 'icon-shang' : 'icon-xia'} w-[20px] h-[20px] transform !text-10`} />
                 </div>
-                {CreativityData.history.list.map((item) => {
+                {CreativityData.history.list.map((item, index) => {
                   return (
-                    <div onClick={(e) => getItemDetail(e, item.uid, 'history')} key={item.uid} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${robotId === item.uid ? '!bg-[#F3F5F8] font-bold' : ''}`}>
+                    <div onClick={(e) => getItemDetail(e, item.id, 'history')} key={index} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${Number(robotId) === item.id ? '!bg-[#F3F5F8] font-bold' : ''}`}>
                       <img alt="" className="w-[20px] h-[20px] rounded-[4px]" src={item.icon} />
                       <span className="text-14 text-[#222] leading-[20px] h-[20px] ml-3 truncate">{item.nickname}</span>
                     </div>
@@ -452,7 +467,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
               </div>
             )}
             {/* 收藏 */}
-            {CreativityData && CreativityData.wish && CreativityData.wish.list && CreativityData.wish.list.length > 0 && (
+            {CreativityData && CreativityData.category && CreativityData.wish && CreativityData.wish.list && CreativityData.category.length > 0 && CreativityData.wish.list.length > 0 && (
               <div onClick={() => dispatch(updateCollapsed({ key: CreativityData.wish.title, collapsed: !CreativityData.wish.isExpanded }))} className={`w-full overflow-hidden rounded-[4px] bg-[#fff] cursor-pointer ${CreativityData.wish.isExpanded ? 'h-auto' : ' h-10'}`}>
                 <div className="flex items-center h-[40px] bg-[#fff] pl-3 pr-[6px] py-[10px]">
                   <div
@@ -464,9 +479,9 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
                   <div className="flex-grow text-14 text-[#222]">{CreativityData.wish.title}</div>
                   <i className={`iconfont ${CreativityData.wish.isExpanded ? 'icon-shang' : 'icon-xia'} w-[20px] h-[20px] transform !text-10`} />
                 </div>
-                {CreativityData.wish.list.map((item) => {
+                {CreativityData.wish.list.map((item, index) => {
                   return (
-                    <div onClick={(e) => getItemDetail(e, item.uid, 'wish')} key={item.uid} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${robotId === item.uid ? '!bg-[#F3F5F8] font-bold' : ''}`}>
+                    <div onClick={(e) => getItemDetail(e, item.id, 'wish')} key={index} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${Number(robotId) === item.id ? '!bg-[#F3F5F8] font-bold' : ''}`}>
                       <img alt="" className="w-[20px] h-[20px] rounded-[4px]" src={item.icon} />
                       <span className="text-14 text-[#222] leading-[20px] h-[20px] ml-3 truncate">{item.nickname}</span>
                     </div>
@@ -475,8 +490,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
               </div>
             )}
             {/* 所有分类 */}
-            {CreativityData &&
-              CreativityData.category.length > 0 &&
+            {CreativityData && CreativityData.category && CreativityData.category.length > 0 ? (
               CreativityData.category.map((item) => {
                 return (
                   <div key={item.title} onClick={() => dispatch(updateCollapsed({ key: item.title, collapsed: !item.isExpanded }))} className={`w-full overflow-hidden rounded-[4px] bg-[#fff] cursor-pointer ${item.isExpanded ? 'h-auto' : ' h-10'}`}>
@@ -490,9 +504,9 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
                       <div className="flex-grow text-14 text-[#222]">{item.title}</div>
                       <i className={`iconfont ${item.isExpanded ? 'icon-shang' : 'icon-xia'} w-[20px] h-[20px] transform !text-10`} />
                     </div>
-                    {item.list.map((list) => {
+                    {item.list.map((list, index) => {
                       return (
-                        <div onClick={(e) => getItemDetail(e, list.uid, item.title)} key={list.uid} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${robotId === list.uid ? '!bg-[#F3F5F8] font-bold' : ''}`}>
+                        <div onClick={(e) => getItemDetail(e, list.id, item.title)} key={index} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${Number(robotId) === list.id ? '!bg-[#F3F5F8] font-bold' : ''}`}>
                           <img alt="" className="w-[20px] h-[20px] rounded-[4px]" src={list.icon} />
                           <span className="text-14 text-[#222] leading-[20px] h-[20px] ml-3 truncate">{list.nickname}</span>
                         </div>
@@ -500,83 +514,100 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
                     })}
                   </div>
                 )
-              })}
+              })
+            ) : (
+              <div className="w-full h-full flex justify-center items-center opacity-30">
+                <Loading />
+              </div>
+            )}
           </div>
         </div>
         {/*  内容 */}
         <div className="w-full h-full bg-[#F3F5F8] flex items-center justify-center overflow-hidden">
           {/*  详情页 表单 */}
-          {currentCategoryDetail && (
+          {CreativityData && (
             <div className="flex flex-col w-1/3 flex-grow h-full bg-[#fff]">
-              <div className="w-full h-full flex flex-col justify-center items-center pb-6">
-                {/* 头部 */}
-                <header className="flex items-center w-full h-[72px] pl-4 border-b-[1px] border-[rgba(0,0,0,0.1)] cursor-pointer">
-                  <img alt="" className="w-7 h-7 rounded-[6px] mx-[10px]" src={currentCategoryDetail.icon} />
-                  <div className="text-20 font-medium">{currentCategoryDetail.title}</div>
-                </header>
-                {/* 表单 */}
-                <div className="w-full px-6 pt-6 h-0 flex-grow overflow-y-scroll nw-scrollbar mr-[2px]">
-                  <Form autoComplete="off" layout="vertical" form={form}>
-                    {currentCategoryDetail.list.map((item) => {
-                      return (
-                        <div key={item.title}>
-                          {item.input_type.startsWith('text') && (
-                            <FormItem label={item.title} name={item.input_name}>
-                              <TextArea className="prompt-textarea" placeholder={item.placeholder} showCount maxLength={parseInt(item.input_type.split('_')[1])} autoSize={{ minRows: Math.min(Math.ceil(parseInt(item.input_type.split('_')[1]) / 15), 4) }} />
-                            </FormItem>
-                          )}
-                          {item.input_type.startsWith('select') && (
-                            <FormItem label={item.title} name={item.input_name} initialValue={item.default || item.option?.[0]}>
-                              <Select options={item.option?.map((option) => ({ label: option, value: option }))} />
-                            </FormItem>
-                          )}
-                          {item.input_type.startsWith('tab') && (
-                            <FormItem label={item.title} name={item.input_name} initialValue={item.default}>
-                              <Select mode="tags" style={{ width: '100%' }} placeholder={item.placeholder} open={false} suffixIcon={null} notFoundContent={null} showSearch={false} maxCount={20} />
-                            </FormItem>
-                          )}
-                          {item.input_type.startsWith('file') && (
-                            <FormItem label={item.title} name={item.input_name} className="no_up_list">
-                              <Upload fileList={[]} accept={item.accept} customRequest={(options) => customRequest(options, item)}>
-                                <Input
-                                  className="cursor-pointer"
-                                  value={currentFile?.file.name}
-                                  readOnly
-                                  size="large"
-                                  addonAfter={
-                                    currentFile ? (
-                                      <i
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          setCurrentFile(undefined)
-                                        }}
-                                        className="iconfont icon-shanchu"
-                                      ></i>
-                                    ) : null
-                                  }
-                                  addonBefore={item.btn_text}
-                                  placeholder={item.placeholder}
-                                />
-                              </Upload>
-                            </FormItem>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </Form>
-                  <div onClick={onReset} className="flex justify-center text-[#5E6770] cursor-pointer items-center">
-                    <i className="iconfont icon-shanchu"></i>
-                    <span className="ml-[5px]">清空录入</span>
+              {CreativityData.category && CreativityData.category.length > 0 && Object.keys(CreativityData.currentCategory).length > 0 ? (
+                <div className="w-full h-full flex flex-col justify-center items-center pb-6">
+                  {/* 头部 */}
+                  <header className="flex items-center w-full h-[72px] pl-4 border-b-[1px] border-[rgba(0,0,0,0.1)] cursor-pointer">
+                    <img alt="" className="w-7 h-7 rounded-[6px] mx-[10px]" src={CreativityData.currentCategory.icon} />
+                    <div className="text-20 font-medium line-clamp-2" title={CreativityData.currentCategory.description}>
+                      {CreativityData.currentCategory.nickname}
+                    </div>
+                  </header>
+                  {/* 表单 */}
+                  <div className="w-full px-6 pt-6 h-0 flex-grow overflow-y-scroll nw-scrollbar mr-[2px]">
+                    <Form autoComplete="off" layout="vertical" form={form}>
+                      {CreativityData &&
+                        CreativityData.currentCategory &&
+                        CreativityData.currentCategory.list &&
+                        CreativityData.currentCategory.list.length > 0 &&
+                        CreativityData.currentCategory.list.map((item) => {
+                          return (
+                            <div key={item.title}>
+                              {item.input_type.startsWith('text') && (
+                                <FormItem label={item.title} name={item.input_name}>
+                                  <TextArea className="prompt-textarea" placeholder={item.placeholder} showCount maxLength={parseInt(item.input_type.split('_')[1])} autoSize={{ minRows: Math.min(Math.ceil(parseInt(item.input_type.split('_')[1]) / 15), 4) }} />
+                                </FormItem>
+                              )}
+                              {item.input_type.startsWith('select') && (
+                                <FormItem label={item.title} name={item.input_name} initialValue={item.default || item.option?.[0]}>
+                                  <Select options={item.option?.map((option) => ({ label: option, value: option }))} />
+                                </FormItem>
+                              )}
+                              {item.input_type.startsWith('tab') && (
+                                <FormItem label={item.title} name={item.input_name} initialValue={item.default}>
+                                  <Select mode="tags" style={{ width: '100%' }} placeholder={item.placeholder} open={false} suffixIcon={null} notFoundContent={null} showSearch={false} maxCount={20} />
+                                </FormItem>
+                              )}
+                              {item.input_type.startsWith('file') && (
+                                <FormItem label={item.title} name={item.input_name} className="no_up_list">
+                                  <Upload fileList={[]} accept={item.accept} customRequest={(options) => customRequest(options, item)}>
+                                    <Input
+                                      className="cursor-pointer"
+                                      value={currentFile?.file.name}
+                                      readOnly
+                                      size="large"
+                                      addonAfter={
+                                        currentFile ? (
+                                          <i
+                                            onClick={(e) => {
+                                              e.stopPropagation()
+                                              setCurrentFile(undefined)
+                                            }}
+                                            className="iconfont icon-shanchu"
+                                          ></i>
+                                        ) : null
+                                      }
+                                      addonBefore={item.btn_text}
+                                      placeholder={item.placeholder}
+                                    />
+                                  </Upload>
+                                </FormItem>
+                              )}
+                            </div>
+                          )
+                        })}
+                    </Form>
+                    <div onClick={onReset} className="flex justify-center text-[#5E6770] cursor-pointer items-center">
+                      <i className="iconfont icon-shanchu"></i>
+                      <span className="ml-[5px]">清空录入</span>
+                    </div>
+                  </div>
+
+                  {/* 提交按钮 */}
+                  <div className="flex justify-center px-6 bg-[#fff] mt-2 z-[100] w-full h-11">
+                    <Button loading={loading} onClick={onSubmit} type="primary" className="flex justify-center items-center !w-full !h-11 text-[#fff] font-semibold bg-[#2E65FF] !rounded-[4px] !text-16">
+                      立即生成 <span className="w-[102px] py-1 px-3 ml-3 rounded-[4px]">Ctrl + Enter</span>
+                    </Button>
                   </div>
                 </div>
-
-                {/* 提交按钮 */}
-                <div className="flex justify-center px-6 bg-[#fff] mt-2 z-[100] w-full h-11">
-                  <Button loading={loading} onClick={onSubmit} type="primary" className="flex justify-center items-center !w-full !h-11 text-[#fff] font-semibold bg-[#2E65FF] !rounded-[4px] !text-16">
-                    立即生成 <span className="w-[102px] py-1 px-3 ml-3 rounded-[4px]">Ctrl + Enter</span>
-                  </Button>
+              ) : (
+                <div className="w-full h-full flex justify-center items-center opacity-30">
+                  <Loading />
                 </div>
-              </div>
+              )}
             </div>
           )}
           {/* 右侧内容输出区域 */}
@@ -598,9 +629,9 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
               <div className="pl-6 py-6 pr-[18px] h-0 flex-grow overflow-y-scroll nw-scrollbar" id="prompt-content-wrap" ref={scrollBox}>
                 {conversitionList &&
                   conversitionList.length > 0 &&
-                  conversitionList.map((item) => {
+                  conversitionList.map((item, index) => {
                     return (
-                      <div key={item.id} className="flex flex-col mb-4">
+                      <div key={index} className="flex flex-col mb-4">
                         <div className="flex-1 bg-[#fff] flex flex-col text-[#222] text-15 leading-[22px] px-6 py-4">
                           <div
                             className="whitespace-pre-wrap break-all text-15 leading-[26px]"

@@ -1,0 +1,23 @@
+.writing {
+  @media screen and (min-width: 1441px) {
+    .search-input-wrap {
+      position: absolute;
+      right: 32px;
+      top: 0px
+    }
+  }
+
+  @media screen and (min-width: 1024px) and (max-width: 1440px) {
+    .search-input-wrap {
+      margin-top: 32px
+    }
+  }
+
+  .creative-card:hover,
+  .creative-card:active {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .12);
+    transition: transform .3s ease-in-out;
+    transform: translateY(-4px)
+  }
+}

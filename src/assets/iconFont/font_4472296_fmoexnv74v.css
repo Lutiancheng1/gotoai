@@ -1,8 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4472296 */
-  src: url('//at.alicdn.com/t/c/font_4472296_xmpa0w1mjms.woff2?t=1715680673618') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4472296_xmpa0w1mjms.woff?t=1715680673618') format('woff'),
-       url('//at.alicdn.com/t/c/font_4472296_xmpa0w1mjms.ttf?t=1715680673618') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_4472296_r411mqztgx8.woff2?t=1716196920434') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4472296_r411mqztgx8.woff?t=1716196920434') format('woff'),
+       url('//at.alicdn.com/t/c/font_4472296_r411mqztgx8.ttf?t=1716196920434') format('truetype'),
+       url('//at.alicdn.com/t/c/font_4472296_r411mqztgx8.svg?t=1716196920434#iconfont') format('svg');
 }
 
 .iconfont {
@@ -11,6 +12,22 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-businessOpportunities:before {
+  content: "\e63b";
+}
+
+.icon-zhongshi:before {
+  content: "\e696";
+}
+
+.icon-xiezuo:before {
+  content: "\e634";
+}
+
+.icon-xiazai:before {
+  content: "\e608";
 }
 
 .icon-shezhi:before {

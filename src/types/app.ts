@@ -67,26 +67,38 @@ export type CitationItem = {
   score: number
   word_count: number
 }
-
+type Usage = {
+  prompt_tokens: number
+  prompt_unit_price: string
+  prompt_price_unit: string
+  prompt_price: string
+  completion_tokens: number
+  completion_unit_price: string
+  completion_price_unit: string
+  completion_price: string
+  total_tokens: number
+  total_price: string
+  currency: string
+  latency: number
+}
 export type MessageEnd = {
   id: string
+  conversation_id: string
+  created_at: number
+  message_id: string
+  task_id: string
+  event: string
   metadata: {
-    retriever_resources?: CitationItem[]
-    annotation_reply: {
-      id: string
-      account: {
-        id: string
-        name: string
-      }
-    }
+    usage: Usage
   }
 }
 
 export type MessageReplace = {
-  id: string
   task_id: string
-  answer: string
+  message_id: string
   conversation_id: string
+  answer: string
+  created_at: number
 }
 
 export type AnnotationReply = {

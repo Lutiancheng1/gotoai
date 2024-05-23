@@ -6,7 +6,7 @@ import Toast from '../Toast'
 import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
 import { initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateConversitionDetail, updateConversitionDetailList, updateCurrentId } from '@/store/reducers/talk'
-import { addChatMessages, AddChatMessagesData, getHistoryList, startChat } from '@/store/action/talkActions'
+import { addChatMessages, AddChatMessagesData, getHistoryList, getQuesions, startChat } from '@/store/action/talkActions'
 import dayjs from 'dayjs'
 import { useLocation } from 'react-router-dom'
 import { menuType, menuWarp } from '@/utils/constants'
@@ -21,7 +21,7 @@ import stopIcon from '@/assets/images/session_stop_icon2.svg'
 import refreshIcon from '@/assets/images/refresh.png'
 import { MessageInfo } from '@/store/types'
 import { UserPrompt } from '@/pages/Talk'
-import { useMount, useSize, useUnmount, useUpdateEffect } from 'ahooks'
+import { useMount, useSize, useUnmount, useUpdateEffect, useUpdateLayoutEffect } from 'ahooks'
 import { ShartChatResp } from '@/types/app'
 import { imgLazyload } from '@mdit/plugin-img-lazyload'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
@@ -87,8 +87,12 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   const [sendValue, setSendValue] = useState('')
   // 判断是否在加载消息
   const [messageLoading, setMessageLoading] = useState(false)
-  // 获取服务器响应的消息
-  const [respText, setRespText] = useState('')
+  // 联想词loading
+  const [quesionsLoading, setQuesionsLoading] = useState(false)
+  // 联想词内容
+  const [quesions, setQuesions] = useState<string[]>([])
+  // initQuesions
+  const [initQuesions, setInitQuesions] = useState(true)
   // 创建一个滚动框
   const scrollBox = useRef<HTMLDivElement>(null)
   // 创建一个内框
@@ -115,6 +119,21 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
         top: scrollBox.current.scrollHeight,
         behavior: 'smooth'
       })
+    }
+  }
+
+  const getConversationQuestions = async (id?: string) => {
+    setQuesions([])
+    try {
+      setQuesionsLoading(true)
+      const { payload } = await dispatch(getQuesions(currentQuestion!.conversationId ?? currentConversation?.conversationId))
+      payload && setQuesions(payload as string[])
+      setQuesionsLoading(false)
+      setTimeout(() => {
+        scrollBottom()
+      }, 0)
+    } catch (error) {
+      setQuesionsLoading(false)
     }
   }
   // 刷新当前历史记录
@@ -148,6 +167,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   }
   // 不使用 stream流 来发消息
   const sendBeta = async (defaultRule?: boolean, prompt?: UserPrompt) => {
+    setQuesions([])
     console.log(defaultRule, prompt, 'defaultRule', 'prompt')
     // defaultRule 为 true 代表是从 首页预设角色过来的 只需要 传递prompt提词 不用发送用户消息
     // 如果是新会话，则创建一个新的会话
@@ -279,6 +299,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                 setCurrentUUID('')
                 // 更新左侧历史title
                 refreshHistoryList()
+                getConversationQuestions()
               }
             },
             onclose() {
@@ -345,6 +366,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
             setMessageLoading(false)
             // 滚动到底部
             scrollBottom()
+            await getConversationQuestions()
           } else {
             setMessageLoading(false)
             setSendValue('')
@@ -571,9 +593,27 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     const pathname = location.pathname
     currentMenuKey.current = menuWarp[pathname] as menuType
   }, [dispatch, location.pathname])
+
+  useEffect(() => {
+    if (conversitionDetailList!.length > 0) {
+      if (initQuesions) {
+        getConversationQuestions()
+        setInitQuesions(false)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversitionDetailList])
+
+  useUpdateEffect(() => {
+    setInitQuesions(true)
+    setQuesions([])
+  }, [currentConversation])
+
   useMount(() => {
     dispatch(toggleIsNewChat(true))
+    setInitQuesions(true)
   })
+
   // 初始化
   useUnmount(() => {
     dispatch(initState())
@@ -715,15 +755,20 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                             })}
                         </div>
                       </div>
-                      {/* {index === conversitionDetailList.length - 1 && (
+                      {index === conversitionDetailList.length - 1 && (
                         <div className="followup-container">
-                          <div className="followup-list">
-                            <div className="followup-item">帮我查看下日历</div>
-                            <div className="followup-item">提醒我明天日程</div>
-                            <div className="followup-item">查询下明天天气</div>
+                          <div className={`followup-list ${quesionsLoading ? 'conversation-loading' : ''}`}>
+                            {quesions &&
+                              quesions.map((quesion) => {
+                                return (
+                                  <div key={quesion} onClick={() => sendBeta(false, { content: quesion } as UserPrompt)} className="followup-item">
+                                    {quesion}
+                                  </div>
+                                )
+                              })}
                           </div>
                         </div>
-                      )} */}
+                      )}
                     </>
                   )}
                 </div>

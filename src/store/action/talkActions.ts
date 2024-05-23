@@ -126,3 +126,11 @@ export const addChatMessages = createAsyncThunk('talk/addChatMessages', async (p
   if (!res.data) return
   return res.data as AddChatMessagesData
 })
+
+// 获取联想词、提问列表
+export const getQuesions = createAsyncThunk('talk/getQuesions', async (conversationId: string) => {
+  const res = (await http.get(`/Chat/Questions?conversationId=${conversationId}`)) as { data: string[]; code: number; msg: string }
+  console.log(res)
+  if (!res.data && res.code !== 0) return
+  return res.data as string[]
+})

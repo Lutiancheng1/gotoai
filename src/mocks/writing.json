@@ -20,7 +20,7 @@
           "nickname": "可行性研究报告",
           "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
           "description": "根据主题及行业输出可行性研究报告",
-          "is_wish": 0,
+          "is_wish": 1,
           "topics": 0
         },
         {
@@ -29,7 +29,7 @@
           "nickname": "转正申请",
           "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
           "description": "生成转正思想汇报范例",
-          "is_wish": 0,
+          "is_wish": 1,
           "topics": 0
         },
         {
@@ -56,7 +56,7 @@
           "nickname": "述职报告",
           "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
           "description": "快速生成述职报告",
-          "is_wish": 0,
+          "is_wish": 1,
           "topics": 0
         },
         {
@@ -132,7 +132,8 @@
           "topics": 0
         }
       ],
-      "title": "热门"
+      "title": "热门",
+      "isExpanded": false
     },
     {
       "icon": "https://cloud.zhaomi.cn/cody_admin/prod/6c7069a0e20667162ec035a6b6bc6a07.png",
@@ -257,7 +258,8 @@
           "topics": 0
         }
       ],
-      "title": "日常办公"
+      "title": "日常办公",
+      "isExpanded": false
     },
     {
       "icon": "https://cloud.zhaomi.cn/cody_admin/prod/b79d32db44cd7fd1e5d1a9d87db966e1.png",
@@ -337,7 +339,8 @@
           "topics": 0
         }
       ],
-      "title": "写作工具"
+      "title": "写作工具",
+      "isExpanded": false
     },
     {
       "icon": "https://cloud.zhaomi.cn/cody_admin/prod/1c4b1af6a953d28d7e770b5a470a4234.png",
@@ -359,7 +362,7 @@
           "nickname": "述职报告",
           "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
           "description": "快速生成述职报告",
-          "is_wish": 0,
+          "is_wish": 1,
           "topics": 0
         },
         {
@@ -422,11 +425,12 @@
           "nickname": "转正申请",
           "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
           "description": "生成转正思想汇报范例",
-          "is_wish": 0,
+          "is_wish": 1,
           "topics": 0
         }
       ],
-      "title": "机关单位"
+      "title": "机关单位",
+      "isExpanded": false
     },
     {
       "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0f5053176e63112e394c9f48757699a8.png",
@@ -484,7 +488,7 @@
           "nickname": "可行性研究报告",
           "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
           "description": "根据主题及行业输出可行性研究报告",
-          "is_wish": 0,
+          "is_wish": 1,
           "topics": 0
         },
         {
@@ -533,7 +537,8 @@
           "topics": 0
         }
       ],
-      "title": "分析/研究"
+      "title": "分析/研究",
+      "isExpanded": false
     },
     {
       "icon": "https://cloud.zhaomi.cn/cody_admin/prod/416e1a808a18dfaf87487efa24b227c0.png",
@@ -649,7 +654,8 @@
           "topics": 0
         }
       ],
-      "title": "教育/论文"
+      "title": "教育/论文",
+      "isExpanded": false
     }
   ],
   "history": {
@@ -658,22 +664,1969 @@
     "icon_small": "https://cloud.zhaomi.cn/character_robot/icon/history_small.png",
     "list": [
       {
-        "uid": "1aa4121c5ebd7ed5044c2a339417e64f",
+        "uid": "160b14d0cefb9efac61dcecd51bc3983",
         "chat_type": 5,
-        "nickname": "实习报告",
-        "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
-        "description": "实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？实习结束报告怎么办？",
-        "is_wish": 0,
+        "nickname": "可行性研究报告",
+        "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+        "description": "根据主题及行业输出可行性研究报告",
+        "is_wish": 1,
+        "topics": 0
+      },
+      {
+        "uid": "8783d2732aef062a2033685f73ec7841",
+        "chat_type": 5,
+        "nickname": "转正申请",
+        "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+        "description": "生成转正思想汇报范例",
+        "is_wish": 1,
         "topics": 0
       }
     ],
-    "title": "最近使用"
+    "title": "最近使用",
+    "isExpanded": false
   },
   "wish": {
     "icon": "https://cloud.zhaomi.cn/character_robot/icon/wish.png",
     "icon_hover": "https://cloud.zhaomi.cn/character_robot/icon/wish_blue.png",
     "icon_small": "https://cloud.zhaomi.cn/character_robot/icon/wish_small.png",
-    "list": [],
-    "title": "我的收藏"
+    "list": [
+      {
+        "uid": "8783d2732aef062a2033685f73ec7841",
+        "chat_type": 5,
+        "nickname": "转正申请",
+        "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+        "description": "生成转正思想汇报范例",
+        "is_wish": 1,
+        "topics": 0
+      },
+      {
+        "uid": "160b14d0cefb9efac61dcecd51bc3983",
+        "chat_type": 5,
+        "nickname": "可行性研究报告",
+        "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+        "description": "根据主题及行业输出可行性研究报告",
+        "is_wish": 1,
+        "topics": 0
+      },
+      {
+        "uid": "0c6f99d8081dd4dc02ea4230d72b2d04",
+        "chat_type": 5,
+        "nickname": "述职报告",
+        "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+        "description": "快速生成述职报告",
+        "is_wish": 1,
+        "topics": 0
+      }
+    ],
+    "title": "我的收藏",
+    "isExpanded": false
+  },
+  "details": {
+    "160b14d0cefb9efac61dcecd51bc3983": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "default": ["AI人工智能与医疗养老领域的创新"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: AI人工智能与医疗养老领域的创新",
+          "title": "报告主题"
+        },
+        {
+          "default": ["医院养老"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["医院养老", "文化旅游", "农村农业", "化工医药", "能源", "机械汽车", "轻工建材", "生态环保", "其他"],
+          "placeholder": "",
+          "title": "所属行业"
+        },
+        {
+          "default": [" AI人工智能应用场景多元，基于现状，适合切入AI+医疗养老领域"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能应用场景多元，基于现状，适合切入AI+医疗养老领域",
+          "title": "研究结论"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "可行性研究报告"
+    },
+    "7c8a6a106a5dc0f3f6d70f2960435e1a": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["产品经理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品经理",
+          "title": "工作岗位"
+        },
+        {
+          "default": ["产品总监"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品总监",
+          "title": "汇报对象"
+        },
+        {
+          "default": ["调研AICG \n完成需求文档编写 \n沟通用户反馈问题"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 调研AICG \n完成需求文档编写 \n沟通用户反馈问题",
+          "title": "月度工作内容"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "月度总结"
+    },
+    "8783d2732aef062a2033685f73ec7841": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+      "list": [
+        {
+          "default": ["入党动机"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 入党动机",
+          "title": "入党动机"
+        },
+        {
+          "default": ["对党的认识"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: 对党的认识",
+          "title": "对党的认识"
+        },
+        {
+          "default": ["如如何巩固和提高自己成为一名合格党员"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_500",
+          "placeholder": "示例: 如如何巩固和提高自己成为一名合格党员",
+          "title": "今后的打算"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "转正申请"
+    },
+    "83d74caeacc9d542b5a03603ea161094": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["JavaScript"],
+          "err_msg": "",
+          "input_name": "inputname_1",
+          "input_type": "select",
+          "option": ["JavaScript", "React", "JSON", "SQL", "HTML", "CSS", "Markdown", "Python"],
+          "placeholder": "",
+          "title": "代码语言"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_1000",
+          "placeholder": "请输入需要纠错的代码",
+          "title": "代码原文"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "代码语法纠错"
+    },
+    "7b8a0f93431cde87b8a4d48d2cf6751b": {
+      "extra": {
+        "title_left": "原文",
+        "title_right": "复杂"
+      },
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+      "list": [
+        {
+          "default": ["中文"],
+          "err_msg": "",
+          "input_name": "inputname_1",
+          "input_type": "select",
+          "option": ["中文"],
+          "placeholder": "",
+          "title": "语言"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "请输入需要复杂化的内容",
+          "title": "原文"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "句子复杂化"
+    },
+    "0c6f99d8081dd4dc02ea4230d72b2d04": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+      "list": [
+        {
+          "default": ["作为一名XXX，我主要负责单位的工作计划制定及监督"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 作为一名XXX，我主要负责单位的工作计划制定及监督",
+          "title": "职务职责"
+        },
+        {
+          "default": ["工作概述"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: 工作概述",
+          "title": "工作概述"
+        },
+        {
+          "default": ["如如何巩固和提高自己，把工作做的更好"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_500",
+          "placeholder": "示例: 如如何巩固和提高自己，把工作做的更好",
+          "title": "今后的打算"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "述职报告"
+    },
+    "c84e5a47728ed9fe03493574e386701f": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["AI人工智能应用场景研究"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: AI人工智能应用场景研究",
+          "title": "课题名称"
+        },
+        {
+          "default": ["选题的目的与意义、国内外研究现状、研究方案"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: 选题的目的与意义、国内外研究现状、研究方案",
+          "title": "选题依据"
+        },
+        {
+          "default": ["严格按“调查筛题一论证一制订方案-实践研究-交流总结-申请结题”的程序进行"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_500",
+          "placeholder": "示例: 严格按“调查筛题一论证一制订方案-实践研究-交流总结-申请结题”的程序进行",
+          "title": "研究思路与方法"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "课题申报"
+    },
+    "9ffc08da2495a162364e05288cfe221e": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+      "list": [
+        {
+          "default": ["勇担使命 守正创新 坚定不移推进机关党建高质量发展"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 勇担使命 守正创新 坚定不移推进机关党建高质量发展",
+          "title": "讲话发言主题"
+        },
+        {
+          "default": ["勇担使命 守正创新 坚定不移推进机关党建高质量发展"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_500",
+          "placeholder": "示例: 勇担使命 守正创新 坚定不移推进机关党建高质量发展",
+          "title": "文案内容概述"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "讲话发言文案"
+    },
+    "d6eceea41ee82eb18041b22d3bddbda5": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+      "list": [
+        {
+          "default": ["创投圈"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 创投圈",
+          "title": "目标群体"
+        },
+        {
+          "default": ["争议型"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "select",
+          "option": ["争议型", "悬念型", "诱惑型", "分享型", "情感型", "故事型", "促销型", "揭秘型", "炒作型", "干货型"],
+          "placeholder": "",
+          "title": "文案风格"
+        },
+        {
+          "default": ["总结原文"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_2000",
+          "placeholder": "示例: 总结原文",
+          "title": "原文"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "文章总结"
+    },
+    "ec550498b799966c0251076a01aeff0c": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["产品经理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品经理",
+          "title": "工作岗位"
+        },
+        {
+          "default": ["产品总监"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品总监",
+          "title": "汇报对象"
+        },
+        {
+          "default": ["调研AICG \n完成需求文档编写 \n沟通用户反馈问题"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 调研AICG \n完成需求文档编写 \n沟通用户反馈问题",
+          "title": "工作内容"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "工作总结"
+    },
+    "132d191151974b6d92955bbd830cc4a5": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["初二上学期物理课程"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 初二上学期物理课程",
+          "title": "教学主题"
+        },
+        {
+          "default": ["物理"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["物理", "化学", "语文", "英语", "数学", "美术", "生物", "地理", "其他"],
+          "placeholder": "",
+          "title": "课程类型"
+        },
+        {
+          "default": [" 主要从指导思想、教材分析、教学目标及教学措施等方面展开"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 主要从指导思想、教材分析、教学目标及教学措施等方面展开",
+          "title": "内容提要"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "教学大纲"
+    },
+    "1aa4121c5ebd7ed5044c2a339417e64f": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["市场营销专员实习生"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 市场营销专员实习生",
+          "title": "实习内容"
+        },
+        {
+          "default": ["参与了多次市场调研和客户拜访工作，深入了解了市场营销的基本原理和方法，掌握一些实用的工具和技能"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_100",
+          "placeholder": "示例: 参与了多次市场调研和客户拜访工作，深入了解了市场营销的基本原理和方法，掌握一些实用的工具和技能",
+          "title": "工作成果"
+        },
+        {
+          "default": ["体验到了团队合作的重要性和沟通技巧的重要性"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 体验到了团队合作的重要性和沟通技巧的重要性",
+          "title": "自我总结"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "实习报告"
+    },
+    "b78b4cf4076ff8fcfb81b744d1812bad": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["初二上学期物理课程"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 初二上学期物理课程",
+          "title": "教学主题"
+        },
+        {
+          "default": ["物理"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["物理", "化学", "语文", "英语", "数学", "美术", "生物", "地理", "其他"],
+          "placeholder": "",
+          "title": "课程类型"
+        },
+        {
+          "default": [" 主要从指导思想、教材分析、教学目标及教学措施等方面展开"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 主要从指导思想、教材分析、教学目标及教学措施等方面展开",
+          "title": "内容提要"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "教学计划"
+    },
+    "02114486fc7fe7283421a5c285b27d43": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "default": ["AI人工智能行业状态"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: AI人工智能行业状态",
+          "title": "调研目的"
+        },
+        {
+          "default": ["观察法、实验法、询问法、问卷法"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: 观察法、实验法、询问法、问卷法",
+          "title": "调研方法"
+        },
+        {
+          "default": ["AI人工智能行业已经有五大成熟的市场应用场景"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能行业已经有五大成熟的市场应用场景",
+          "title": "调研结果"
+        },
+        {
+          "default": [" AI人工智能应用场景多元，基于现状，适合切入AI数字人领域"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能应用场景多元，基于现状，适合切入AI数字人领域",
+          "title": "调研结论"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "市场调研报告"
+    },
+    "0bc552bba1f823ed899a4a4709e93c8b": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["请输入原邮件正文"],
+          "err_msg": "",
+          "input_name": "inputname_1",
+          "input_type": "text_500",
+          "placeholder": "请输入原邮件正文",
+          "title": "原邮件"
+        },
+        {
+          "default": ["请输入回复邮件"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "请输入回复邮件",
+          "title": "回复抬头"
+        },
+        {
+          "default": [],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "关键词"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "邮件回复"
+    },
+    "d52240ab430c6dfa8460e32857f1e21d": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["产品经理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品经理",
+          "title": "工作岗位"
+        },
+        {
+          "default": ["产品总监"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品总监",
+          "title": "汇报对象"
+        },
+        {
+          "default": ["调研AICG \n完成需求文档编写 \n沟通用户反馈问题"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 调研AICG \n完成需求文档编写 \n沟通用户反馈问题",
+          "title": "季度工作内容"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "季度总结"
+    },
+    "8de2759a3efd98e9318363138a58a177": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["产品经理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品经理",
+          "title": "工作岗位"
+        },
+        {
+          "default": ["产品总监"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品总监",
+          "title": "汇报对象"
+        },
+        {
+          "default": ["调研AICG \n完成需求文档编写 \n沟通用户反馈问题"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 调研AICG \n完成需求文档编写 \n沟通用户反馈问题",
+          "title": "半年工作内容"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "半年总结"
+    },
+    "b92b22bf037a5ecb02c7c1724fdd4296": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["产品经理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品经理",
+          "title": "工作岗位"
+        },
+        {
+          "default": ["产品总监"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品总监",
+          "title": "汇报对象"
+        },
+        {
+          "default": ["2023年"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_30",
+          "placeholder": "示例: 2023年",
+          "title": "总结年份"
+        },
+        {
+          "default": ["调研AICG \n完成需求文档编写 \n沟通用户反馈问题"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_400",
+          "placeholder": "示例: 调研AICG \n完成需求文档编写 \n沟通用户反馈问题",
+          "title": "年度工作内容"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "年度总结"
+    },
+    "34e4550894503308a332b10e8bb11903": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["产品经理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品经理",
+          "title": "转正工作岗位"
+        },
+        {
+          "default": ["产品总监"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品总监",
+          "title": "汇报对象"
+        },
+        {
+          "default": ["调研AICG \n完成需求文档编写 \n沟通用户反馈问题"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 调研AICG \n完成需求文档编写 \n沟通用户反馈问题",
+          "title": "试用期工作内容"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "转正总结"
+    },
+    "5192ddd2ef1b3cee57f886da3c5e10cb": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["产品经理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品经理",
+          "title": "工作岗位"
+        },
+        {
+          "default": ["满足高级产品经理晋级要求"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_10",
+          "placeholder": "示例: 满足高级产品经理晋级要求",
+          "title": "考核目标"
+        },
+        {
+          "default": ["调研AICG \n完成需求文档编写 \n沟通用户反馈问题"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 调研AICG \n完成需求文档编写 \n沟通用户反馈问题",
+          "title": "工作内容"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "考核总结"
+    },
+    "d7c7a194da2fd0fdee176d8a32ca62fb": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["产品经理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品经理",
+          "title": "当前职位"
+        },
+        {
+          "default": ["高级产品经理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 高级产品经理",
+          "title": "晋升职位"
+        },
+        {
+          "default": ["产品总监"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品总监",
+          "title": "汇报对象"
+        },
+        {
+          "default": ["调研AICG \n完成需求文档编写 \n沟通用户反馈问题"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 调研AICG \n完成需求文档编写 \n沟通用户反馈问题",
+          "title": "工作内容"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "晋升总结"
+    },
+    "ad0a9a030ad174fd7b61f0da15464d5f": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["产品经理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品经理",
+          "title": "工作岗位"
+        },
+        {
+          "default": ["产品总监"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品总监",
+          "title": "汇报对象"
+        },
+        {
+          "default": ["调研AICG \n完成需求文档编写 \n沟通用户反馈问题"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 调研AICG \n完成需求文档编写 \n沟通用户反馈问题",
+          "title": "汇报内容"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "工作汇报"
+    },
+    "377a0c16c3f27543d9aa98aaaee9519c": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["产品经理"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 产品经理",
+          "title": "工作岗位"
+        },
+        {
+          "default": ["规划设计产品、研究竞争产品和行业、参与、协调和推动产品实现的全过程、监控和优化用户反馈、规划迭代、优化和改进产品、做好互联网营销。"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_100",
+          "placeholder": "示例: 规划设计产品、研究竞争产品和行业、参与、协调和推动产品实现的全过程、监控和优化用户反馈、规划迭代、优化和改进产品、做好互联网营销。",
+          "title": "工作职责"
+        },
+        {
+          "default": ["目标：将产品决策从 “直觉 “转变为 “数据驱动”，以降低复杂性 \n关键结果： \n– 每个用户故事都有成功的衡量标准 \n– 将销售和客户服务团队的eNPS得分从40提高到65 \n– 到本季度末，没有一个适应率低于40%的新功能仍在使用"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_500",
+          "placeholder": "目标：将产品决策从 “直觉 “转变为 “数据驱动”，以降低复杂性 \n关键结果： \n– 每个用户故事都有成功的衡量标准 \n– 将销售和客户服务团队的eNPS得分从40提高到65 \n– 到本季度末，没有一个适应率低于40%的新功能仍在使用",
+          "title": "上级OKR"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "OKR制定"
+    },
+    "d26a7648a2c4fcde9e55d5cf602af5f7": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["AI数字员2.0发布会"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: AI数字员2.0发布会",
+          "title": "PPT标题"
+        },
+        {
+          "default": ["介绍AI数字员工新版重点功能"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_1000",
+          "placeholder": "示例: 介绍AI数字员工新版重点功能",
+          "title": "PPT主题"
+        },
+        {
+          "default": ["多模态支持，语音视频内容支持；模型反应速度提升；更多应用功能落地推出"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_500",
+          "placeholder": "多模态支持，语音视频内容支持；模型反应速度提升；更多应用功能落地推出",
+          "title": "PPT内容概要"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "PPT大纲生成器"
+    },
+    "ef838f2bc43c71f5f37bb3c7717e0e26": {
+      "extra": {
+        "title_left": "原文",
+        "title_right": "改写"
+      },
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+      "list": [
+        {
+          "default": ["中文"],
+          "err_msg": "",
+          "input_name": "inputname_1",
+          "input_type": "select",
+          "option": ["中文", "英语"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "语言"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_1000",
+          "placeholder": "请输入要改写的内容",
+          "title": "原文"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "文章改写"
+    },
+    "1a7ae8ab23cf789ab0818a5f64271c58": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+      "list": [
+        {
+          "default": ["在一片茂密的森林里，住着许多小伙伴，有：小河马、小松鼠和小白兔还有小鸟。其中有一只可爱的小猪——慢慢，因为他做事总是拖拉，他还有一句口头禅：“明天再说吧"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_1000",
+          "placeholder": "示例: 在一片茂密的森林里，住着许多小伙伴，有：小河马、小松鼠和小白兔还有小鸟。其中有一只可爱的小猪——慢慢，因为他做事总是拖拉，他还有一句口头禅：“明天再说吧",
+          "title": "原文"
+        },
+        {
+          "default": ["小猪因为拖拖拉拉，没有小朋友和他玩，后来他改掉了拖拖拉拉的习惯，交到了很多好朋友。"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_500",
+          "placeholder": "示例: 小猪因为拖拖拉拉，没有小朋友和他玩，后来他改掉了拖拖拉拉的习惯，交到了很多好朋友。",
+          "title": "大纲"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "文章续写"
+    },
+    "3390f00d617e96cf5927a8d5bc206da3": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "list": [
+        {
+          "default": ["请输入原邮件正文"],
+          "err_msg": "",
+          "input_name": "inputname_1",
+          "input_type": "text_500",
+          "placeholder": "请输入原邮件正文",
+          "title": "原邮件"
+        },
+        {
+          "default": ["请输入回复邮件"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "请输入回复邮件",
+          "title": "回复抬头"
+        },
+        {
+          "default": [],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "关键词"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "邮件回复"
+    },
+    "d582219f009333a533f6fc2dc916c424": {
+      "extra": {
+        "title_left": "文言文",
+        "title_right": "白话文"
+      },
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+      "list": [
+        {
+          "default": ["白话文"],
+          "err_msg": "",
+          "input_name": "inputname_1",
+          "input_type": "select",
+          "option": ["白话文"],
+          "placeholder": "",
+          "title": "语言"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_2000",
+          "placeholder": "请输入需要转换的文言文",
+          "title": "原文"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "文言文转白话文"
+    },
+    "8eff4cba491fd667c786b83ae88e9fc8": {
+      "extra": {
+        "title_left": "原文",
+        "title_right": "简化"
+      },
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+      "list": [
+        {
+          "default": ["中文"],
+          "err_msg": "",
+          "input_name": "inputname_1",
+          "input_type": "select",
+          "option": ["中文"],
+          "placeholder": "",
+          "title": "语言"
+        },
+        {
+          "default": [],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_500",
+          "placeholder": "请输入需要简化的内容",
+          "title": "原文"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "内容简化"
+    },
+    "dd7e875fdb92b365f49a4714eb2bad94": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
+      "list": [
+        {
+          "default": ["×××，男（女），××××年××月××日出生，汉族，住××市×××路××号，身份证号码××××××××××××××××××，电话：××××××××"],
+          "err_msg": "",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例：×××，男，××××年××月××日出生，汉族，住××市×××路××号，身份证号码××××××××××××××××××，电话：××××××××",
+          "title": "原告基本情况"
+        },
+        {
+          "default": ["×××，男（女），××××年××月××日出生，汉族，住××市×××路××号，身份证号码××××××××××××××××××，电话：××××××××"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_100",
+          "placeholder": "示例：×××，男，××××年××月××日出生，汉族，住××市×××路××号，身份证号码××××××××××××××××××，电话：××××××××",
+          "title": "被告基本情况"
+        },
+        {
+          "default": ["一、（写明具体的诉讼请求、标的。）\n二、诉讼费由被告负担。"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_200",
+          "placeholder": "示例：一、（写明具体的诉讼请求、标的。）\n二、诉讼费由被告负担。",
+          "title": "诉讼请求"
+        },
+        {
+          "default": ["（按具体情况陈述事实与理由。）"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例：（按具体情况陈述事实与理由。）",
+          "title": "事实"
+        },
+        {
+          "default": ["（按具体情况陈述事实与理由。）"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_5",
+          "input_type": "text_200",
+          "placeholder": "示例：（按具体情况陈述事实与理由。）",
+          "title": "理由"
+        },
+        {
+          "default": ["原告提交的证据：原告身份证明(个人为原告身份证复印件、法人为营业执照复印件，法定代表人身份证明书)；被告身份证明工商资料(个人为原告身份证复印件、法人为营业执照复印件，法定代表人身份证明书)；……（其他证据依次列明）。"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_6",
+          "input_type": "text_500",
+          "placeholder": "示例：原告提交的证据：原告身份证明(个人为原告身份证复印件、法人为营业执照复印件，法定代表人身份证明书)；被告身份证明工商资料(个人为原告身份证复印件、法人为营业执照复印件，法定代表人身份证明书)；……（其他证据依次列明）。",
+          "title": "证据"
+        },
+        {
+          "default": ["xx市xx区人民法院"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_7",
+          "input_type": "text_30",
+          "placeholder": "示例：xx市xx区人民法院",
+          "title": "送达人民法院"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "民事起诉状"
+    },
+    "52632039c3c66bdf6db17ac4daad9995": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+      "list": [
+        {
+          "default": ["关于XXXX个人先进事迹材料"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 关于XXXX个人先进事迹材料",
+          "title": "报告主题"
+        },
+        {
+          "default": ["XX生于海宁，于2004年参加工作，曾多次获得单位“劳模”称号，兢兢业业，勇于承担责任"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: XX生于海宁，于2004年参加工作，曾多次获得单位“劳模”称号，兢兢业业，勇于承担责任",
+          "title": "先进人/团体描述"
+        },
+        {
+          "default": ["认认真真做事，老老实实做人"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_500",
+          "placeholder": "示例: 认认真真做事，老老实实做人",
+          "title": "先进事迹概述"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "先进事迹"
+    },
+    "b8bca2e56f84b2afe99fd65c55bc436f": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+      "list": [
+        {
+          "default": ["党内教育学习心得"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例:党内教育学习心得",
+          "title": "材料主题"
+        },
+        {
+          "default": ["做任何工作都要理论联系实际，不能指谈理论。实践是检验真理的唯一标准"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_500",
+          "placeholder": "示例: 做任何工作都要理论联系实际，不能指谈理论。实践是检验真理的唯一标准",
+          "title": "心得体会概述"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "心得体会"
+    },
+    "c4fdc64c0cb8afed9aeac8489946975e": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+      "list": [
+        {
+          "default": ["周计划"],
+          "err_msg": "",
+          "input_name": "inputname_1",
+          "input_type": "select",
+          "option": ["年计划", "月计划", "周计划", "日计划", "三年计划", "五年计划"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "计划类型"
+        },
+        {
+          "default": ["落实《国家十四五规划》的具体任务"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例：落实《国家十四五规划》的具体任务",
+          "title": "计划目标"
+        },
+        {
+          "default": ["营销云产品部"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_30",
+          "placeholder": "示例：营销云产品部",
+          "title": "发文单位"
+        },
+        {
+          "default": ["周工作计划，未来工作计划规划"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 周工作计划，未来工作计划规划",
+          "title": "内容摘要"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "工作计划"
+    },
+    "5284d7dd38ab98013a4eb9d6d014ba98": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+      "list": [
+        {
+          "default": ["AI人工智能行业状态"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: AI人工智能行业状态",
+          "title": "调查目的"
+        },
+        {
+          "default": ["观察法、实验法、询问法、问卷法"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: 观察法、实验法、询问法、问卷法",
+          "title": "调查方法"
+        },
+        {
+          "default": ["AI人工智能行业已经有五大成熟的市场应用场景"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能行业已经有五大成熟的市场应用场景",
+          "title": "调查结果"
+        },
+        {
+          "default": [" AI人工智能应用场景多元，基于现状，适合切入AI数字人领域"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能应用场景多元，基于现状，适合切入AI数字人领域",
+          "title": "调查结论"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "调查报告"
+    },
+    "1ee6225ecfac795341333523ae94e679": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+      "list": [
+        {
+          "default": ["请示"],
+          "err_msg": "",
+          "input_name": "inputname_1",
+          "input_type": "select",
+          "option": ["请示", "报告", "意见【上行】", "函", "通知", "纪要", "议案", "意见【平行】", "命令", "决定", "公告", "通告", "通报", "批复", "决议", "公报", "意见【下行】", "通知【下行】"],
+          "placeholder": "",
+          "prompt_flag": 1,
+          "title": "公文类型"
+        },
+        {
+          "default": ["召开年度工作总结大会"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例：召开年度工作总结大会",
+          "title": "事由"
+        },
+        {
+          "default": ["营销云产品部"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_30",
+          "placeholder": "示例：营销云产品部",
+          "title": "发文单位"
+        },
+        {
+          "default": ["北京奇虎科技有限公司"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_30",
+          "placeholder": "示例：北京奇虎科技有限公司",
+          "title": "主送机关"
+        },
+        {
+          "default": ["北京奇虎科技有限公司"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_5",
+          "input_type": "text_600",
+          "placeholder": "示例：北京奇虎科技有限公司",
+          "title": "文件原文"
+        },
+        {
+          "default": ["年度工作总结，未来工作计划规划"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_6",
+          "input_type": "text_100",
+          "placeholder": "示例: 年度工作总结，未来工作计划规划",
+          "title": "内容摘要"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "公文写作"
+    },
+    "cdf278d7e4d78ff0b554d3afedf448d0": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/aeea96d8bcf46b93dc705740ac45746b.png",
+      "list": [
+        {
+          "default": ["永远在路上"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 永远在路上",
+          "title": "观看片名"
+        },
+        {
+          "default": ["中央纪委宣传部、中央电视台"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: 中央纪委宣传部、中央电视台",
+          "title": "基本信息"
+        },
+        {
+          "default": ["贯彻群众路线，加强作风建设，关乎人心向背员"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_500",
+          "placeholder": "示例: 贯彻群众路线，加强作风建设，关乎人心向背",
+          "title": "心得体会"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "观后感"
+    },
+    "04d8221fc5ac29af7f469dde2addf81d": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "default": ["AI人工智能应用场景研究"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: AI人工智能应用场景研究",
+          "title": "课题名称"
+        },
+        {
+          "default": ["课题的来源、目的与意义、起止时间、支持的经费等内容"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_500",
+          "placeholder": "示例: 课题的来源、目的与意义、起止时间、支持的经费等内容",
+          "title": "课题概述"
+        },
+        {
+          "default": ["注明完成情况，写明存在问题，分析问题的原因"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_500",
+          "placeholder": "示例: 注明完成情况，写明存在问题，分析问题的原因",
+          "title": "现阶段科研进度"
+        },
+        {
+          "default": ["根据课题工作计划写出下一阶段将进行的研究，又要针对上阶段工作的经验和存在的问题，将未完成的任务移至下一阶段去完成"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_500",
+          "placeholder": "示例: 根据课题工作计划写出下一阶段将进行的研究，又要针对上阶段工作的经验和存在的问题，将未完成的任务移至下一阶段去完成",
+          "title": "下阶段科研计划"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "科研进度报告"
+    },
+    "337fd093eeed5741e8e65fd72a9fb02b": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "default": ["AI人工智能行业应用案例分析"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: AI人工智能行业应用案例分析",
+          "title": "分析目的"
+        },
+        {
+          "default": ["AI人工智能深度学习技术可以通过分析医学图像，快速准确地识别肿瘤、血管和其他关键结构，帮助医生提高诊断的精确性和效率"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_300",
+          "placeholder": "示例: AI人工智能深度学习技术可以通过分析医学图像，快速准确地识别肿瘤、血管和其他关键结构，帮助医生提高诊断的精确性和效率",
+          "title": "内容描述"
+        },
+        {
+          "default": [" AI人工智能应用场景多元，基于现状，适合切入AI+医疗领域"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能应用场景多元，基于现状，适合切入AI+医疗领域",
+          "title": "分析结论"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "SWOT分析报告"
+    },
+    "c40d214cd1b390f88f998fae2bea19a9": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "default": ["AI人工智能行业应用案例分析"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: AI人工智能行业应用案例分析",
+          "title": "分析目的"
+        },
+        {
+          "default": ["观察法、实验法、询问法、问卷法"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: 观察法、实验法、询问法、问卷法",
+          "title": "分析方法"
+        },
+        {
+          "default": ["AI人工智能深度学习技术可以通过分析医学图像，快速准确地识别肿瘤、血管和其他关键结构，帮助医生提高诊断的精确性和效率"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_300",
+          "placeholder": "示例: AI人工智能深度学习技术可以通过分析医学图像，快速准确地识别肿瘤、血管和其他关键结构，帮助医生提高诊断的精确性和效率",
+          "title": "案例描述"
+        },
+        {
+          "default": [" AI人工智能应用场景多元，基于现状，适合切入AI+医疗领域"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能应用场景多元，基于现状，适合切入AI+医疗领域",
+          "title": "分析结论"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "案例分析报告"
+    },
+    "44b1cc99fca3a891303acf08a1463434": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "default": ["小马开疆产品消费者分析报告"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 小马开疆产品消费者分析报告",
+          "title": "分析主题"
+        },
+        {
+          "default": ["详细分析不同消费者群体的态度并给出战略建议"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_100",
+          "placeholder": "示例: 详细分析不同消费者群体的态度并给出战略建议",
+          "title": "分析目的"
+        },
+        {
+          "default": ["AI人工智能消费者主要是学生群体及企业用户，应用场景不同"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_300",
+          "placeholder": "示例: AI人工智能消费者主要是学生群体及企业用户，应用场景不同",
+          "title": "内容描述"
+        },
+        {
+          "default": [" 学生群体学历较高、男性为主，追求新和快；企业用户多为创业企业，从事相应内容生产"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例:学生群体学历较高、男性为主，追求新和快；企业用户多为创业企业，从事相应内容生产",
+          "title": "分析结论"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "消费者调查报告"
+    },
+    "605183a84f2b1bc0e27caa9dd7336385": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "default": ["小马开疆财务分析报告"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 小马开疆财务分析报告",
+          "title": "报告主题"
+        },
+        {
+          "default": ["详细分析小马开疆的企业财务健康状况，并得出改善意见"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_100",
+          "placeholder": "示例: 详细分析小马开疆的企业财务健康状况，并得出改善意见",
+          "title": "分析目的"
+        },
+        {
+          "default": ["通过对小马开疆基本状况了解和分析，对企业财务基本面进行分析，作出估值分析并对企业未来经营中的风险做出判断"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_300",
+          "placeholder": "示例: 通过对小马开疆基本状况了解和分析，对企业财务基本面进行分析，作出估值分析并对企业未来经营中的风险做出判断",
+          "title": "内容概述"
+        },
+        {
+          "default": [" 通过全面分析，小马开疆企业财务状况良好"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 通过全面分析，小马开疆企业财务状况良好",
+          "title": "分析结论"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "财务分析报告"
+    },
+    "9437010dbda2ddaa85025c70be73f758": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "default": ["XXX交通项目社会稳定风险评估"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: XXX交通项目社会稳定风险评估",
+          "title": "风险评估主体/主题"
+        },
+        {
+          "default": ["论证XX交通项目的可行性"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例:论证XX交通项目的可行性",
+          "title": "评估目的"
+        },
+        {
+          "default": ["风险因素分析法、模糊综合评价法、专家访谈法"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: 风险因素分析法、模糊综合评价法、专家访谈法",
+          "title": "评估方法"
+        },
+        {
+          "default": ["XX交通", "风险评估", "研究分析", "社会稳定风险"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "评估要点"
+        },
+        {
+          "default": [" 该交通项目社会稳定风险可控，但需要采取有效措施应对可能出现的风险。建议在项目实施过程中，加强与民众、社会团体等各方的沟通与合作，确保信息透明度，提高项目的社会认可"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_300",
+          "placeholder": "示例: 该交通项目社会稳定风险可控，但需要采取有效措施应对可能出现的风险。建议在项目实施过程中，加强与民众、社会团体等各方的沟通与合作，确保信息透明度，提高项目的社会认可",
+          "title": "评估结论"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "风险评估报告"
+    },
+    "d5234bed4a595c8bfac437e0e5f1af7a": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "default": ["小马开疆企业战略分析报告"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 小马开疆企业战略分析报告",
+          "title": "分析主题"
+        },
+        {
+          "default": ["详细分析小马开疆关于AI人工智能的战略定位"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_100",
+          "placeholder": "示例: 详细分析小马开疆关于AI人工智能的战略定位",
+          "title": "分析目的"
+        },
+        {
+          "default": ["AI人工智能深度学习技术可以通过分析医学图像，快速准确地识别肿瘤、血管和其他关键结构，帮助医生提高诊断的精确性和效率"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_300",
+          "placeholder": "示例: AI人工智能深度学习技术可以通过分析医学图像，快速准确地识别肿瘤、血管和其他关键结构，帮助医生提高诊断的精确性和效率",
+          "title": "内容描述"
+        },
+        {
+          "default": [" AI人工智能应用场景多元，基于小马开疆企业现状，适合切入AI+医疗领域"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能应用场景多元，基于小马开疆企业现状，适合切入AI+医疗领域",
+          "title": "分析结论"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "企业战略分析报告"
+    },
+    "c7bbe9ed2fd6446b15a9119749064f4d": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "default": ["AI人工智能发展前景"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: AI人工智能发展前景",
+          "title": "研究目的"
+        },
+        {
+          "default": ["文献综述、数据分析和实证研"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: 文献综述、数据分析和实证研",
+          "title": "研究方法"
+        },
+        {
+          "default": ["AI人工智能技术将不断向更深层次发展，AI人工智能技术将在更多的领域得到应用"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能技术将不断向更深层次发展，AI人工智能技术将在更多的领域得到应用",
+          "title": "研究结果"
+        },
+        {
+          "default": ["AI人工智能技术的发展前景无疑是非常广阔的"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能技术的发展前景无疑是非常广阔的",
+          "title": "研究结论"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "研究报告"
+    },
+    "6871a0c91e604828fb24e97bc9755656": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/add8ac50309ceed8d648917d743ff5c1.png",
+      "list": [
+        {
+          "default": ["简洁明了地介绍你的商业计划"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_50",
+          "placeholder": "示例: 简洁明了地介绍你的商业计划",
+          "title": "计划概述"
+        },
+        {
+          "default": ["介绍你的公司的组织结构、管理团队、员工和财务情，还要阐述公司的使命和价值观"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_50",
+          "placeholder": "示例: 介绍你的公司的组织结构、管理团队、员工和财务情，还要阐述公司的使命和价值观",
+          "title": "公司描述"
+        },
+        {
+          "default": ["对市场进行分析，包括市场规模、竞争对手、消费者需求和市场趋势等"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_100",
+          "placeholder": "示例: 对市场进行分析，包括市场规模、竞争对手、消费者需求和市场趋势等",
+          "title": "市场分析"
+        },
+        {
+          "default": ["如何推广品牌、如何推销产品以及如何销售产品"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_100",
+          "placeholder": "示例: 如何推广品牌、如何推销产品以及如何销售产品",
+          "title": "营销策略"
+        },
+        {
+          "default": ["阐述你的经营计划，包括财务预算、生产成本、收入预测和现金流等"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_5",
+          "input_type": "text_100",
+          "placeholder": "示例: 阐述你的经营计划，包括财务预算、生产成本、收入预测和现金流等",
+          "title": "经营计划"
+        },
+        {
+          "default": ["所面临的风险和挑战，以及你将如何应对这些风险和挑战"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_6",
+          "input_type": "text_100",
+          "placeholder": "示例: 所面临的风险和挑战，以及你将如何应对这些风险和挑战",
+          "title": "风险和挑战"
+        },
+        {
+          "default": ["总结商业计划书，说明目标和愿景，以及如何达成这些目标"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_7",
+          "input_type": "text_100",
+          "placeholder": "示例: 总结商业计划书，说明目标和愿景，以及如何达成这些目标",
+          "title": "结论和建议"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "商业计划书"
+    },
+    "ff14289eb4181e085bf77afad5f7ca70": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["暑假"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["元旦", "五一", "国庆节", "清明节", "中秋节", "暑假", "寒假", "端午节", "其他"],
+          "placeholder": "",
+          "title": "假日类型"
+        },
+        {
+          "default": ["主要从假期时间安排、教师工作安排等方面展开"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 主要从假期时间安排、教师工作安排等方面展开",
+          "title": "内容提要"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "假期工作安排"
+    },
+    "f42457e76c452ad281ea00ccc8f0a8f1": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["初二上学期物理课程"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 初二上学期物理课程",
+          "title": "教学主题"
+        },
+        {
+          "default": ["物理"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["物理", "化学", "语文", "英语", "数学", "美术", "生物", "地理", "其他"],
+          "placeholder": "",
+          "title": "课程类型"
+        },
+        {
+          "default": ["主要从教学过程的问题、解决问题的尝试方法、教学态度、教学成绩等方面展开"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 主要从教学过程的问题、解决问题的尝试方法、教学态度、教学成绩等方面展开",
+          "title": "内容提要"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "教学评估总结报告"
+    },
+    "ce24de404a02b99daeb0e7f2e9421a82": {
+      "extra": null,
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["XXX初级中学"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: XXX初级中学",
+          "title": "招生主体/主题"
+        },
+        {
+          "default": ["1、坚持户籍优先，免试就近划片入学；2、中学秋季招收七年级新生的年纪须满12周岁；"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_300",
+          "placeholder": "示例: 1、坚持户籍优先，免试就近划片入学；2、中学秋季招收七年级新生的年纪须满12周岁；",
+          "title": "招生原则"
+        },
+        {
+          "default": ["1、招生对象：符合招生条件；2、招生计划：6个班（315人）；3、招生范围：东至梅花大道，西至龙华大道；4、招生办法：招生条件与招生批次；5、录取办法；6、政策对象；7、登记建档工作；8、户籍与房产；9、其他规定；10、联系方式"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_2000",
+          "placeholder": "示例: 1、招生对象：符合招生条件；2、招生计划：6个班（315人）；3、招生范围：东至梅花大道，西至龙华大道；4、招生办法：招生条件与招生批次；5、录取办法；6、政策对象；7、登记建档工作；8、户籍与房产；9、其他规定；10、联系方式",
+          "title": "招生办法"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "招生简章"
+    },
+    "c09d3709463adbd9ad4f4c02e3bdd008": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["AI人工智能行业应用案例分析"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: AI人工智能行业应用案例分析",
+          "title": "演讲主题"
+        },
+        {
+          "default": ["人工智能是未来方向、还有问题待解决、应用场景多元"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: 人工智能是未来方向、还有问题待解决、应用场景多元",
+          "title": "学术观点"
+        },
+        {
+          "default": [" AI人工智能应用场景多元"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能应用场景多元",
+          "title": "学术结论"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "学术演讲稿"
+    },
+    "3c515448dd6600d298ddba757055a1ff": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["AI人工智能行业应用案例分析"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: AI人工智能行业应用案例分析",
+          "title": "论文主题"
+        },
+        {
+          "default": ["人工智能应用", "科技创新", "机器学习", "深度学习"],
+          "err_msg": "",
+          "input_name": "inputname_3",
+          "input_type": "tab",
+          "placeholder": "输入关键词，按Enter添加",
+          "title": "主题词/关键词"
+        },
+        {
+          "default": [" AI人工智能应用场景多元，是未来很重要的方向"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: AI人工智能应用场景多元，是未来很重要的方向",
+          "title": "论文提要"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "论文提纲"
+    },
+    "5958a96550abfb994715bc2cfc12f832": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["AI人工智能应用场景研究"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: AI人工智能应用场景研究",
+          "title": "课题名称"
+        },
+        {
+          "default": ["选题的目的与意义、国内外研究现状、研究方案"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_200",
+          "placeholder": "示例: 选题的目的与意义、国内外研究现状、研究方案",
+          "title": "选题依据"
+        },
+        {
+          "default": ["严格按“调查筛题一论证一制订方案-实践研究-交流总结-申请结题”的程序进行"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_3",
+          "input_type": "text_500",
+          "placeholder": "示例: 严格按“调查筛题一论证一制订方案-实践研究-交流总结-申请结题”的程序进行",
+          "title": "研究思路与方法"
+        },
+        {
+          "default": ["选题的目的与意义、国内外研究现状、研究方案、人员分工等"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_500",
+          "placeholder": "示例: 选题的目的与意义、国内外研究现状、研究方案、人员分工等",
+          "title": "内容提要"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "科研开题报告"
+    },
+    "93401406c658a5c11f285dade0269876": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["幼儿园世界读书日主题教育活动"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_100",
+          "placeholder": "示例: 幼儿园世界读书日主题教育活动",
+          "title": "活动主题"
+        },
+        {
+          "default": ["游戏活动"],
+          "err_msg": "",
+          "input_name": "inputname_2",
+          "input_type": "select",
+          "option": ["课程教学", "实验教学", "讨论教学", "作业教学", "社团活动", "竞赛活动", "实践活动", "游戏活动", "其他"],
+          "placeholder": "",
+          "title": "活动类型"
+        },
+        {
+          "default": [" 推动更多的儿童参与阅读，享受阅读带来的乐趣，养成日常阅读的习惯"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 推动更多的儿童参与阅读，享受阅读带来的乐趣，养成日常阅读的习惯",
+          "title": "内容提要"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "教育活动方案"
+    },
+    "3dac40bee3751c95992025e5d3ee760a": {
+      "extra": {},
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/a056e687af0c6916c8c57eae9af4c202.png",
+      "list": [
+        {
+          "default": ["钢铁是怎么炼成的"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_1",
+          "input_type": "text_30",
+          "placeholder": "示例: 钢铁是怎么炼成的",
+          "title": "书名"
+        },
+        {
+          "default": ["尼古拉·奥斯特洛夫斯基"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_30",
+          "placeholder": "示例: 尼古拉·奥斯特洛夫斯基",
+          "title": "作者"
+        },
+        {
+          "default": ["在当代重读这本书，还是有很多值得我们学习的精华"],
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_4",
+          "input_type": "text_200",
+          "placeholder": "示例: 在当代重读这本书，还是有很多值得我们学习的精华",
+          "title": "你的观点"
+        }
+      ],
+      "support_flow": 0,
+      "support_ind_report": 0,
+      "title": "读书笔记"
+    }
   }
 }

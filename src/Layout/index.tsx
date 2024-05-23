@@ -1,4 +1,4 @@
-import { ConfigProvider, Menu, MenuProps, Popover, Tooltip, Layout, Modal, FloatButton, Drawer, Select, Button } from 'antd'
+import { ConfigProvider, Menu, MenuProps, Popover, Tooltip, Layout, Modal, FloatButton, Drawer, Button } from 'antd'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Sider from 'antd/es/layout/Sider'
 import React, { Suspense, useEffect, useState } from 'react'
@@ -23,9 +23,8 @@ import userImg from '@/assets/images/user.jpeg'
 import pruduct from '@/assets/images/product.svg'
 import { desensitizePhone } from '@/utils'
 import Robot from '@/pages/Robot'
-import { useMount } from 'ahooks'
-import { MJlogin } from '@/api/MJAIgcAPi'
 import { productMatrix } from '@/config'
+
 // 导入子路由
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
 const Home = React.lazy(() => import('@/pages/Talk'))
@@ -39,7 +38,10 @@ const VideoCreation = React.lazy(() => import('@/pages/Creation'))
 const Application = React.lazy(() => import('@/pages/Application'))
 const MarketingCreativity = React.lazy(() => import('@/pages/MarketingCreativity'))
 const CreativityDetail = React.lazy(() => import('@/pages/MarketingCreativity/CreativityDetail'))
-
+const Writing = React.lazy(() => import('@/pages/Writing'))
+const WritingDetail = React.lazy(() => import('@/pages/Writing/WritingDetail'))
+const SmartCustomerService = React.lazy(() => import('@/pages/SmartCustomerService'))
+const BusinessOpportunities = React.lazy(() => import('@/pages/BusinessOpportunities'))
 type Props = {} & Partial<talkInitialState>
 const Index = ({ loading }: Props) => {
   const [categoryCollapsed, setCategoryCollapsed] = useState(false)
@@ -78,16 +80,15 @@ const Index = ({ loading }: Props) => {
   useEffect(() => {
     if (location.pathname.substr(1).startsWith('marketingCreativity/')) {
       return setCurrentPath('marketingCreativity')
+    } else if (location.pathname.substr(1).startsWith('writing/')) {
+      return setCurrentPath('writing')
     }
     setCurrentPath(location.pathname.substr(1))
   }, [location])
   useEffect(() => {
     dispatch(getUserProfile(getAccountInfo().username))
   }, [dispatch])
-  useMount(async () => {
-    // 登陆MJapi
-    await MJlogin()
-  })
+
   return (
     <ConfigProvider
       theme={{
@@ -283,6 +284,10 @@ const Index = ({ loading }: Props) => {
                 <Route path="/application" element={<Application />} />
                 <Route path="/marketingCreativity" element={<MarketingCreativity />} />
                 <Route path="/marketingCreativity/:robotId" element={<CreativityDetail />} />
+                <Route path="/writing" element={<Writing />} />
+                <Route path="/writing/:robotId" element={<WritingDetail />} />
+                <Route path="/smartCustomerService" element={<SmartCustomerService />} />
+                <Route path="/businessOpportunities" element={<BusinessOpportunities />} />
                 <Route path="/*" element={<NotFound />} />
               </Routes>
             </Suspense>

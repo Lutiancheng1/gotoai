@@ -3,9 +3,10 @@ import { AnnotationReply, MessageEnd, MessageReplace, ThoughtItem, VisionFile } 
 import { getDifyInfo, hasDifyInfo } from './storage'
 const TIME_OUT = 10000
 // const BASE_URL = getDifyInfo().apiUrl || 'http://admin.gotoai.world/v1'
-const BASE_URL = '/dify'
+const BASE_URL = 'https://admin.gotoai.world/v1'
 
-let token = hasDifyInfo() && getDifyInfo().apikey
+// let token = hasDifyInfo() && getDifyInfo().apikey
+let token = 'app-kY76EflnhU20hspLVuOOLPGq'
 const ContentType = {
   json: 'application/json',
   stream: 'text/event-stream',
@@ -290,7 +291,7 @@ export const ssePost = (url: string, fetchOptions: FetchOptionType, { onData, on
     },
     fetchOptions
   )
-
+  options.headers.set('Authorization', `Bearer ${token}`)
   const contentType = options.headers.get('Content-Type')
   if (!contentType) options.headers.set('Content-Type', ContentType.json)
 

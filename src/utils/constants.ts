@@ -42,11 +42,16 @@ export const menuConfig = [
     icon: 'icon-yingxiaochuangyi',
     label: '营销创意'
   },
-  // {
-  //   key: 'smartCustomerService',
-  //   icon: 'icon-zhinengkefu',
-  //   label: '智能客服'
-  // },
+  {
+    key: 'writing',
+    icon: 'icon-xiezuo',
+    label: '文书写作'
+  },
+  {
+    key: 'smartCustomerService',
+    icon: 'icon-zhinengkefu font-600',
+    label: '智能客服'
+  },
   // {
   //   key: 'aiSearch',
   //   icon: 'icon-AIsearch',
@@ -57,6 +62,11 @@ export const menuConfig = [
   //   icon: 'icon-zimu',
   //   label: 'AI 翻译'
   // },
+  {
+    key: 'businessOpportunities',
+    icon: 'icon-businessOpportunities',
+    label: '商机获客'
+  },
   {
     key: 'application',
     icon: 'icon-yingyong',
@@ -71,9 +81,9 @@ export const menuConfig = [
 
 /**
  * @param { 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 }
- * @returns {对话｜文档｜代码｜知识库｜数据分析｜画图｜视频｜应用｜客服app｜营销创意｜智能客服 AI搜索｜AI翻译}
+ * @returns {对话｜文档｜代码｜知识库｜数据分析｜画图｜视频｜应用｜客服app、智能客服｜营销创意｜文书写作｜ AI搜索｜AI翻译}
  */
-export type menuType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+export type menuType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 export const menuWarp = {
   '/talk': 0,
   '/document': 1,
@@ -83,8 +93,9 @@ export const menuWarp = {
   '/drawDesigns': 5,
   '/video': 6,
   '/application': 7,
+  '/smartCustomerService': 8,
   '/marketingCreativity': 9,
-  '/smartCustomerService': 10,
+  '/writing': 10,
   '/aiSearch': 11,
   '/aiTranslation': 12
 } as {

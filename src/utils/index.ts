@@ -35,7 +35,19 @@ export function randomString(length: number) {
   for (let i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)]
   return result
 }
-
+// 将对象 的值从数组转换为字符串
+export const transformObject = (obj: { [key: string]: any }) => {
+  let newObj = {} as { [key: string]: any }
+  Object.keys(obj).forEach((key) => {
+    let value = obj[key]
+    if (Array.isArray(value)) {
+      newObj[key] = value.join(',')
+    } else {
+      newObj[key] = String(value)
+    }
+  })
+  return newObj
+}
 export const getPurifyHref = (href: string) => {
   if (!href) return ''
 

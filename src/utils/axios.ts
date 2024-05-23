@@ -30,7 +30,7 @@ http.interceptors.response.use(
     }
     if (response.data.code === -401) {
       Toast.notify({
-        type: 'error',
+        type: 'warning',
         message: '登陆过期,请重新登陆',
         duration: 1000
       })

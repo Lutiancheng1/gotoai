@@ -1,0 +1,9 @@
+.business-opportunities {
+  .ant-tabs-nav-list {
+    width: calc(100vw - 240px);
+  }
+
+  .ant-tabs-nav-list:first-child {
+    margin-left: 20px;
+  }
+}

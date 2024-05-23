@@ -6,10 +6,138 @@ export type AutomaticRes = {
   variables: string[]
   opening_statement: string
 }
+type sendChatMessageReq = {
+  query: string
+  inputs?: object
+  response_mode?: 'streaming' | 'blocking'
+  user: string
+  conversation_id: string
+  files?: Array<{
+    type: 'image'
+    transfer_method: 'remote_url' | 'local_file'
+    url?: string
+    upload_file_id: string
+  }>
+  auto_generate_name?: boolean
+}
+type Usage = {
+  prompt_tokens: number
+  prompt_unit_price: string
+  prompt_price_unit: string
+  prompt_price: string
+  completion_tokens: number
+  completion_unit_price: string
+  completion_price_unit: string
+  completion_price: string
+  total_tokens: number
+  total_price: string
+  currency: string
+  latency: number
+}
 
+type RetrieverResource = {
+  position: number
+  dataset_id: string
+  dataset_name: string
+  document_id: string
+  document_name: string
+  segment_id: string
+  score: number
+  content: string
+}
 
+//  blocking 模式
+export type ChatCompletionResponse = {
+  event: string
+  message_id: string
+  conversation_id: string
+  mode: string
+  answer: string
+  metadata: {
+    usage: Usage
+    retriever_resources: Array<RetrieverResource>
+  }
+  created_at: number
+}
+type MessageEvent = {
+  event: 'message'
+  task_id: string
+  message_id: string
+  conversation_id: string
+  answer: string
+  created_at: number
+}
+
+type AgentMessageEvent = {
+  event: 'agent_message'
+  task_id: string
+  message_id: string
+  conversation_id: string
+  answer: string
+  created_at: number
+}
+
+type AgentThoughtEvent = {
+  event: 'agent_thought'
+  id: string
+  task_id: string
+  message_id: string
+  position: number
+  thought: string
+  observation: string
+  tool: string
+  tool_input: string
+  created_at: number
+  message_files: Array<string>
+  file_id: string
+  conversation_id: string
+}
+
+type MessageFileEvent = {
+  event: 'message_file'
+  id: string
+  type: string
+  belongs_to: string
+  url: string
+  conversation_id: string
+}
+
+type MessageEndEvent = {
+  event: 'message_end'
+  task_id: string
+  message_id: string
+  conversation_id: string
+  metadata: {
+    usage: Usage
+    retriever_resources: Array<RetrieverResource>
+  }
+}
+
+type MessageReplaceEvent = {
+  event: 'message_replace'
+  task_id: string
+  message_id: string
+  conversation_id: string
+  answer: string
+  created_at: number
+}
+
+type ErrorEvent = {
+  event: 'error'
+  task_id: string
+  message_id: string
+  status: number
+  code: string
+  message: string
+}
+
+type PingEvent = {
+  event: 'ping'
+}
+
+export type ChunkChatCompletionResponse = MessageEvent | AgentMessageEvent | AgentThoughtEvent | MessageFileEvent | MessageEndEvent | MessageReplaceEvent | ErrorEvent | PingEvent
 export const sendChatMessage = async (
-  body: Record<string, any>,
+  body: sendChatMessageReq,
   {
     onData,
     onCompleted,
@@ -28,11 +156,10 @@ export const sendChatMessage = async (
     onMessageReplace: IOnMessageReplace
     onError: IOnError
     getAbortController?: (abortController: AbortController) => void
-  },
-  appId: string
+  }
 ) => {
   return ssePost(
-    `apps/chat-messages`,
+    `/chat-messages`,
     {
       body: {
         ...body,
@@ -40,81 +167,20 @@ export const sendChatMessage = async (
       }
     },
     { onData, onCompleted, onThought, onFile, onError, getAbortController, onMessageEnd, onMessageReplace }
-  )
+  ) as void | Promise<ChunkChatCompletionResponse>
 }
 
-export const stopChatMessageResponding = async (appId: string, taskId: string) => {
-  return post(`apps/${appId}/chat-messages/${taskId}/stop`)
+/**
+ * Stops the chat message responding for a given task ID.
+ *
+ * @param {string} taskId - The ID of the task to stop responding for.
+ * @return {Promise<any>} A promise that resolves when the task responding is stopped.
+ */
+export const stopChatMessageResponding = async (taskId: string) => {
+  return post(`/chat-messages/${taskId}/stop`)
 }
 
-export const sendCompletionMessage = async (
-  appId: string,
-  body: Record<string, any>,
-  {
-    onData,
-    onCompleted,
-    onError,
-    onMessageReplace
-  }: {
-    onData: IOnData
-    onCompleted: IOnCompleted
-    onError: IOnError
-    onMessageReplace: IOnMessageReplace
-  }
-) => {
-  return ssePost(
-    `apps/${appId}/completion-messages`,
-    {
-      body: {
-        ...body,
-        response_mode: 'streaming'
-      }
-    },
-    { onData, onCompleted, onError, onMessageReplace }
-  )
-}
-
-export const fetchSuggestedQuestions = (appId: string, messageId: string, getAbortController?: any) => {
-  return get(
-    `apps/${appId}/chat-messages/${messageId}/suggested-questions`,
-    {},
-    {
-      getAbortController
-    }
-  )
-}
-
-export const fetchConvesationMessages = (appId: string, conversation_id: string, getAbortController?: any) => {
-  return get(
-    `apps/${appId}/chat-messages`,
-    {
-      params: {
-        conversation_id
-      }
-    },
-    {
-      getAbortController
-    }
-  )
-}
-
-export const generateRule = (body: Record<string, any>) => {
-  return post<AutomaticRes>('/rule-generate', {
-    body
-  })
-}
-
-export const fetchPromptTemplate = ({ appMode, mode, modelName, hasSetDataSet }: { appMode: string; mode: ModelModeType; modelName: string; hasSetDataSet: boolean }) => {
-  return get<Promise<{ chat_prompt_config: ChatPromptConfig; completion_prompt_config: CompletionPromptConfig; stop: [] }>>('/app/prompt-templates', {
-    params: {
-      app_mode: appMode,
-      model_mode: mode,
-      model_name: modelName,
-      has_context: hasSetDataSet
-    }
-  })
-}
-
-export const fetchTextGenerationMessge = ({ appId, messageId }: { appId: string; messageId: string }) => {
-  return get<Promise<{ message: [] }>>(`/apps/${appId}/messages/${messageId}`)
+// 获取联想词
+export const getMessagesSuggested = async (message_id: string, user: string) => {
+  return get(`/messages/${message_id}/suggested?user=${user}`)
 }

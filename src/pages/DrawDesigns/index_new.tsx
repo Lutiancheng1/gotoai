@@ -811,8 +811,8 @@ const DrawDesigns = () => {
               Tabs: {
                 /* 这里是你的组件 token */
                 inkBarColor: '#dcddde',
-                itemActiveColor: '',
-                itemSelectedColor: '',
+                itemActiveColor: '#1a2029',
+                itemSelectedColor: '#1a2029',
                 itemHoverColor: ''
               }
             }

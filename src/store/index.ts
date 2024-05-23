@@ -5,6 +5,7 @@ import talkSlice from './reducers/talk'
 import documentSlice from './reducers/document'
 import robotSlice from './reducers/robot'
 import creativitySlice from './reducers/creativity'
+import writingSlice from './reducers/writing'
 const store = configureStore({
   reducer: {
     loginSlice,
@@ -12,7 +13,8 @@ const store = configureStore({
     talkSlice,
     documentSlice,
     robotSlice,
-    creativitySlice
+    creativitySlice,
+    writingSlice
   }
 })
 

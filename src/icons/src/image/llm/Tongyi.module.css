@@ -1,0 +1,5 @@
+.wrapper {
+  display: inline-flex;
+  background: url(@/icons/assets/image/llm/tongyi.png) center center no-repeat;
+  background-size: contain;
+}

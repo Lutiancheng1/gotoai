@@ -80,9 +80,7 @@ export interface PrologueInfo {
 export interface ChatMessages {
   query: string
   inputs?: {
-    additionalProp1: string
-    additionalProp2: string
-    additionalProp3: string
+    [key: string]: string
   }
   conversationId: string
   menu: number

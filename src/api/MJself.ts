@@ -54,12 +54,18 @@ request.interceptors.response.use(
         'May contains sensitive words': '提示词包含敏感词',
         'The queue is full, please try again later': '队列已满，请稍后尝试',
         'base64List parameter error': 'base64列表参数错误',
-        'In queue, there are 1 tasks ahead': '在队列中，前面有1个任务'
+        'In queue, there are {0} tasks ahead': '在队列中，前面有{0}个任务'
       } as {
         [key: string]: string
       }
 
       const formatErrorMessage = (errorMsg: string): string => {
+        const regex = /In queue, there are (\d+) tasks ahead/
+        const match = errorMsg.match(regex)
+        if (match) {
+          const num = match[1]
+          return formatMsg['In queue, there are {0} tasks ahead'].replace('{0}', num)
+        }
         return formatMsg[errorMsg] || errorMsg
       }
 

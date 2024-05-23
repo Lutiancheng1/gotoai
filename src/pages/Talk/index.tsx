@@ -70,19 +70,12 @@ const Talk: React.FC<Props> = ({ isNewChat, currentConversation }) => {
     getData()
   }, [])
 
-  useEffect(() => {
-    console.log(currentConversation, 'currentId变化了')
-  }, [currentConversation])
-
   // 点击提词
   const onPrompt = (item: UserPrompt) => {
     console.log(item)
     dialogueRef.current?.sendBeta(true, item)
   }
 
-  useEffect(() => {
-    // ipInCN()
-  }, [])
   return (
     <ConfigProvider
       theme={{

@@ -1,0 +1,28 @@
+.prompt-textarea .ant-input-data-count {
+  right: 0px !important;
+  top: -25px !important;
+  color: #bbb !important;
+  font-size: 12px !important
+}
+
+.no-draw-arrow {
+  animation: bounce-left 1s infinite
+}
+
+@keyframes bounce-left {
+
+  0%,
+  to {
+    transform: translate(-25%);
+    animation-timing-function: cubic-bezier(.8, 0, 1, 1)
+  }
+
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, .2, 1)
+  }
+}
+
+.no_up_list .ant-upload-list {
+  display: none;
+}
