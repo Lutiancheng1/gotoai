@@ -76,6 +76,19 @@ type Props = {
   multiple?: boolean
   style?: React.CSSProperties
 } & Partial<talkInitialState>
+// 递归找到DOM下最后一个元素节点
+function findLastElement(element: HTMLElement): HTMLElement {
+  // 如果该DOM没有子元素，则返回自身
+  if (!element.children.length) {
+    return element
+  }
+  const lastChild = element.children[element.children.length - 1]
+  // 如果最后一个子元素是元素节点，则递归查找
+  if (lastChild.nodeType === Node.ELEMENT_NODE) {
+    return findLastElement(lastChild as HTMLElement)
+  }
+  return element
+}
 
 const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend, placeholder = '输入你的问题或需求', hasUploadBtn = false, initChildren, autoToBottom = true, fileId, sse = false, hasFooter = true, multiple }: Props, ref) => {
   // 初始化问题Id
@@ -409,22 +422,21 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
     }
     // 如果按下的是回车键
-    if (e.keyCode === 13) {
-      // 如果输入框为空
-      if (!sendValue && !sendValue.trim()) {
-        // 去除输入框中的回车和换行符
-        setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
-        // 弹出提示框，提示需要输入内容
-        return Toast.notify({ type: 'info', message: '请输入内容' })
-      } else {
-        // 发送消息
-        sendMessage()
-        // 清空输入框
-        setSendValue('')
-      }
+    e.preventDefault() // 防止回车键默认的提交行为
+    // 去除输入框中的回车、换行符和空格
+    const trimmedValue = sendValue.replace(/\r/gi, '').replace(/\n/gi, '').trim()
+    setSendValue(trimmedValue)
+    // 如果输入框为空，则不发送消息
+    if (!trimmedValue) {
+      // 弹出提示框，提示需要输入内容
+      return Toast.notify({ type: 'info', message: '请输入内容' })
+    } else {
+      // 发送消息
+      sendMessage()
+      // 清空输入框
+      setSendValue('')
     }
   }
-  // 复制事件
 
   // 定义markdown解析
   const md: MarkdownIt = new MarkdownIt({
@@ -464,13 +476,17 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     const title = token.attrGet('title')
     return `<a href="${src}" target="_blank" class="img-preview"><img src="${src}" alt="${alt}" title="${title}" style="width: 300px; height: 300px;"/></a>`
   }
+
   md.renderer.rules.fence = (tokens, idx) => {
     // 匹配 a标签  给a标签加上  target="_blank" rel="noopener noreferrer"属性
     const token = tokens[idx]
     const langClass = token.info ? `language-${token.info}` : ''
     const lines = token.content.split('\n').slice(0, -1)
     const lineNumbers = lines.map((line, i) => `<span>${i + 1}</span>`).join('\n')
-    const content = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true }).value
+    const pure = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true })
+    const hasCursor = pure.code?.includes('<span class="gpt-cursor"/>')
+    const pureCode = pure.code?.replace('<span class="gpt-cursor"/></span>', '')
+    const content = hljs.highlight(pureCode!, { language: token.info || 'md', ignoreIllegals: true }).value + `${hasCursor ? '<span class="gpt-cursor"/> ' : ''}`
     // 为每个代码块创建一个唯一的ID
     const uniqueId = `copy-button-${Date.now()}-${Math.random()}`
     // 创建一个复制按钮 在makedown 渲染完成之后在插入
@@ -480,6 +496,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
         copybutton.addEventListener('click', () => handleCopyClick(token.content))
       }
     })
+
     return `
     <div class="${langClass}">
       <div class="top"> <div class="language">${token.info}</div><div class="copy-button" id="${uniqueId}">复制</div></div>
@@ -595,14 +612,12 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   }, [dispatch, location.pathname])
 
   useEffect(() => {
-    if (conversitionDetailList!.length > 0) {
-      if (initQuesions) {
-        getConversationQuestions()
-        setInitQuesions(false)
-      }
+    if (conversitionDetailList!.length > 0 && !firstSend && initQuesions) {
+      getConversationQuestions()
+      setInitQuesions(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversitionDetailList])
+  }, [conversitionDetailList!.length])
 
   useUpdateEffect(() => {
     setInitQuesions(true)
@@ -698,13 +713,13 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                             ref={index === conversitionDetailList.length - 1 ? currentMessageRef : null}
                             dangerouslySetInnerHTML={{
                               __html: md.render(
-                                ` ${
-                                  item.isLoading
-                                    ? '<span class="loading loading-dots loading-xs"></span>'
-                                    : item.files && item.files.length > 0
-                                    ? item.content + '\n\n' + item.files.map((file) => (file.mimetype?.startsWith('image') ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
-                                    : item.content
-                                }`
+                                item.isLoading
+                                  ? '<span class="loading loading-dots loading-xs"></span>'
+                                  : item.files && item.files.length > 0
+                                  ? item.content + '\n\n' + item.files.map((file) => (file.mimetype?.startsWith('image') ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
+                                  : item.content.endsWith('```') || item.content.match(/\B```\b[a-zA-Z]+\b(?!\s)/)
+                                  ? item.content
+                                  : item.content + `${currentUUID === item.UUID ? '<span class="gpt-cursor"/></span>' : ''}`
                               )
                             }}
                           ></div>

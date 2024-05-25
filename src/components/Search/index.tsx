@@ -101,7 +101,7 @@ export default function Search({ fileList, setFileList, sendValue, setSendValue,
 
             <div className="input-wrap">
               <div className="input-box-inner">
-                <TextArea value={sendValue} onKeyUp={(e) => enterMessage(e)} onChange={(e) => setSendValue(e.target.value)} placeholder={placeholder} autoSize={{ minRows: 1, maxRows: 9 }} onFocus={scrollToBottom} />
+                <TextArea value={sendValue} onPressEnter={(e) => enterMessage(e)} onChange={(e) => setSendValue(e.target.value)} placeholder={placeholder} autoSize={{ minRows: 1, maxRows: 9 }} onFocus={scrollToBottom} />
               </div>
               <div className="search-interactive">
                 <div className="upload-image-wrap">

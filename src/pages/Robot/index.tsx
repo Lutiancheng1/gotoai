@@ -82,16 +82,16 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
     setQuesions([])
     try {
       setQuesionsLoading(true)
-      // const { payload } = await dispatch(getQuesions(currentQuestion!.conversationId ?? currentConversation?.conversationId))
-      // payload && setQuesions(payload as string[])
-      const { data } = (await getMessagesSuggested(id ?? '', user.username)) as { data: [] }
-      data && setQuesions(data as string[])
+      const { payload } = await dispatch(getQuesions(currentQuestion!.conversationId ?? currentConversation?.conversationId))
+      payload && setQuesions(payload as string[])
+      // const { data } = (await getMessagesSuggested(id ?? '', user.username)) as { data: [] }
+      // data && setQuesions(data as string[])
       setQuesionsLoading(false)
       setTimeout(() => {
         scrollBottom()
       }, 0)
     } catch (error) {
-      // setQuesionsLoading(false)
+      setQuesionsLoading(false)
     }
   }
   const sendMessage = async () => {
@@ -110,23 +110,26 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
   }
   // 不使用 stream流 来发消息
   const sendBeta = async (defaultRule?: boolean, prompt?: UserPrompt) => {
+    setQuesions([])
     console.log(defaultRule, prompt, 'defaultRule', 'prompt')
     // defaultRule 为 true 代表是从 首页预设角色过来的 只需要 传递prompt提词 不用发送用户消息
     // 如果是新会话，则创建一个新的会话
     // 创建一个新的会话
-    // const { payload } = (await dispatch(
-    //   startChat({
-    //     menu: 8,
-    //     prompt: '',
-    //     promptId: 0,
-    //     fileId: ''
-    //   })
-    // )) as { payload: ShartChatResp }
-    // currentQuestion = payload
-    // 获取历史列表
-    // 更新当前 ID
-    // dispatch(updateCurrentId(currentQuestion as ShartChatResp))
-    dispatch(toggleIsNewChat(false))
+    if (isNewChat) {
+      const { payload } = (await dispatch(
+        startChat({
+          menu: 8,
+          prompt: '',
+          promptId: 0,
+          fileId: ''
+        })
+      )) as { payload: ShartChatResp }
+      currentQuestion = payload
+      // 获取历史列表
+      // 更新当前 ID
+      dispatch(updateCurrentId(currentQuestion as ShartChatResp))
+      dispatch(toggleIsNewChat(false))
+    }
     // 将内容发送给服务器
     // 预设角色不需要发送消息
     setMessageLoading(true)
@@ -171,99 +174,99 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
     scrollBottom()
     if (sse) {
       const newController = new AbortController()
-      // setController(newController)
-      // const signal = newController.signal
+      setController(newController)
+      const signal = newController.signal
       try {
-        // const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
-        // fetchEventSource(url, {
-        //   method: 'POST',
-        //   signal: signal,
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     'Cache-Control': 'no-cache',
-        //     Connection: 'keep-alive',
-        //     Authorization: `Bearer ${getTokenInfo().token}`
+        const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+        fetchEventSource(url, {
+          method: 'POST',
+          signal: signal,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache',
+            Connection: 'keep-alive',
+            Authorization: `Bearer ${getTokenInfo().token}`
+          },
+          body: JSON.stringify({
+            conversationId: currentQuestion!.conversationId,
+            menu: 8,
+            query: prompt?.content || sendValue
+          }),
+          onopen(response) {
+            return Promise.resolve()
+          },
+          onmessage(msg) {
+            // 接收一次数据段时回调，因为是流式返回，所以这个回调会被调用多次
+            if (msg.event === 'message') {
+              // 处理数据段
+              let { message, files } = JSON.parse(msg.data) as unknown as AddChatMessagesData
+              let file = files && files.length > 0 ? files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n') : ''
+              dispatch(updateConversitionDetail({ UUID: uuid, content: message ? message + file : file }))
+              // 进行连接正常的操作
+            } else if (msg.event === 'message_end') {
+              setMessageLoading(false)
+              newController.abort()
+              setCurrentUUID('')
+              getConversationQuestions()
+            }
+          },
+          onclose() {
+            // 正常结束的回调
+            newController.abort() // 关闭连接
+          },
+          onerror(err) {
+            // 连接出现异常回调
+            // 必须抛出错误才会停止
+            throw err
+          }
+        })
+        // await sendChatMessage(
+        //   {
+        //     inputs: {},
+        //     query: prompt?.content || sendValue,
+        //     conversation_id: conversation_id,
+        //     user: user.username
         //   },
-        //   body: JSON.stringify({
-        //     conversationId: currentQuestion!.conversationId,
-        //     menu: 8,
-        //     query: prompt?.content || sendValue
-        //   }),
-        //   onopen(response) {
-        //     return Promise.resolve()
-        //   },
-        //   onmessage(msg) {
-        //     // 接收一次数据段时回调，因为是流式返回，所以这个回调会被调用多次
-        //     if (msg.event === 'message') {
-        //       // 处理数据段
-        //       let { message, files } = JSON.parse(msg.data) as unknown as AddChatMessagesData
-        //       let file = files && files.length > 0 ? files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n') : ''
-        //       dispatch(updateConversitionDetail({ UUID: uuid, content: message ? message + file : file }))
-        //       // 进行连接正常的操作
-        //     } else if (msg.event === 'message_end') {
+        //   {
+        //     onData: (data, isFirstMessage, moreInfo) => {
+        //       // console.log(data, isFirstMessage, moreInfo, 'data')
+        //       // handle data
+        //       dispatch(updateConversitionDetail({ UUID: uuid, content: data }))
+        //     },
+        //     onCompleted: () => {
+        //       // handle completion
         //       setMessageLoading(false)
         //       newController.abort()
         //       setCurrentUUID('')
-        //       getConversationQuestions()
+        //     },
+        //     onFile: (file) => {
+        //       // handle file
+        //     },
+        //     onThought: (thought) => {
+        //       // handle thought
+        //       console.log(thought, 'thought')
+        //     },
+        //     onMessageEnd: ({ message_id, conversation_id: id }) => {
+        //       // handle message end
+        //       conversation_id = id
+        //       getConversationQuestions(message_id)
+        //     },
+        //     onMessageReplace: (message) => {
+        //       // handle message replace
+        //       console.log(message, 'message')
+        //     },
+        //     onError: (error) => {
+        //       // handle error
+        //       setMessageLoading(false)
+        //       newController.abort()
+        //       setCurrentUUID('')
+        //     },
+        //     getAbortController: (abortController) => {
+        //       // handle abort controller
+        //       setController(abortController)
         //     }
-        //   },
-        //   onclose() {
-        //     // 正常结束的回调
-        //     newController.abort() // 关闭连接
-        //   },
-        //   onerror(err) {
-        //     // 连接出现异常回调
-        //     // 必须抛出错误才会停止
-        //     throw err
         //   }
-        // })
-        await sendChatMessage(
-          {
-            inputs: {},
-            query: prompt?.content || sendValue,
-            conversation_id: conversation_id,
-            user: user.username
-          },
-          {
-            onData: (data, isFirstMessage, moreInfo) => {
-              // console.log(data, isFirstMessage, moreInfo, 'data')
-              // handle data
-              dispatch(updateConversitionDetail({ UUID: uuid, content: data }))
-            },
-            onCompleted: () => {
-              // handle completion
-              setMessageLoading(false)
-              newController.abort()
-              setCurrentUUID('')
-            },
-            onFile: (file) => {
-              // handle file
-            },
-            onThought: (thought) => {
-              // handle thought
-              console.log(thought, 'thought')
-            },
-            onMessageEnd: ({ message_id, conversation_id: id }) => {
-              // handle message end
-              conversation_id = id
-              getConversationQuestions(message_id)
-            },
-            onMessageReplace: (message) => {
-              // handle message replace
-              console.log(message, 'message')
-            },
-            onError: (error) => {
-              // handle error
-              setMessageLoading(false)
-              newController.abort()
-              setCurrentUUID('')
-            },
-            getAbortController: (abortController) => {
-              // handle abort controller
-              setController(abortController)
-            }
-          }
-        )
+        // )
       } catch (err) {
         setMessageLoading(false)
         setSendValue('')
@@ -328,19 +331,19 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
       return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
     }
     // 如果按下的是回车键
-    if (e.keyCode === 13) {
-      // 如果输入框为空
-      if (!sendValue.trim()) {
-        // 去除输入框中的回车和换行符
-        setSendValue(sendValue.replace(/\r/gi, '').replace(/\n/gi, ''))
-        // 弹出提示框，提示需要输入内容
-        return Toast.notify({ type: 'info', message: '请输入内容' })
-      } else {
-        // 发送消息
-        sendMessage()
-        // 清空输入框
-        setSendValue('')
-      }
+    e.preventDefault() // 防止回车键默认的提交行为
+    // 去除输入框中的回车、换行符和空格
+    const trimmedValue = sendValue.replace(/\r/gi, '').replace(/\n/gi, '').trim()
+    setSendValue(trimmedValue)
+    // 如果输入框为空，则不发送消息
+    if (!trimmedValue) {
+      // 弹出提示框，提示需要输入内容
+      return Toast.notify({ type: 'info', message: '请输入内容' })
+    } else {
+      // 发送消息
+      sendMessage()
+      // 清空输入框
+      setSendValue('')
     }
   }
   // 定义markdown解析
@@ -387,7 +390,10 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
     const langClass = token.info ? `language-${token.info}` : ''
     const lines = token.content.split('\n').slice(0, -1)
     const lineNumbers = lines.map((line, i) => `<span>${i + 1}</span>`).join('\n')
-    const content = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true }).value
+    const pure = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true })
+    const hasCursor = pure.code?.includes('<span class="gpt-cursor"/>')
+    const pureCode = pure.code?.replace('<span class="gpt-cursor"/></span>', '')
+    const content = hljs.highlight(pureCode!, { language: token.info || 'md', ignoreIllegals: true }).value + `${hasCursor ? '<span class="gpt-cursor"/> ' : ''}`
     // 为每个代码块创建一个唯一的ID
     const uniqueId = `copy-button-${Date.now()}-${Math.random()}`
     // 创建一个复制按钮 在makedown 渲染完成之后在插入
@@ -397,6 +403,7 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
         copybutton.addEventListener('click', () => handleCopyClick(token.content))
       }
     })
+
     return `
     <div class="${langClass}">
       <div class="top"> <div class="language">${token.info}</div><div class="copy-button" id="${uniqueId}">复制</div></div>
@@ -500,13 +507,13 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
                                 ref={index === conversitionDetailList.length - 1 ? currentMessageRef : null}
                                 dangerouslySetInnerHTML={{
                                   __html: md.render(
-                                    ` ${
-                                      item.isLoading
-                                        ? '<span class="loading loading-dots loading-xs"></span>'
-                                        : item.files && item.files.length > 0
-                                        ? item.content + '\n\n' + item.files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
-                                        : item.content
-                                    }`
+                                    item.isLoading
+                                      ? '<span class="loading loading-dots loading-xs"></span>'
+                                      : item.files && item.files.length > 0
+                                      ? item.content + '\n\n' + item.files.map((file) => (file.mimetype?.startsWith('image') ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
+                                      : item.content.endsWith('```') || item.content.match(/\B```\b[a-zA-Z]+\b(?!\s)/)
+                                      ? item.content
+                                      : item.content + `${currentUUID === item.UUID ? '<span class="gpt-cursor"/></span>' : ''}`
                                   )
                                 }}
                               ></div>
@@ -569,7 +576,7 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
                 <div className="search-input-box">
                   <div className="input-wrap">
                     <div className="input-box-inner flex items-end">
-                      <TextArea value={sendValue} onKeyUp={(e) => enterMessage(e)} onChange={(e) => setSendValue(e.target.value)} placeholder={placeholder} autoSize={{ minRows: 1, maxRows: 3 }} />
+                      <TextArea value={sendValue} onPressEnter={(e) => enterMessage(e)} onChange={(e) => setSendValue(e.target.value)} placeholder={placeholder} autoSize={{ minRows: 1, maxRows: 3 }} />
                       <div className="h-[28px]">
                         <img className={`enter ${!sse && messageLoading ? 'loading loading-spinner loading-xs' : ''}`} onClick={() => sendMessage()} src={sendIcon} alt="" />
                       </div>

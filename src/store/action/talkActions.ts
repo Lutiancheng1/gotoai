@@ -4,6 +4,7 @@ import { ChatMessages, GetHistoryFroMenu, HistoryList, MessageInfo, NewQuestion 
 import { delHistory, saveHistoryList, updateConversitionDetailList, updateCurrentId, updateHistoryList } from '../reducers/talk'
 import { ShartChatResp } from '@/types/app'
 import { FileInfo } from '@/components/Dialogue'
+import { AxiosResponse } from 'axios'
 
 export type HisResponse = {
   rows: HistoryList[]
@@ -71,10 +72,10 @@ export const startChat = createAsyncThunk('talk/startChat', async (params: { men
  * 获取会话详情
  * @returns thunk
  */
-export const getConversitionDetail = createAsyncThunk('talk/getConversitionDetail', async (id: string | number, { dispatch }) => {
+export const getConversitionDetail = createAsyncThunk('talk/getConversitionDetail', async (id: string | number): Promise<MessageInfo[] | void> => {
   const res = await http.get(`/Chat/MessageList?chatid=${id}`)
   if (!res.data) return
-  return res.data
+  return res.data as MessageInfo[]
 })
 
 /**

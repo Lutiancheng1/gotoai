@@ -97,6 +97,7 @@ const History = ({ className = '', title = '对话', title_icon = false, item_Ic
     // 如果当前id 等于传过来的id 直接return
     if (currentConversation!.chatId === item.id) return
     dispatch(toggleIsNewChat!(false))
+    dispatch(toggleFirstSend(false))
     // 切换当前会话id
     dispatch(
       updateCurrentId({
