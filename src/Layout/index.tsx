@@ -10,7 +10,7 @@ import './index.css'
 import { getAccountInfo, removeDifyInfo } from '@/utils/storage'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { logOut } from '@/store/reducers/login'
-import { getUserProfile } from '@/store/action/profileActions'
+import { getUser, getUserProfile } from '@/store/action/profileActions'
 import { AppDispatch, RootState } from '@/store'
 import { connect } from 'react-redux'
 import { talkInitialState } from '@/store/reducers/talk'
@@ -24,12 +24,14 @@ import pruduct from '@/assets/images/product.svg'
 import { desensitizePhone } from '@/utils'
 import Robot from '@/pages/Robot'
 import { productMatrix } from '@/config'
+import { useMount } from 'ahooks'
 
 // 导入子路由
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
 const Home = React.lazy(() => import('@/pages/Talk'))
 const Loading = React.lazy(() => import('@/pages/Loading'))
 const Document = React.lazy(() => import('@/pages/Document'))
+const Documents = React.lazy(() => import('@/pages/Documents'))
 const Code = React.lazy(() => import('@/pages/Code'))
 const KnowledgeBase = React.lazy(() => import('@/pages/KnowledgeBase'))
 const DataAnalysis = React.lazy(() => import('@/pages/DataAnalysis'))
@@ -74,7 +76,7 @@ const Index = ({ loading }: Props) => {
   }
   const handleLogoutConfirm = async () => {
     dispatch(logOut())
-    removeDifyInfo()
+    // removeDifyInfo()
     navagate('/login', { replace: true })
   }
   useEffect(() => {
@@ -85,10 +87,10 @@ const Index = ({ loading }: Props) => {
     }
     setCurrentPath(location.pathname.substr(1))
   }, [location])
-  useEffect(() => {
-    dispatch(getUserProfile(getAccountInfo().username))
-  }, [dispatch])
 
+  useMount(() => {
+    dispatch(getUserProfile(getAccountInfo().username ?? ''))
+  })
   return (
     <ConfigProvider
       theme={{
@@ -250,7 +252,8 @@ const Index = ({ loading }: Props) => {
                 )}
               </div>
             }
-            style={{ borderInlineEnd: '1px solid rgba(5, 5, 5, 0.06)', position: 'relative', zIndex: 99 }}
+            className="nw-no-scroll"
+            style={{ overflow: 'auto', height: 'calc(100% - 80px)', borderInlineEnd: '1px solid rgba(5, 5, 5, 0.06)', position: 'relative', zIndex: 99 }}
             width={160}
             collapsible
             collapsed={categoryCollapsed}
@@ -276,6 +279,7 @@ const Index = ({ loading }: Props) => {
               <Routes>
                 <Route path="/talk" element={<Home />} />
                 <Route path="/document" element={<Document />} />
+                <Route path="/documents" element={<Documents />} />
                 <Route path="/code" element={<Code />} />
                 <Route path="/knowledgeBase" element={<KnowledgeBase />} />
                 <Route path="/dataAnalysis" element={<DataAnalysis />} />

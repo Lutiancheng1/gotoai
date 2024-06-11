@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { initialState as initCreativityData, initCurrentCategory, updateCollapsed } from '@/store/reducers/creativity'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { Button, Form, Input, Modal, Select, Upload } from 'antd'
+import { Button, FloatButton, Form, Input, Modal, Select, Upload } from 'antd'
 import { CategorysDetail, List, ListDetail } from '../types'
 import FormItem from 'antd/es/form/FormItem'
 import TextArea from 'antd/es/input/TextArea'
@@ -69,17 +69,21 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
   const restParams = () => {
     setIsInit(true)
     setConversitionList([])
+    setLoading(false)
     currentConversation = {
       conversationId: '',
       chatId: 0
     }
     if (CreativityData && CreativityData.currentCategory && form) {
-      form.resetFields()
+      setTimeout(() => {
+        form.resetFields()
+      }, 0)
     }
   }
   // 各分类list 点击
   const getItemDetail = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: number, type: string) => {
     e.stopPropagation()
+    if (id === Number(robotId)) return
     navigate(`/marketingCreativity/${id}`, {
       state: {
         type
@@ -92,6 +96,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
         closeOthers: true
       })
     )
+    restParams()
   }
   // 重置
   const onReset = () => {
@@ -142,6 +147,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
       setIsInit(false)
     }
     let uuid = UUID()
+    setCurrentUUID(uuid)
     setConversitionList((prevList) => [
       {
         id: 0,
@@ -202,6 +208,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
               setLoading(false)
               newController.abort()
               setCurrentUUID('')
+              dispatch(getHistoryList())
             }
           },
           onclose() {
@@ -353,7 +360,6 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
     const getData = async () => {
       await dispatch(initCurrentCategory())
       await dispatch(getCategoryDetail(Number(robotId)))
-      restParams()
     }
     getData()
   }, [robotId])
@@ -405,7 +411,10 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
     const langClass = token.info ? `language-${token.info}` : ''
     const lines = token.content.split('\n').slice(0, -1)
     const lineNumbers = lines.map((line, i) => `<span>${i + 1}</span>`).join('\n')
-    const content = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true }).value
+    const pure = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true })
+    const hasCursor = pure.code?.includes('<span class="gpt-cursor"></span>')
+    const pureCode = pure.code?.replace('<span class="gpt-cursor"></span>', '')
+    const content = hljs.highlight(pureCode!, { language: token.info || 'md', ignoreIllegals: true }).value + `${hasCursor ? '<span class="gpt-cursor"></span>' : ''}`
     // 为每个代码块创建一个唯一的ID
     const uniqueId = `copy-button-${Date.now()}-${Math.random()}`
     // 创建一个复制按钮 在makedown 渲染完成之后在插入
@@ -415,6 +424,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
         copybutton.addEventListener('click', () => handleCopyClick(token.content))
       }
     })
+
     return `
     <div class="${langClass}">
       <div class="top"> <div class="language">${token.info}</div><div class="copy-button" id="${uniqueId}">复制</div></div>
@@ -425,11 +435,11 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
   return (
     <div className="w-full h-full">
       {contextHolder}
-      <div className="w-full text-[#1a2029] h-[113px] bg-white p-2 border-b-[1px] border-[rgba(0,0,0,0.1)]">
+      <div className="w-full text-[#1a2029] bg-white p-2 border-b-[1px] border-[rgba(0,0,0,0.1)]">
         <p className="text-28 font-600 *:leading-7">AI 营销创意助手</p>
-        <p className="font-400 text-14 mt-3 ">根据企业需求，生成各种营销创意，如广告语、海报设计、视频脚本以及全面的营销方案策划，包括线上线下活动、社交媒体推广等。帮助企业实现营销活动的自动化，提高营销效率，降低人力成本。</p>
+        <p className="font-400 text-14 mt-3 line-clamp-1">根据企业需求，生成各种营销创意，如广告语、海报设计、视频脚本以及全面的营销方案策划，包括线上线下活动、社交媒体推广等。帮助企业实现营销活动的自动化，提高营销效率，降低人力成本。</p>
       </div>
-      <div className="w-full h-[calc(100vh-113px)] bg-[#F3F5F8] flex items-center justify-center overflow-hidden">
+      <div className="w-full h-[calc(100vh-91px)] bg-[#F3F5F8] flex items-center justify-center overflow-hidden">
         {/*  分类树 */}
         <div className="w-[200px] h-full bg-[#fff] border-r-[1px] border-[rgba(0,0,0,0.1)] flex flex-col">
           {/* 头部 返回按钮 */}
@@ -568,7 +578,6 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
                                       className="cursor-pointer"
                                       value={currentFile?.file.name}
                                       readOnly
-                                      size="large"
                                       addonAfter={
                                         currentFile ? (
                                           <i
@@ -634,9 +643,11 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
                       <div key={index} className="flex flex-col mb-4">
                         <div className="flex-1 bg-[#fff] flex flex-col text-[#222] text-15 leading-[22px] px-6 py-4">
                           <div
-                            className="whitespace-pre-wrap break-all text-15 leading-[26px]"
+                            className="markdown-body text-15 leading-[26px]"
                             dangerouslySetInnerHTML={{
-                              __html: md.render(item.isLoading ? '<span class="loading loading-dots loading-xs"></span>' : item.content)
+                              __html: md.render(
+                                item.isLoading ? '<span class="loading loading-dots loading-xs"></span>' : item.content.endsWith('```') || item.content.match(/\B```\b[a-zA-Z]+\b(?!\s)/) ? item.content : item.content + `${currentUUID === item.UUID ? '<span class="gpt-cursor"></span>' : ''}`
+                              )
                             }}
                           ></div>
                           <div className="flex items-center mt-[15px] pt-[15px] text-14 border-dashed border-t-[1px] border-[rgba(105,117,126,0.3)] justify-end">
@@ -649,6 +660,14 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
                       </div>
                     )
                   })}
+                <FloatButton.BackTop
+                  style={{
+                    right: 30
+                  }}
+                  className="hover:opacity-80"
+                  visibilityHeight={200}
+                  target={() => document.querySelector('#prompt-content-wrap') as HTMLDivElement}
+                />
               </div>
             )}
           </div>

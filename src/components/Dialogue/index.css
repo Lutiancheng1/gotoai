@@ -260,32 +260,6 @@
 
 }
 
-.gpt-cursor {
-  display: inline-block;
-  width: 2.5px;
-  height: 16px;
-  background-color: #1a2029;
-  vertical-align: middle;
-  margin-right: 2px;
-  margin-left: 2px;
-  /* 根据需要调整光标的位置 */
-  opacity: 1;
-  animation: blink 1s infinite;
-}
-
-@keyframes blink {
-
-  0%,
-  50% {
-    opacity: 1;
-  }
-
-  50.1%,
-  100% {
-    opacity: 0;
-  }
-}
-
 .followup-container {
   display: -webkit-box;
   display: -webkit-flex;

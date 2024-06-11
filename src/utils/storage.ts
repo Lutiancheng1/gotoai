@@ -63,6 +63,17 @@ export const removeAccountInfo = () => {
 }
 
 /**
+ * 删除本地缓存中的帐号信息的密码
+ */
+export const removeAccountPassword = () => {
+  const accountInfo = getAccountInfo()
+  if (accountInfo && accountInfo.password) {
+    delete accountInfo.password
+    localStorage.setItem(USER_INFO, JSON.stringify(accountInfo))
+  }
+}
+
+/**
  * 判断本地缓存中是否存在 帐号 信息
  */
 export const hasAccountInfo = (): boolean => {

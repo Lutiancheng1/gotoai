@@ -1579,37 +1579,33 @@
       "title": "文章续写"
     },
     "3390f00d617e96cf5927a8d5bc206da3": {
-      "extra": {},
-      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/dfdb9338459df71293909c03e3fd8009.png",
+      "extra": {
+        "title_left": "白话文",
+        "title_right": "文言文"
+      },
+      "icon": "https://cloud.zhaomi.cn/cody_admin/prod/0bac4c49d80ea4bacfaff997ec43ec29.png",
       "list": [
         {
-          "default": ["请输入原邮件正文"],
+          "default": ["文言文"],
           "err_msg": "",
           "input_name": "inputname_1",
-          "input_type": "text_500",
-          "placeholder": "请输入原邮件正文",
-          "title": "原邮件"
-        },
-        {
-          "default": ["请输入回复邮件"],
-          "err_msg": "请输入正确的内容",
-          "input_name": "inputname_2",
-          "input_type": "text_30",
-          "placeholder": "请输入回复邮件",
-          "title": "回复抬头"
+          "input_type": "select",
+          "option": ["文言文"],
+          "placeholder": "",
+          "title": "语言"
         },
         {
           "default": [],
-          "err_msg": "",
-          "input_name": "inputname_3",
-          "input_type": "tab",
-          "placeholder": "输入关键词，按Enter添加",
-          "title": "关键词"
+          "err_msg": "请输入正确的内容",
+          "input_name": "inputname_2",
+          "input_type": "text_2000",
+          "placeholder": "请输入想要改写的白话文",
+          "title": "原文"
         }
       ],
       "support_flow": 0,
       "support_ind_report": 0,
-      "title": "邮件回复"
+      "title": "白话文转文言文"
     },
     "d582219f009333a533f6fc2dc916c424": {
       "extra": {

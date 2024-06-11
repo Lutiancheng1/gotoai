@@ -1,6 +1,6 @@
 import './index.css'
 import type { UploadFile, UploadProps } from 'antd'
-import { ConfigProvider, Input, message, Modal, Tooltip, Upload } from 'antd'
+import { ConfigProvider, Input, message, Modal, Popover, Tooltip, Upload } from 'antd'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import { RcFile } from 'antd/es/upload'
 import { UploadRequestOption, UploadRequestError } from 'rc-upload/lib/interface'
@@ -23,10 +23,10 @@ import Dialogue from '@/components/Dialogue'
 import { clearConversitionDetailList, toggleIsNewChat, updateCurrentId, updateLoading } from '@/store/reducers/talk'
 import UploadErrorImg from '@/assets/images/upload-error.svg'
 import explainIcon from './images/toolbar/explain-hover.svg'
-import quoteIcon from './images/toolbar/explain-hover.svg'
-import rewriteIcon from './images/toolbar/explain-hover.svg'
-import summaryIcon from './images/toolbar/explain-hover.svg'
-import translateIcon from './images/toolbar/explain-hover.svg'
+import quoteIcon from './images/toolbar/quote-hover.svg'
+import rewriteIcon from './images/toolbar/rewrite-hover.svg'
+import summaryIcon from './images/toolbar/summary-hover.svg'
+import translateIcon from './images/toolbar/translate-hover.svg'
 import document_translate from './images/document_translate.svg'
 import document_analyze from './images/document_analyze.svg'
 import document_question from './images/document_question.svg'
@@ -100,7 +100,6 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
             const { payload } = (await dispatch(getDocumentSummary(data.fileId))) as { payload: { data: string } }
             loadMore(1)
             dispatch(updateCurrentFile({ fileid: data.fileId, path: data.url, chatId: data.chat.chatId, conversationid: data.chat.conversationId, summary: payload.data } as unknown as DocFile))
-            dispatch(toggleIsNewChat(false))
             dispatch(
               updateCurrentId({
                 conversationId: data.chat.conversationId,
@@ -108,6 +107,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
               })
             )
             dispatch(updateDocLoading(false))
+            dispatch(toggleIsNewChat(false))
             setProgress(0)
           }
         },
@@ -201,12 +201,17 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
   const delHistory = async (e: React.MouseEvent<HTMLElement, MouseEvent>, fileid: string) => {
     e.stopPropagation()
     if (!fileid) return
+    dispatch(updateLoading(true))
     const { payload } = await dispatch(delDocument(fileid))
     // 删除成功
     if (payload) {
       Toast.notify({ type: 'success', message: '删除成功' })
       loadMore(1)
       dispatch(toggleIsNewDoc(true))
+      dispatch(updateLoading(false))
+    } else {
+      dispatch(toggleIsNewDoc(true))
+      dispatch(updateLoading(false))
     }
     dispatch(
       updateCurrentId({
@@ -324,19 +329,18 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
     )) as { payload: ShartChatResp }
 
     let docFIle = { fileid: doc.data.fileId, path: doc.data.url, chatId: chat.chatId, conversationid: chat.conversationId, summary: summary.data } as DocFile
-    dispatch(updateCurrentFile(docFIle))
-    dispatch(
+    await dispatch(updateCurrentFile(docFIle))
+    await dispatch(
       updateCurrentId({
         conversationId: chat.conversationId,
         chatId: chat.chatId
       })
     )
-    dispatch(toggleIsNewChat(false))
-    console.log(docFIle)
+    await dispatch(toggleIsNewChat(false))
     // 加载 PDF 文件
-    toggleHistory(true)
-    dispatch(updateLoading(false))
-    loadMore(1)
+    await toggleHistory(true)
+    await dispatch(updateLoading(false))
+    await loadMore(1)
     onPrompt({
       content: prompt
     } as UserPrompt)
@@ -546,7 +550,30 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
                                   <span>或拖动文档到这里</span>
                                 </p>
                                 <p className="tip-right-subtitle">
-                                  <span>支持PDF、Word文件，文件大小不超过30M，不支持扫描件</span> <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)', marginLeft: 10 }} />
+                                  <span>支持PDF、Word文件，文件大小不超过30M，不支持扫描件</span>
+                                  <Popover
+                                    rootClassName="upload-popover"
+                                    placement="right"
+                                    content={
+                                      <div className="content" onClick={(e) => e.stopPropagation()}>
+                                        <p className="title">文档上传规范</p>
+                                        <p className="content-item">
+                                          <span className="content-icon" />
+                                          <span className="content-text">支持文件类型：PDF、Word</span>
+                                        </p>
+                                        <p className="content-item">
+                                          <span className="content-icon" />
+                                          <span className="content-text">文件大小：小于30M</span>
+                                        </p>
+                                        <p className="content-item">
+                                          <span className="content-icon" />
+                                          <span className="content-text">内容要求：一栏排版、文字清晰</span>
+                                        </p>
+                                      </div>
+                                    }
+                                  >
+                                    <InfoCircleOutlined style={{ color: 'rgba(0,0,0,.45)', marginLeft: 10 }} />
+                                  </Popover>
                                 </p>
                               </div>
                             </div>
@@ -595,7 +622,7 @@ const Document = ({ isNewDoc, fileList, currentFile, docLoading }: Props) => {
             <Pane minSize={'30%'}>
               {/* pdfjs预览 */}
               <div className="left relative">
-                <div className="preview-container  bg-[#d4d4d7]" style={{ overflowY: 'scroll', height: '100vh' }}>
+                <div className="preview-container nw-scrollbar bg-[#d4d4d7]" style={{ overflowY: 'scroll', height: '100vh' }}>
                   {currentFile && isPdfFile(currentFile.path) ? <PDFViewer hasTools={true} url={currentFile.path} handleMouseUp={handleMouseUp} /> : <WordPreview url={currentFile!.path} handleMouseUp={handleMouseUp} />}
                 </div>
                 <div

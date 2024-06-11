@@ -23,7 +23,6 @@ const linkService = new pdfjsViewer.PDFLinkService({
 })
 let pdf = null as pdfjsLib.PDFDocumentProxy | null
 let viewContainer = null as HTMLDivElement | null
-let pdfPageView = null as pdfjsViewer.PDFPageView | null
 let loadingTask = null as pdfjsLib.PDFDocumentLoadingTask | null
 let loadingBar = null as HTMLDivElement | null
 const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) => {
@@ -71,7 +70,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
   // 渲染页面的函数
   const renderPage = async (page: PDFPageProxy, pageNum: number) => {
     const viewport = page.getViewport({ scale })
-    pdfPageView = new pdfjsViewer.PDFPageView({
+    const pdfPageView = new pdfjsViewer.PDFPageView({
       container: containerRef.current!,
       id: pageNum,
       scale,
@@ -86,7 +85,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
     // 调整文本层尺寸以匹配canvas层
     adjustTextLayerSize(pageNum, canvas.style.width, canvas.style.height)
 
-    setPdfPageViews((prev) => [...prev, pdfPageView] as pdfjsViewer.PDFPageView[]) // 将新的PDFPageView实例添加到数组中
+    setPdfPageViews((prev) => [...prev, pdfPageView]) // 将新的PDFPageView实例添加到数组中
     if (pageNum === 1) {
       setLoading(false) // 第一页渲染完成后取消加载状态
     }
@@ -97,7 +96,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
       try {
         if (containerRef.current) {
           containerRef.current.innerHTML = '' // 清理上一次的PDF内容
-          pdfPageView?.destroy()
           setLoading(true)
           setPdfPageViews([]) // 清空PDFPageView实例数组
           setPageNumber(1)
@@ -135,7 +133,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
 
         // 在后台加载并渲染剩余页面
         for (let pageNum = 2; pageNum <= pdf.numPages; pageNum++) {
-          pdf.getPage(pageNum).then((page) => renderPage(page, pageNum))
+          await pdf.getPage(pageNum).then((page) => renderPage(page, pageNum))
         }
       } catch (error) {
         console.error('Error loading PDF: ', error)
@@ -171,9 +169,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
   const handleScroll = () => {
     const containerTop = scroll && scroll.top
     const containerCenter = viewContainer!.offsetHeight / 2 + containerTop!
-
     let closestPageNum = 1
     let minDistance = Infinity
+    let closestPageNumOnBoundary = 1
+    let minDistanceOnBoundary = Infinity
+
     pdfPageViews.forEach((view, index) => {
       const pageTop = view.div.offsetTop
       const pageBottom = pageTop + view.div.clientHeight
@@ -185,11 +185,27 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
         closestPageNum = index + 1
         minDistance = distance
       }
+
+      // 考虑滚动到两个页面的分界线时
+      if (distance < minDistanceOnBoundary) {
+        closestPageNumOnBoundary = index + 1
+        minDistanceOnBoundary = distance
+      }
     })
+
+    // 如果closestPageNum仍然为1，那么就将其设置为当前滚动位置最接近的页面编号
+    if (closestPageNum === 1) {
+      closestPageNum = closestPageNumOnBoundary
+    }
+
     console.log(closestPageNum, minDistance, 'minDistance')
 
     updatePageNumber(closestPageNum)
   }
+  useUpdateEffect(() => {
+    handleScroll()
+  }, [scroll])
+
   useMount(() => {
     handleMouseUp && containerRef.current?.addEventListener('mouseup', handleMouseUp)
     viewContainer = document.querySelector('.preview-container')! as HTMLDivElement
@@ -207,6 +223,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
       })
     }
   }, [scale])
+
   return (
     <div>
       {loading && (

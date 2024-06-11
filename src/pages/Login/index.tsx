@@ -8,8 +8,9 @@ import logo from '@/assets/images/logo.png'
 import Toast from '@/components/Toast'
 import { login } from '@/store/action/loginActions'
 import { useAppDispatch } from '@/store/hooks'
-import { getAccountInfo, hasAccountInfo, removeAccountInfo, setAccountInfo, setDifyInfo } from '@/utils/storage'
+import { getAccountInfo, hasAccountInfo, removeAccountInfo, removeAccountPassword, setAccountInfo, setDifyInfo } from '@/utils/storage'
 import { getAppInfo } from '@/api/login'
+import { getUserProfile } from '@/store/action/profileActions'
 type FieldType = {
   username?: string
   password?: string
@@ -53,8 +54,11 @@ export default function Login() {
         password: password
       })
     } else {
-      // 否则删除用户名和密码
-      removeAccountInfo()
+      // 否则只保存帐号
+      setAccountInfo({
+        username: username
+      })
+      // removeAccountPassword()
     }
     // 获取Dify 配置
     // const resp = await getAppInfo()

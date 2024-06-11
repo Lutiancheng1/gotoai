@@ -19,7 +19,6 @@ import defaultAvatar from '@/assets/images/default-avatar.jpg'
 import rebotAvatar from '@/assets/images/robot.svg'
 import stopIcon from '@/assets/images/session_stop_icon2.svg'
 import refreshIcon from '@/assets/images/refresh.png'
-import { MessageInfo } from '@/store/types'
 import { UserPrompt } from '@/pages/Talk'
 import { useMount, useSize, useUnmount, useUpdateEffect, useUpdateLayoutEffect } from 'ahooks'
 import { ShartChatResp } from '@/types/app'
@@ -75,22 +74,10 @@ type Props = {
   hasFooter?: boolean
   multiple?: boolean
   style?: React.CSSProperties
+  fileIds?: string[]
 } & Partial<talkInitialState>
-// 递归找到DOM下最后一个元素节点
-function findLastElement(element: HTMLElement): HTMLElement {
-  // 如果该DOM没有子元素，则返回自身
-  if (!element.children.length) {
-    return element
-  }
-  const lastChild = element.children[element.children.length - 1]
-  // 如果最后一个子元素是元素节点，则递归查找
-  if (lastChild.nodeType === Node.ELEMENT_NODE) {
-    return findLastElement(lastChild as HTMLElement)
-  }
-  return element
-}
 
-const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend, placeholder = '输入你的问题或需求', hasUploadBtn = false, initChildren, autoToBottom = true, fileId, sse = false, hasFooter = true, multiple }: Props, ref) => {
+const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend, placeholder = '输入你的问题或需求', hasUploadBtn = false, initChildren, autoToBottom = true, fileId, sse = false, hasFooter = true, multiple, fileIds }: Props, ref) => {
   // 初始化问题Id
   let currentQuestion = currentConversation
   const location = useLocation()
@@ -112,8 +99,6 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   const innerBox = useRef<HTMLDivElement>(null)
   // 创建一个上传组件
   const uploadRef = useRef<HTMLInputElement>(null)
-  // 用于处理流式传输的数据
-  const streamingText = useRef('')
   // 初始化文件列表
   const [fileList, setFileList] = useState<FileInfo[]>([])
   // 记录当前菜单的key
@@ -145,27 +130,15 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       setTimeout(() => {
         scrollBottom()
       }, 0)
+      setInitQuesions(false)
     } catch (error) {
       setQuesionsLoading(false)
+      setInitQuesions(false)
     }
   }
   // 刷新当前历史记录
   const refreshHistoryList = () => {
     dispatch(getHistoryList({ menu: currentMenuKey.current, page: 1, pageSize: parseInt(window.innerHeight / 80 + '') + 1 }))
-  }
-  const onDownload = (src: string) => {
-    fetch(src)
-      .then((response) => response.blob())
-      .then((blob) => {
-        const url = URL.createObjectURL(new Blob([blob]))
-        const link = document.createElement('a')
-        link.href = url
-        link.download = 'image.png'
-        document.body.appendChild(link)
-        link.click()
-        URL.revokeObjectURL(url)
-        link.remove()
-      })
   }
   const sendMessage = async () => {
     // 如果消息正在加载中，则直接返回
@@ -283,7 +256,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
             body: JSON.stringify({
               conversationId: currentQuestion!.conversationId,
               menu: currentMenuKey.current,
-              query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
+              query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
+              files: fileIds
             }),
             onopen(response) {
               // 建立连接的回调
@@ -312,6 +286,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                 setCurrentUUID('')
                 // 更新左侧历史title
                 refreshHistoryList()
+                dispatch(updateConversitionDetail({ UUID: uuid, content: '' }))
                 getConversationQuestions()
               }
             },
@@ -320,6 +295,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
               newController.abort() // 关闭连接
             },
             onerror(err) {
+              console.log(err, 'err')
               // 连接出现异常回调
               // 必须抛出错误才会停止
               throw err
@@ -484,9 +460,9 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     const lines = token.content.split('\n').slice(0, -1)
     const lineNumbers = lines.map((line, i) => `<span>${i + 1}</span>`).join('\n')
     const pure = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true })
-    const hasCursor = pure.code?.includes('<span class="gpt-cursor"/>')
-    const pureCode = pure.code?.replace('<span class="gpt-cursor"/></span>', '')
-    const content = hljs.highlight(pureCode!, { language: token.info || 'md', ignoreIllegals: true }).value + `${hasCursor ? '<span class="gpt-cursor"/> ' : ''}`
+    const hasCursor = pure.code?.includes('<span class="gpt-cursor"></span>')
+    const pureCode = pure.code?.replace('<span class="gpt-cursor"></span>', '')
+    const content = hljs.highlight(pureCode!, { language: token.info || 'md', ignoreIllegals: true }).value + `${hasCursor ? '<span class="gpt-cursor"></span>' : ''}`
     // 为每个代码块创建一个唯一的ID
     const uniqueId = `copy-button-${Date.now()}-${Math.random()}`
     // 创建一个复制按钮 在makedown 渲染完成之后在插入
@@ -614,10 +590,9 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   useEffect(() => {
     if (conversitionDetailList!.length > 0 && !firstSend && initQuesions) {
       getConversationQuestions()
-      setInitQuesions(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversitionDetailList!.length])
+  }, [conversitionDetailList?.length])
 
   useUpdateEffect(() => {
     setInitQuesions(true)
@@ -625,13 +600,12 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   }, [currentConversation])
 
   useMount(() => {
-    dispatch(toggleIsNewChat(true))
     setInitQuesions(true)
   })
 
   // 初始化
   useUnmount(() => {
-    dispatch(initState())
+    currentMenuKey.current !== 11 && dispatch(initState())
   })
   return (
     <div className="dialogue-detail" style={style}>
@@ -719,7 +693,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                                   ? item.content + '\n\n' + item.files.map((file) => (file.mimetype?.startsWith('image') ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
                                   : item.content.endsWith('```') || item.content.match(/\B```\b[a-zA-Z]+\b(?!\s)/)
                                   ? item.content
-                                  : item.content + `${currentUUID === item.UUID ? '<span class="gpt-cursor"/></span>' : ''}`
+                                  : item.content + `${currentUUID === item.UUID ? '<span class="gpt-cursor"></span>' : ''}`
                               )
                             }}
                           ></div>

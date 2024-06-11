@@ -1,8 +1,17 @@
-.prompt-textarea .ant-input-data-count {
+.rewrite-textarea .ant-input-data-count {
   right: 0px !important;
   top: -25px !important;
   color: #bbb !important;
   font-size: 12px !important
+}
+
+.rewrite-textarea {
+  min-height: max(100%, 436px) !important;
+  resize: none !important;
+  padding: 20px !important;
+  font-size: 16px !important;
+  background-color: #f8f9fc !important;
+  border-radius: 6px !important
 }
 
 .no-draw-arrow {
@@ -25,4 +34,8 @@
 
 .no_up_list .ant-upload-list {
   display: none;
+}
+
+.no_up_list .ant-upload.ant-upload-select {
+  width: 100%;
 }

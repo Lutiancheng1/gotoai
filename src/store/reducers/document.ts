@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createTempChat } from '../action/talkActions'
 export type DocFile = {
   id: number
   fileid: string
@@ -27,6 +28,7 @@ export type DocumentInitState = {
   isNewDoc: boolean
   currentFile: DocFile
   docLoading: boolean
+  tempConversationId?: string
 }
 const initialState = {
   fileList: {
@@ -88,10 +90,12 @@ const DocumentSlice = createSlice({
         empty: true
       }
     }
+  },
+  extraReducers(builder) {
+    builder.addCase(createTempChat.fulfilled, (state, { payload }) => {
+      state.tempConversationId = payload
+    })
   }
-  // extraReducers(builder) {
-
-  // }
 })
 
 export const { saveFileList, updateFileList, updateCurrentFile, initState, updateDocLoading, toggleIsNewDoc } = DocumentSlice.actions

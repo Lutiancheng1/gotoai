@@ -13,6 +13,7 @@ import axios from 'axios'
 import { MD5 } from '@/utils/md5'
 import { dateFormat } from '@/utils/libs'
 import { UploadRequestOption } from 'rc-upload/lib/interface'
+import { PhotoProvider, PhotoView } from 'react-photo-view'
 import Loading from '@/components/loading'
 import errorIcon from '@/assets/images/error.png'
 import NotFoundImg from '@/assets/images/NotFound.png'
@@ -20,6 +21,8 @@ import { RcFile } from 'antd/es/upload'
 import React from 'react'
 import Gallery from './gallery'
 import MosaicCanvas from './MosaicCanvas/MosaicCanvas'
+import { ZoomIn, ZoomOut } from '@/icons/src/vender/line/editor'
+import { RefreshCcw01 } from '@/icons/src/vender/line/arrows'
 
 export interface Property {
   notifyHook?: any
@@ -1390,281 +1393,297 @@ const DrawDesigns = () => {
                         width: '100%'
                       }}
                     >
-                      {taskList.rows &&
-                        taskList.rows.length > 0 &&
-                        taskList.rows.map((item) => {
+                      <PhotoProvider
+                        loadingElement={<Loading />}
+                        toolbarRender={({ onScale, scale, rotate, onRotate, images, index }) => {
+                          // console.log(images[index])
+
                           return (
-                            <div
-                              style={{
-                                gridColumn: `span ${columnSpan} / span ${columnSpan}`
-                              }}
-                              key={item.id}
-                            >
-                              <div className="h-full relative overflow-hidden rounded-md border p-4 transition-all hover:shadow">
-                                <div className="flex items-center justify-between">
-                                  <div className="task_tag">
-                                    {/* 任务状态: NOT_START（未启动）、SUBMITTED（已提交处理）、IN_PROGRESS（执行中）、FAILURE（失败）、SUCCESS（成功） */}
-                                    <Tag
-                                      color={
-                                        {
-                                          SUCCESS: '#87d068',
-                                          IN_PROGRESS: '#1890ff',
-                                          SUBMITTED: '#fadb14',
-                                          NOT_START: '#d9d9d9',
-                                          FAILURE: '#f5222d'
-                                        }[item.status] || '#fadb14'
-                                      }
-                                    >
-                                      {item.status === 'NOT_START' ? '未启动' : item.status === 'SUBMITTED' ? '已提交处理' : item.status === 'IN_PROGRESS' ? '执行中' : item.status === 'FAILURE' ? '失败' : item.status === 'MODAL' ? '需弹窗确认' : '成功'}
-                                    </Tag>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <ConfigProvider
-                                      theme={{
-                                        components: {
-                                          Button: {
-                                            /* 这里是你的组件 token */
-                                            paddingInlineSM: 3,
-                                            // paddingBlockSM: 0
-                                            contentFontSizeSM: 12,
-                                            onlyIconSizeSM: 12
-                                          }
+                            <>
+                              <ZoomOut className="size-5 opacity-75 hover:opacity-100 cursor-pointer transition-opacity" onClick={() => onScale(scale - 1)} />
+                              <ZoomIn className="size-5 ml-[10px] opacity-75 hover:opacity-100 cursor-pointer transition-opacity" onClick={() => onScale(scale + 1)} />
+                              <RefreshCcw01 className="size-5 ml-[10px] opacity-75 hover:opacity-100 cursor-pointer transition-opacity" onClick={() => onRotate(rotate - 90)} />
+                            </>
+                          )
+                        }}
+                      >
+                        {taskList.rows &&
+                          taskList.rows.length > 0 &&
+                          taskList.rows.map((item) => {
+                            return (
+                              <div
+                                style={{
+                                  gridColumn: `span ${columnSpan} / span ${columnSpan}`
+                                }}
+                                key={item.id}
+                              >
+                                <div className="h-full relative overflow-hidden rounded-md border p-4 transition-all hover:shadow">
+                                  <div className="flex items-center justify-between">
+                                    <div className="task_tag">
+                                      {/* 任务状态: NOT_START（未启动）、SUBMITTED（已提交处理）、IN_PROGRESS（执行中）、FAILURE（失败）、SUCCESS（成功） */}
+                                      <Tag
+                                        color={
+                                          {
+                                            SUCCESS: '#87d068',
+                                            IN_PROGRESS: '#1890ff',
+                                            SUBMITTED: '#fadb14',
+                                            NOT_START: '#d9d9d9',
+                                            FAILURE: '#f5222d'
+                                          }[item.status] || '#fadb14'
                                         }
-                                      }}
-                                    >
-                                      {item.action !== 'DESCRIBE' && item.promptEn && (
+                                      >
+                                        {item.status === 'NOT_START' ? '未启动' : item.status === 'SUBMITTED' ? '已提交处理' : item.status === 'IN_PROGRESS' ? '执行中' : item.status === 'FAILURE' ? '失败' : item.status === 'MODAL' ? '需弹窗确认' : '成功'}
+                                      </Tag>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <ConfigProvider
+                                        theme={{
+                                          components: {
+                                            Button: {
+                                              /* 这里是你的组件 token */
+                                              paddingInlineSM: 3,
+                                              // paddingBlockSM: 0
+                                              contentFontSizeSM: 12,
+                                              onlyIconSizeSM: 12
+                                            }
+                                          }
+                                        }}
+                                      >
+                                        {item.action !== 'DESCRIBE' && item.promptEn && (
+                                          <div>
+                                            <Tooltip title={item.promptEn && item.promptEn}>
+                                              <Button disabled={!item.promptEn} onClick={() => setUsedPromot(item.promptEn && item.promptEn)} type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-huabi"></i>}>
+                                                使用
+                                              </Button>
+                                            </Tooltip>
+                                          </div>
+                                        )}
                                         <div>
-                                          <Tooltip title={item.promptEn && item.promptEn}>
-                                            <Button disabled={!item.promptEn} onClick={() => setUsedPromot(item.promptEn && item.promptEn)} type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-huabi"></i>}>
-                                              使用
+                                          <Button disabled={!item.imageUrl} onClick={() => downloadImage(item.imageUrl)} type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-xiazaitupian"></i>}>
+                                            下载
+                                          </Button>
+                                        </div>
+                                        <div>
+                                          <Popconfirm title="" description="是否删除该任务？" onConfirm={() => delTask(item.taskId)} okText="确认" okButtonProps={{ className: 'bg-[#1890ff] ' }} cancelText="取消">
+                                            <Button type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-shanchu1"></i>}>
+                                              删除
                                             </Button>
-                                          </Tooltip>
+                                          </Popconfirm>
+                                        </div>
+                                      </ConfigProvider>
+                                    </div>
+                                  </div>
+                                  <div className="my-4 h-[280px]">
+                                    <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-md relative" title={item.description}>
+                                      {item.progress && item.progress !== '' && item.progress !== '100%' && (
+                                        <div className="radial-progress absolute text-[#3875f7]" style={{ '--value': item.progress && item.progress.replace('%', '') } as any} role="progressbar">
+                                          {/* {item.status} */}
+                                          {item.progress}
                                         </div>
                                       )}
-                                      <div>
-                                        <Button disabled={!item.imageUrl} onClick={() => downloadImage(item.imageUrl)} type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-xiazaitupian"></i>}>
-                                          下载
-                                        </Button>
-                                      </div>
-                                      <div>
-                                        <Popconfirm title="" description="是否删除该任务？" onConfirm={() => delTask(item.taskId)} okText="确认" okButtonProps={{ className: 'bg-[#1890ff] ' }} cancelText="取消">
-                                          <Button type="default" className="flex justify-center items-center btn_no_mr" size="small" icon={<i className="iconfont icon-shanchu1"></i>}>
-                                            删除
-                                          </Button>
-                                        </Popconfirm>
-                                      </div>
-                                    </ConfigProvider>
-                                  </div>
-                                </div>
-                                <div className="my-4 h-[280px]">
-                                  <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-md relative" title={item.description}>
-                                    {item.progress && item.progress !== '' && item.progress !== '100%' && (
-                                      <div className="radial-progress absolute text-[#3875f7]" style={{ '--value': item.progress && item.progress.replace('%', '') } as any} role="progressbar">
-                                        {/* {item.status} */}
-                                        {item.progress}
-                                      </div>
-                                    )}
-                                    {item.status === 'IN_PROGRESS' ||
-                                      (item.status === 'SUCCESS' && (
-                                        <a href={item.imageUrl} className="w-full h-full flex justify-center items-center cursor-pointer" target="_blank" rel="noopener noreferrer">
-                                          <img
-                                            className="cursor-pointer max-w-[100%] h-full"
-                                            onError={(e) => {
-                                              // e.currentTarget.src = NotFoundImg // 设置默认图片
-                                              e.currentTarget.title = '图片无法加载' // 设置图片的 title 属性
-                                            }}
-                                            loading="lazy"
-                                            src={item.imageUrl}
-                                            alt=""
-                                          />
-                                        </a>
-                                      ))}
-                                    {item.status === 'FAILURE' && (
-                                      <div className="flex h-full w-full rounded-md bg-[#fafafc] ">
-                                        <div className="m-auto overflow-hidden text-center">
-                                          <img src={errorIcon} alt="" className="inline-block text-[100px] h-[8rem] w-[8rem]" />
-                                          <h2 className="text-base">任务失败</h2>
-                                          <div className="mt-2 text-sm line-clamp-3 text-slate-600 ">{item.failReason?.replace('[Invalid parameter]', '')}</div>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <div className="-mx-4 -mb-4 h-full flex items-start bg-[#fafafc] px-4 py-2 ">
-                                  <div className="flex-1">
-                                    <div>
-                                      {item.buttons && item.buttons.length > 0 && (
-                                        <>
-                                          {['IMAGINE', 'VARIATION', 'REROLL', 'ZOOM', 'BLEND'].includes(item.action) && (
-                                            <>
-                                              <div className="mb-2 flex items-center justify-between">
-                                                <span>放大：</span>
-                                                <Tooltip
-                                                  title={
-                                                    <>
-                                                      <p> 参数释义:放大某张图片 </p>
-                                                      <p> 如 U1 放大第一张图片，以此类推 </p>
-                                                    </>
-                                                  }
-                                                >
-                                                  <InfoCircleOutlined rotate={180} />
-                                                </Tooltip>
-                                                <div className="flex-1">
-                                                  <div className="flex items-center justify-around">
-                                                    {item.buttons
-                                                      .filter((i) => i.label.startsWith('U'))
-                                                      .map((i, index) => {
-                                                        return (
-                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('U', item.taskId, i.customId, index + 1)}>
-                                                            {i.label}
-                                                          </Button>
-                                                        )
-                                                      })}
-                                                    {item.buttons
-                                                      .filter((i) => i.label === '')
-                                                      .map((i) => (
-                                                        <Tooltip title={'重新生成'} key={i.customId}>
-                                                          <Button onClick={() => changeImagine('R', item.taskId, i.customId)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
-                                                        </Tooltip>
-                                                      ))}
-                                                  </div>
-                                                </div>
-                                              </div>
-                                              <div className="mb-2 flex items-center justify-between">
-                                                <span>变换：</span>
-                                                <Tooltip
-                                                  title={
-                                                    <>
-                                                      <p>参数释义:以某张图片为基准重新生成</p>
-                                                      <p>如 V1 则变换第一张图片，以此类推 </p>
-                                                    </>
-                                                  }
-                                                >
-                                                  <InfoCircleOutlined rotate={180} />
-                                                </Tooltip>
-                                                <div className="flex-1">
-                                                  <div className="flex items-center justify-around">
-                                                    {item.buttons
-                                                      .filter((i) => i.label.startsWith('V'))
-                                                      .map((i, index) => {
-                                                        return (
-                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('V', item.taskId, i.customId, index + 1)}>
-                                                            {i.label}
-                                                          </Button>
-                                                        )
-                                                      })}
-                                                    <Button className="opacity-0" type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </>
-                                          )}
-                                          {['PAN'].includes(item.action) && (
-                                            <>
-                                              <div className="mb-2 flex items-center justify-between min-h-[56px]">
-                                                <span>放大：</span>
-                                                <Tooltip
-                                                  title={
-                                                    <>
-                                                      <p> 参数释义:放大某张图片 </p>
-                                                      <p> 如 U1 放大第一张图片，以此类推 </p>
-                                                    </>
-                                                  }
-                                                >
-                                                  <InfoCircleOutlined rotate={180} />
-                                                </Tooltip>
-                                                <div className="flex-1">
-                                                  <div className="flex items-center justify-around">
-                                                    {item.buttons
-                                                      .filter((i) => i.label.startsWith('U'))
-                                                      .map((i, index) => {
-                                                        return (
-                                                          <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('U', item.taskId, i.customId, index + 1)}>
-                                                            {i.label}
-                                                          </Button>
-                                                        )
-                                                      })}
-                                                    {item.buttons
-                                                      .filter((i) => i.label === '')
-                                                      .map((i) => (
-                                                        <Tooltip title={'重新生成'} key={i.customId}>
-                                                          <Button onClick={() => changeImagine('R', item.taskId, i.customId)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
-                                                        </Tooltip>
-                                                      ))}
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </>
-                                          )}
-                                          {['UPSCALE'].includes(item.action) && (
-                                            <div
-                                              className="mb-2 grid grid-cols-7 gap-4 min-h-[56px]"
-                                              style={{
-                                                alignItems: item.buttons.length > 7 ? 'flex-start' : 'center'
+                                      {item.status === 'IN_PROGRESS' ||
+                                        (item.status === 'SUCCESS' && (
+                                          // <a href={item.imageUrl} className="w-full h-full flex justify-center items-center cursor-pointer" target="_blank" rel="noopener noreferrer">
+                                          <PhotoView src={item.imageUrl}>
+                                            <img
+                                              className="cursor-pointer max-w-[100%] h-full"
+                                              onError={(e) => {
+                                                // e.currentTarget.src = NotFoundImg // 设置默认图片
+                                                e.currentTarget.title = '图片无法加载' // 设置图片的 title 属性
                                               }}
-                                            >
-                                              {item.buttons.map((b, i) => (
-                                                <Tooltip key={b.customId} title={b.label ? labelMappings[b.label] : labelMappings[b.emoji]}>
-                                                  <Button
-                                                    onClick={b.label === 'Vary (Region)' ? () => openCanvas(b, item) : b.label === 'Custom Zoom' ? () => onScaleChange(b, item) : () => submitAction(b, item, b.label ? labelMappings[b.label] : labelMappings[b.emoji])}
-                                                    disabled={item.status === 'FAILURE'}
-                                                    type="default"
-                                                    size="small"
-                                                    icon={b.emoji === 'upscale_1' || b.emoji === '⏫' ? <i className="iconfont icon-julong" /> : b.emoji === '🖌️' ? <i className="iconfont icon-huabi1" /> : b.emoji}
-                                                  ></Button>
-                                                </Tooltip>
-                                              ))}
-                                            </div>
-                                          )}
-                                          {['DESCRIBE'].includes(item.action) && (
-                                            <>
-                                              <div className="mb-2 flex items-center justify-between">
-                                                <span>类型：</span>
-                                                <div className="flex-1">图生文</div>
-                                              </div>
-                                              <div className="mb-2 flex items-center justify-between">
-                                                <span>提示词：</span>
-                                                <Tooltip
-                                                  title={
-                                                    <>
-                                                      <p> 参数释义:点击可以使用提示词 </p>
-                                                      <p> 如 P1 则为第一个提示词，以此类推</p>
-                                                    </>
-                                                  }
-                                                >
-                                                  <InfoCircleOutlined rotate={180} />
-                                                </Tooltip>
-                                                <div className="flex-1">
-                                                  <div className="flex items-center justify-around">
-                                                    {item.promptEn &&
-                                                      item.promptEn
-                                                        .replaceAll(/\d️⃣/g, '') // 使用正则表达式匹配并替换所有的数字序号
-                                                        .split('\n\n')
-                                                        .map((b, i) => (
-                                                          <Tooltip key={i} title={b}>
-                                                            <Button
-                                                              onClick={() => {
-                                                                setPrompt(b)
-                                                                Toast.notify({
-                                                                  type: 'success',
-                                                                  message: '已使用，请查看提词框'
-                                                                })
-                                                              }}
-                                                              disabled={item.status === 'FAILURE'}
-                                                              type="default"
-                                                              size="small"
-                                                            >
-                                                              P{i + 1}
+                                              loading="lazy"
+                                              src={item.imageUrl}
+                                              alt=""
+                                            />
+                                          </PhotoView>
+                                          // </a>
+                                        ))}
+                                      {item.status === 'FAILURE' && (
+                                        <div className="flex h-full w-full rounded-md bg-[#fafafc] ">
+                                          <div className="m-auto overflow-hidden text-center">
+                                            <img src={errorIcon} alt="" className="inline-block text-[100px] h-[8rem] w-[8rem]" />
+                                            <h2 className="text-base">任务失败</h2>
+                                            <div className="mt-2 text-sm line-clamp-3 text-slate-600 ">{item.failReason?.replace('[Invalid parameter]', '')}</div>
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="-mx-4 -mb-4 h-full flex items-start bg-[#fafafc] px-4 py-2 ">
+                                    <div className="flex-1">
+                                      <div>
+                                        {item.buttons && item.buttons.length > 0 && (
+                                          <>
+                                            {['IMAGINE', 'VARIATION', 'REROLL', 'ZOOM', 'BLEND'].includes(item.action) && (
+                                              <>
+                                                <div className="mb-2 flex items-center justify-between">
+                                                  <span>放大：</span>
+                                                  <Tooltip
+                                                    title={
+                                                      <>
+                                                        <p> 参数释义:放大某张图片 </p>
+                                                        <p> 如 U1 放大第一张图片，以此类推 </p>
+                                                      </>
+                                                    }
+                                                  >
+                                                    <InfoCircleOutlined rotate={180} />
+                                                  </Tooltip>
+                                                  <div className="flex-1">
+                                                    <div className="flex items-center justify-around">
+                                                      {item.buttons
+                                                        .filter((i) => i.label.startsWith('U'))
+                                                        .map((i, index) => {
+                                                          return (
+                                                            <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('U', item.taskId, i.customId, index + 1)}>
+                                                              {i.label}
                                                             </Button>
+                                                          )
+                                                        })}
+                                                      {item.buttons
+                                                        .filter((i) => i.label === '')
+                                                        .map((i) => (
+                                                          <Tooltip title={'重新生成'} key={i.customId}>
+                                                            <Button onClick={() => changeImagine('R', item.taskId, i.customId)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
                                                           </Tooltip>
                                                         ))}
+                                                    </div>
                                                   </div>
                                                 </div>
+                                                <div className="mb-2 flex items-center justify-between">
+                                                  <span>变换：</span>
+                                                  <Tooltip
+                                                    title={
+                                                      <>
+                                                        <p>参数释义:以某张图片为基准重新生成</p>
+                                                        <p>如 V1 则变换第一张图片，以此类推 </p>
+                                                      </>
+                                                    }
+                                                  >
+                                                    <InfoCircleOutlined rotate={180} />
+                                                  </Tooltip>
+                                                  <div className="flex-1">
+                                                    <div className="flex items-center justify-around">
+                                                      {item.buttons
+                                                        .filter((i) => i.label.startsWith('V'))
+                                                        .map((i, index) => {
+                                                          return (
+                                                            <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('V', item.taskId, i.customId, index + 1)}>
+                                                              {i.label}
+                                                            </Button>
+                                                          )
+                                                        })}
+                                                      <Button className="opacity-0" type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </>
+                                            )}
+                                            {['PAN'].includes(item.action) && (
+                                              <>
+                                                <div className="mb-2 flex items-center justify-between min-h-[56px]">
+                                                  <span>放大：</span>
+                                                  <Tooltip
+                                                    title={
+                                                      <>
+                                                        <p> 参数释义:放大某张图片 </p>
+                                                        <p> 如 U1 放大第一张图片，以此类推 </p>
+                                                      </>
+                                                    }
+                                                  >
+                                                    <InfoCircleOutlined rotate={180} />
+                                                  </Tooltip>
+                                                  <div className="flex-1">
+                                                    <div className="flex items-center justify-around">
+                                                      {item.buttons
+                                                        .filter((i) => i.label.startsWith('U'))
+                                                        .map((i, index) => {
+                                                          return (
+                                                            <Button disabled={item.status === 'FAILURE'} type="default" size="small" key={i.customId} onClick={() => changeImagine('U', item.taskId, i.customId, index + 1)}>
+                                                              {i.label}
+                                                            </Button>
+                                                          )
+                                                        })}
+                                                      {item.buttons
+                                                        .filter((i) => i.label === '')
+                                                        .map((i) => (
+                                                          <Tooltip title={'重新生成'} key={i.customId}>
+                                                            <Button onClick={() => changeImagine('R', item.taskId, i.customId)} disabled={item.status === 'FAILURE'} type="default" size="small" icon={<i className="iconfont icon-zhongxinshengcheng"></i>}></Button>
+                                                          </Tooltip>
+                                                        ))}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </>
+                                            )}
+                                            {['UPSCALE'].includes(item.action) && (
+                                              <div
+                                                className="mb-2 grid grid-cols-7 gap-4 min-h-[56px]"
+                                                style={{
+                                                  alignItems: item.buttons.length > 7 ? 'flex-start' : 'center'
+                                                }}
+                                              >
+                                                {item.buttons.map((b, i) => (
+                                                  <Tooltip key={b.customId} title={b.label ? labelMappings[b.label] : labelMappings[b.emoji]}>
+                                                    <Button
+                                                      onClick={b.label === 'Vary (Region)' ? () => openCanvas(b, item) : b.label === 'Custom Zoom' ? () => onScaleChange(b, item) : () => submitAction(b, item, b.label ? labelMappings[b.label] : labelMappings[b.emoji])}
+                                                      disabled={item.status === 'FAILURE'}
+                                                      type="default"
+                                                      size="small"
+                                                      icon={b.emoji === 'upscale_1' || b.emoji === '⏫' ? <i className="iconfont icon-julong" /> : b.emoji === '🖌️' ? <i className="iconfont icon-huabi1" /> : b.emoji}
+                                                    ></Button>
+                                                  </Tooltip>
+                                                ))}
                                               </div>
-                                            </>
-                                          )}
-                                          {/* {['SHORTEN'].includes(item.action) && (
+                                            )}
+                                            {['DESCRIBE'].includes(item.action) && (
+                                              <>
+                                                <div className="mb-2 flex items-center justify-between">
+                                                  <span>类型：</span>
+                                                  <div className="flex-1">图生文</div>
+                                                </div>
+                                                <div className="mb-2 flex items-center justify-between">
+                                                  <span>提示词：</span>
+                                                  <Tooltip
+                                                    title={
+                                                      <>
+                                                        <p> 参数释义:点击可以使用提示词 </p>
+                                                        <p> 如 P1 则为第一个提示词，以此类推</p>
+                                                      </>
+                                                    }
+                                                  >
+                                                    <InfoCircleOutlined rotate={180} />
+                                                  </Tooltip>
+                                                  <div className="flex-1">
+                                                    <div className="flex items-center justify-around">
+                                                      {item.promptEn &&
+                                                        item.promptEn
+                                                          .replaceAll(/\d️⃣/g, '') // 使用正则表达式匹配并替换所有的数字序号
+                                                          .split('\n\n')
+                                                          .map((b, i) => (
+                                                            <Tooltip key={i} title={b}>
+                                                              <Button
+                                                                onClick={() => {
+                                                                  setPrompt(b)
+                                                                  Toast.notify({
+                                                                    type: 'success',
+                                                                    message: '已使用，请查看提词框'
+                                                                  })
+                                                                }}
+                                                                disabled={item.status === 'FAILURE'}
+                                                                type="default"
+                                                                size="small"
+                                                              >
+                                                                P{i + 1}
+                                                              </Button>
+                                                            </Tooltip>
+                                                          ))}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </>
+                                            )}
+                                            {/* {['SHORTEN'].includes(item.action) && (
                                             <>
                                               <div className="mb-2 flex items-center justify-between">
                                                 <span>类型：</span>
@@ -1687,25 +1706,26 @@ const DrawDesigns = () => {
                                               </div>
                                             </>
                                           )} */}
-                                        </>
-                                      )}
-                                      {item.startTime && (
-                                        <div
-                                          className="flex items-center justify-between text-slate-500"
-                                          style={{
-                                            marginTop: item.buttons && item.buttons.length === 0 ? 64 : 0
-                                          }}
-                                        >
-                                          <span>时间：{dateFormat(item.startTime, 'yyyy-MM-dd HH:mm:ss')}</span>
-                                        </div>
-                                      )}
+                                          </>
+                                        )}
+                                        {item.startTime && (
+                                          <div
+                                            className="flex items-center justify-between text-slate-500"
+                                            style={{
+                                              marginTop: item.buttons && item.buttons.length === 0 ? 64 : 0
+                                            }}
+                                          >
+                                            <span>时间：{dateFormat(item.startTime, 'yyyy-MM-dd HH:mm:ss')}</span>
+                                          </div>
+                                        )}
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          )
-                        })}
+                            )
+                          })}
+                      </PhotoProvider>
                     </div>
                   </main>
                 </div>

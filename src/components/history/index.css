@@ -129,6 +129,7 @@
   height: 20px;
   text-align: left;
   display: flex;
+  align-items: center;
   justify-content: flex-start;
   white-space: nowrap;
 }
@@ -218,4 +219,18 @@
 
 .expand-icon:hover {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAMAAAAOusbgAAAAh1BMVEVHcEwkVP8kVP8jU/8kVP8kVP8oWP8lVf8gUP8kVP8kVP8jU/8lVf8kVP8kVP8lVf8kVf8lVf8kVP8kVP////+tv//I1P9bf/8yX/8/af/j6f92lP9Aav+Rqf+En//k6v+ftP/x9f/x9P/W3/+Sqv9oif9NdP+7yv+6yf+Dnv9Odf9piv/V3v9TB719AAAAE3RSTlMAgECQ778g3xBwf1Bgj88wr2+wsM1k9AAABE9JREFUaN7Nm+liojAQgFFAQGvtbginIIdHt7vv/3yrEhQLSSYEks7PCvk6B5PJJDEMurg7b/vhOGiEOO/21lsaY8T1bAvJiv22EqaiicR+E8CuLTShOOuVDmyDBnCXDppBnA1P3S2aSbYui7ty0GziMDy9tNCMYlHN/QvNLN4wd41ml7UWfSk6b5AS6eXvlaUGbH2LbddBisR5/Z63SJlsNTi472ZHJbhj7DVSKgsVGXowsl09Cj9VdlSDicpvSLk0mdNWD7bvoYU0iKvH0o2tbR3gm63Hvbk/5QW+SZaG0ai4Xo6A5kHpd6UuQtExdoYn+EaUB/6AHPBe0MmmGDYrfZoEImqbQrHFwt5EQOvfxjucGx58nmTguVEgUWddQlVf4/kqeXFJXny9h4LBZu7EVHJ8cWecXjrkE2w8KHh/YAZRnCeC5jZEudTYPZZCZEOMWzEMGeOW/GcqcNRyg5j5XN6STxOBCzJewXvwTDxd7ScBt4oc+Y/GhFxPAd6XYO6TnE0AvlDtHGLc8+aZmOcsDU5J0uj/chqMYOKYQBpMInognut7HNEsFEqCU7qDm1/6H18JUZkLDmiGpoLb2SSUAn81g6QiYKJyIQXGdIWpYKJyFcmAD3SF6WCicigB/qKGNAtMAqOQAOesAKWDm0/hIAG+sPIfHRw1P0XjwTXLWXQwSrizIwfM/M8ZYMwtCNjg2B/Oilxwxo0uNji8v/9PHNxEF5YEB0zwYOT9vf/0OSvYP6SiL8qCE/qaaV5w/lw+pBObOmZnoDShrZlyyeCKmJ9Tt4b/FmQFt+LjJJBmmmFUyR2lw94scZJNmSnLKMdHiPX+4XA8uADUEm0pXfRmU4nZKeU4mYTSDV3FwNkUBI5Apeo1yOrLedJCADLEwKLHly59iNEqseYdq0KEgkndlo1QOJMr6DF0wfv9FT+WAzfpmpl2h9/Asou2wOcmkcG+RSwLjn0xY2NY2wKwMCdrsAMsssnTSSwPjtq+RgTn8j0Dab6cSROk3oO5/IwDajfl0A5py02m6uwdGXVdJ3G0fVaug+G9TAzoheelABfcvX2Qq2wYHT7ayiAuGPywtu+XuNfD6u6QwLhwcKeYvfq6OD2+rej8shsUACcygf2u+GUPwC+DAOPP4PWPfg4dTWij7cjbCwnO4LHEdq27dXRfqhw+kiO6XU5H17lImfJufCBBidN6QFnR3UVbcIuvZeMOPLkchfc0kSm8qflMkGGYpmm4j0a97Rk7pEWWhmtpAevcqvd0gG8Hcl0d4JXOAyg6bN0cfVYf1w453bRQDW6PValW+Xn8d6FHYZWnMrsevp9vVgl+Oe1squOaP+MIrLZDv8rcPHCcXUnmHDzMvlD5BavV2aNdG9jMe11h+fMuaFy/59kyielybsNs5rmEA7nttZgcbS1c0I2n1bRoKLY5+jzd1TLPFbvWtpqAbQlT2/ztmfb7uOuDzofp7VjU/yGq6t6GzwM/AAAAAElFTkSuQmCC);
+}
+
+.expand-files {
+  top: 136px;
+
+  &:hover {
+    >i {
+      color: #fff;
+    }
+  }
+}
+
+.expand-upload {
+  top: 196px;
 }

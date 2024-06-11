@@ -41,7 +41,7 @@ const History = ({ className = '', title = '对话', title_icon = false, item_Ic
   // 记录历史折叠状态
   const [historyCollapsed, { toggle: setHistoryCollapsed }] = useBoolean(false)
   // 创建历史折叠按钮的ref
-  const historyDivRef = useRef(null) as unknown as MutableRefObject<HTMLDivElement>
+  const historyDivRef = useRef<HTMLDivElement>(null) as MutableRefObject<HTMLDivElement>
   // 记录当前菜单的key
   const currentMenuKey = useRef<menuType>(0)
   // 切换历史折叠状态

@@ -6,6 +6,7 @@ import store from './store'
 import './assets/styles/main.css'
 import './assets/iconFont/font_4472296_fmoexnv74v.css'
 import 'animate.css'
+import 'react-photo-view/dist/react-photo-view.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <Provider store={store}>

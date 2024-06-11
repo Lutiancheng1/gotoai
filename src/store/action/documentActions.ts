@@ -66,7 +66,14 @@ export const getDocumentMessages = createAsyncThunk('document/getDocumentMessage
 })
 
 // 从系统文件拷贝新的文档
-export const copyDocument = createAsyncThunk('document/copyDocument', async () => {
-  const res = (await http.get('/Document/CopySystem')) as { code: number; msg: string; data: { fileId: string; url: string } }
+export const copyDocument = createAsyncThunk('document/copyDocument', async (menu?: number) => {
+  const res = (await http.get('/Document/CopySystem?menu=' + menu)) as { code: number; msg: string; data: { fileId: string; url: string } }
   return res
+})
+
+//  删除对话附带的文档
+// files 接收fileId数组
+export const delChatDocument = createAsyncThunk('document/delChatDocument', async (params: { conversationId: string; files: string[] }) => {
+  const res = (await http.post('/Document/DeleteChatFile', params)) as { code: number; msg: string; data: any }
+  return res.data
 })

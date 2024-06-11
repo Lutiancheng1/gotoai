@@ -37,7 +37,10 @@ export interface Wish {
 }
 // 分类详情
 export interface CategorysDetail {
-  extra?: any
+  extra?: {
+    title_left: string
+    title_right: string
+  }
   icon: string
   list: ListDetail[]
   support_flow: number

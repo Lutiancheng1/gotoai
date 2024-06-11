@@ -1,4 +1,4 @@
-.document {
+.documents {
   height: 100%;
   display: flex;
 
@@ -6,7 +6,7 @@
     position: relative;
     flex: 1;
     flex-shrink: 0;
-    padding: 60px 0;
+    padding: 60px 0 0 0;
     /* background-color: #f9fafb; */
     overflow-x: auto;
     display: flex;
@@ -128,13 +128,18 @@
   }
 
   .my_upload {
-    margin-top: 38px;
+    margin-top: 30px;
     display: inline-block;
     text-align: center;
     cursor: pointer;
     outline: 0;
     width: 100%;
     height: 300px;
+  }
+
+  .my_upload.upload_sm {
+    height: 150px;
+    margin-top: 10px;
   }
 
   .my_upload .ant-upload.ant-upload-drag:hover {
@@ -875,8 +880,68 @@
   }
 }
 
-.document .ant-upload-list {
-  display: none !important;
+.documents .ant-upload-list.ant-upload-list-picture::before {
+  content: none;
+}
+
+.documents .ant-upload-list.ant-upload-list-picture {
+  margin-top: 12px;
+  padding-left: 10px;
+  align-self: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  max-width: 918px;
+
+  .ant-upload-list-item-container {
+    flex: 1;
+    flex-shrink: 0;
+    flex-grow: 0;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+
+    .ant-upload-list-item-name {
+      max-width: 250px;
+      overflow: hidden;
+      /* 文字超出隐藏 */
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ant-upload-list-item.ant-upload-list-item-done {
+      border-color: rgba(5, 5, 5, 0.06);
+      display: flex;
+      color: #838a95;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 20px;
+
+      .ant-upload-list-item-thumbnail {
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    .ant-upload-list-item.ant-upload-list-item-error {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 20px;
+
+      .ant-upload-list-item-thumbnail {
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    .ant-upload-list-item.ant-upload-list-item-uploading {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 20px;
+    }
+  }
 }
 
 .upload-popover {

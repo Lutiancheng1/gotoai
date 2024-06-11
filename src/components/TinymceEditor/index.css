@@ -1,0 +1,30 @@
+/*Container, container body, iframe*/
+.tox-tinymce,
+.tox-editor-container {
+  min-height: 100% !important;
+}
+
+/*Container body*/
+.tox-sidebar-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/*Editing area*/
+.tox-edit-area {
+  position: absolute;
+}
+
+/*Footer*/
+.tox-tinymce .tox-statusbar {
+  position: absolute !important;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.tox .tox-edit-area::before {
+  border: none !important;
+}

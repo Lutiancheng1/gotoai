@@ -13,6 +13,11 @@ export const menuConfig = [
     label: '文档'
   },
   {
+    key: 'documents',
+    icon: 'icon-duowendang',
+    label: '多文档'
+  },
+  {
     key: 'code',
     icon: 'icon-daimamoshi',
     label: '代码'
@@ -81,12 +86,13 @@ export const menuConfig = [
 
 /**
  * @param { 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 }
- * @returns {对话｜文档｜代码｜知识库｜数据分析｜画图｜视频｜应用｜客服app、智能客服｜营销创意｜文书写作｜ AI搜索｜AI翻译}
+ * @returns {对话｜文档｜代码｜知识库｜数据分析｜画图｜视频｜应用｜客服app、智能客服｜营销创意｜文书写作｜多文档}
  */
 export type menuType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 export const menuWarp = {
   '/talk': 0,
   '/document': 1,
+  '/documents': 11,
   '/code': 2,
   '/knowledgeBase': 3,
   '/dataAnalysis': 4,
@@ -95,9 +101,7 @@ export const menuWarp = {
   '/application': 7,
   '/smartCustomerService': 8,
   '/marketingCreativity': 9,
-  '/writing': 10,
-  '/aiSearch': 11,
-  '/aiTranslation': 12
+  '/writing': 10
 } as {
   [key: string]: number
 }

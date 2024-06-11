@@ -7,7 +7,7 @@ import pageUpIcon from '../PDFViewer/images/pageup.svg'
 import pageDownIcon from '../PDFViewer/images/pagedown.svg'
 import minusIcon from '../PDFViewer/images/minus.svg'
 import plusIcon from '../PDFViewer/images/plus.svg'
-import { useMount, useUnmount } from 'ahooks'
+import { useDebounceFn, useMount, useScroll, useUnmount, useUpdateEffect } from 'ahooks'
 
 interface WordPreviewProps {
   url: string // 仅支持 URL
@@ -24,16 +24,32 @@ const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools 
   const [numPages, setNumPages] = useState<number>(1)
   // 当前页面
   const [pageNumber, setPageNumber] = useState(1)
-
+  const scroll = useScroll(viewContainer)!
+  const { run: updatePageNumber } = useDebounceFn(
+    (pageNum) => {
+      setPageNumber(pageNum)
+    },
+    { wait: 100 } // 100毫秒内的多次调用将被合并为一次
+  )
+  const zoomPages = (scale: number) => {
+    const pages = previewRef.current!.getElementsByClassName('docx') as HTMLCollectionOf<HTMLDivElement>
+    Array.from(pages).forEach((page, index) => {
+      ;(pages[index].style as any).zoom = scale.toString()
+    })
+  }
   const zoomIn = () => {
     setScale((prevScale) => {
-      return parseFloat((prevScale * 1.1).toFixed(1)) // 放大10%，保留1位小数
+      const newScale = parseFloat((prevScale * 1.1).toFixed(1)) // 放大10%，保留1位小数
+      zoomPages(newScale)
+      return newScale
     })
   }
 
   const zoomOut = () => {
     setScale((prevScale) => {
-      return parseFloat((prevScale / 1.1).toFixed(1)) // 缩小10%，保留1位小数
+      const newScale = parseFloat((prevScale / 1.1).toFixed(1)) // 缩小10%，保留1位小数
+      zoomPages(newScale)
+      return newScale
     })
   }
   const goToPreviousPage = () => {
@@ -49,7 +65,8 @@ const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools 
     requestAnimationFrame(() => {
       let pageContainer = document.querySelector(`.docx[data-page-number="${pageNum}"]`) as HTMLDivElement | null
       if (pageContainer && viewContainer) {
-        const topPosition = pageContainer.getBoundingClientRect().top + window.pageYOffset - previewRef.current!.getBoundingClientRect().top
+        const zoomFactor = parseFloat((pageContainer.style as any).zoom)
+        const topPosition = pageContainer.getBoundingClientRect().top * zoomFactor + window.pageYOffset - previewRef.current!.getBoundingClientRect().top
         viewContainer!.scrollTo({ top: topPosition, behavior: 'smooth' })
       }
     })
@@ -79,7 +96,6 @@ const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools 
       xhr.onload = () => {
         if (xhr.status === 200) {
           const blob = xhr.response
-          setLoading(false)
           renderAsync(blob, previewRef.current!, undefined, {
             className: 'docx',
             inWrapper: true,
@@ -98,13 +114,16 @@ const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools 
             renderEndnotes: true,
             debug: false
           })
-            .then(() => {
-              const pages = previewRef.current!.getElementsByClassName('docx')
+            .then(async () => {
+              const pages = previewRef.current!.getElementsByClassName('docx') as HTMLCollectionOf<HTMLDivElement>
               setNumPages(pages.length)
-              for (let i = 0; i < pages.length; i++) {
+              Array.from(pages).forEach((page, index) => {
                 // 为每个页面元素添加一个唯一的 data-page-id 属性
-                pages[i].setAttribute('data-page-number', `${i + 1}`)
-              }
+                pages[index].setAttribute('data-page-number', `${index + 1}`)
+                // 设置每个页面元素的缩放
+                ;(pages[index].style as any).zoom = scale.toString()
+              })
+              setLoading(false)
             })
             .catch(console.error)
         }
@@ -120,7 +139,57 @@ const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools 
     }
 
     loadDocument()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url])
+
+  // 创建 handleScroll 函数
+  const handleScroll = () => {
+    const containerTop = scroll && scroll.top
+    const containerCenter = viewContainer!.offsetHeight / 2 + containerTop!
+    let closestPageNum = 1
+    let minDistance = Infinity
+    let closestPageNumOnBoundary = 1
+    let minDistanceOnBoundary = Infinity
+
+    const pages = previewRef.current!.getElementsByClassName('docx') as HTMLCollectionOf<HTMLDivElement>
+
+    Array.from(pages).forEach((page, index) => {
+      const zoomFactor = parseFloat((page.style as any).zoom)
+      const pageTop = page.offsetTop * zoomFactor
+      const pageHeight = page.clientHeight * zoomFactor
+      const pageBottom = pageTop + pageHeight
+      const pageCenter = pageTop + pageHeight / 2
+      const distance = Math.abs(containerCenter - pageCenter)
+
+      // 考虑页面的上下边界与容器中心的距离
+      if (pageTop <= containerCenter && pageBottom >= containerCenter && distance < minDistance) {
+        closestPageNum = index + 1
+        minDistance = distance
+      }
+
+      // 考虑滚动到两个页面的分界线时
+      if (distance < minDistanceOnBoundary) {
+        closestPageNumOnBoundary = index + 1
+        minDistanceOnBoundary = distance
+      }
+    })
+
+    // 如果closestPageNum仍然为1，那么就将其设置为当前滚动位置最接近的页面编号
+    if (closestPageNum === 1) {
+      closestPageNum = closestPageNumOnBoundary
+    }
+
+    // 如果页面的顶部超过了容器中心，将页码更新为下一页
+    if (pages[closestPageNum - 1] && pages[closestPageNum - 1].offsetTop * parseFloat((pages[closestPageNum - 1].style as any).zoom) > containerCenter) {
+      closestPageNum += 1
+    }
+
+    updatePageNumber(closestPageNum)
+  }
+
+  useUpdateEffect(() => {
+    handleScroll()
+  }, [scroll])
 
   useMount(() => {
     handleMouseUp && previewRef.current?.addEventListener('mouseup', handleMouseUp)
@@ -143,8 +212,7 @@ const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools 
         <div
           ref={previewRef}
           style={{
-            transform: `scale(${scale})`, // 使用 transform 属性应用缩放
-            transformOrigin: 'top center', // 设置缩放中心点为容器中心
+            // zoom: scale, // 使用 zoom 属性应用缩放
             width: '100%', // 确保容器宽度是100%，以便缩放时内容能够正确显示
             height: '100%' // 同样确保容器高度是100%
           }}

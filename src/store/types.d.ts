@@ -16,6 +16,18 @@ export type User = {
   type: number
   username: string
 }
+export type TalkFile = {
+  id: number
+  chatId: number
+  type: string
+  url: string
+  mimetype: string
+  fileId: string
+  name: string
+  size: number
+  indexuri?: any
+  summary: string
+}
 // 对话模块
 export type HistoryList = {
   id: number
@@ -27,6 +39,7 @@ export type HistoryList = {
   menu: number
   conversationid: string
   provider: string
+  files: TalkFile[]
 }
 // 对话历史查询条件
 export interface GetHistoryFroMenu {

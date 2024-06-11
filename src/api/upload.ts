@@ -1,9 +1,10 @@
 import Toast from '@/components/Toast'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import axios, { AxiosError, CanceledError } from 'axios'
+import axios, { AxiosError, AxiosResponse, CanceledError } from 'axios'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { UploadRequestError } from 'rc-upload/lib/interface'
 import { http } from '@/utils/axios'
+import { RcFile } from 'antd/es/upload'
 
 interface UploadResponse {
   url: string
@@ -19,7 +20,7 @@ export const formatMap: { [key: string]: string[] } = {
   csv: ['text/csv'],
   video: ['video/*']
 }
-// 修改函数签名以接受成功和失败的回调
+// 单个文件上传
 export async function uploadFile(
   menu: number,
   file: File,

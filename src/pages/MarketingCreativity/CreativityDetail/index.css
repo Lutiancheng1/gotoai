@@ -26,3 +26,7 @@
 .no_up_list .ant-upload-list {
   display: none;
 }
+
+.no_up_list .ant-upload.ant-upload-select {
+  width: 100%;
+}

@@ -1,10 +1,10 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { getTokenInfo, removeTokenInfo } from './storage'
 import Toast from '@/components/Toast'
-
+export const httpBaseURL = process.env.REACT_APP_BASE_URL
 export const http = axios.create({
   timeout: 1000000000,
-  baseURL: process.env.REACT_APP_BASE_URL
+  baseURL: httpBaseURL
 })
 
 // 2. 设置请求拦截器和响应拦截器

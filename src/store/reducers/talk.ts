@@ -42,7 +42,7 @@ const initialState = {
   conversitionDetailList: [],
   loading: false,
   // 是否是新对话
-  isNewChat: false,
+  isNewChat: true,
   firstSend: true
 } as talkInitialState
 

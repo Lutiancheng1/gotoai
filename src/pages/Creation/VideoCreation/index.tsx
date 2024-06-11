@@ -208,6 +208,13 @@ const VideoCreation: React.FC<{}> = () => {
       })
       // 从本地缓存中 过滤掉当前id
       localStorage.setItem('task_id', JSON.stringify(getTaskIds()!.filter((id) => id !== taskId)))
+    } else if (res.status === 404 && res.message?.endsWith('task not found')) {
+      Toast.notify({ type: 'warning', message: '任务不存在,已删除' })
+      setVideoHistoryList((perv) => {
+        return perv ? perv.filter((item) => item.task_id !== taskId) : undefined
+      })
+      // 从本地缓存中 过滤掉当前id
+      localStorage.setItem('task_id', JSON.stringify(getTaskIds()!.filter((id) => id !== taskId)))
     }
   }
   // 根据视频主题 生成文案
@@ -754,6 +761,8 @@ const VideoCreation: React.FC<{}> = () => {
               {videoHistoryList && videoHistoryList.length > 0 && (
                 <ul className="grid grid-cols-1 lg:grid-cols-4 gap-[32px] overflow-auto nw-no-scroll h-[calc(100vh-220px)] lg:h-[calc(100vh-200px-70px)]">
                   {videoHistoryList.map((item, index) => {
+                    console.log(videoHistoryList, 'vd')
+
                     return (
                       <li key={index}>
                         <div>
@@ -772,6 +781,20 @@ const VideoCreation: React.FC<{}> = () => {
                                     <span className="text-[16px] font-bold text-white group-hover:text-[#bbb]">
                                       <i className="iconfont icon-zhongshi mr-2"></i>
                                       重试
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {!item.data && (
+                              <div>
+                                <img alt="placeholder" className="w-full aspect-video bg-#54545A26/[0.1] rounded-[16px]" src="https://qncdn.aoscdn.com/astro/reccloud/_astro/cover.0583e4e6.svg" />
+                                <div className="absolute inset-0 flex flex-col justify-center items-center gap-[12px] cursor-pointer bg-black/[0.5] rounded-[16px]">
+                                  <span className="text-[18px] text-[#F06464] font-semibold">已失效</span>
+                                  <div className="flex gap-[8px] items-center justify-center group">
+                                    <span className="text-[16px] font-bold text-white group-hover:text-[#bbb]" onClick={() => handleDeleteVideo(item.task_id)}>
+                                      <i className="iconfont icon-shanchu1 mr-2"></i>
+                                      删除
                                     </span>
                                   </div>
                                 </div>

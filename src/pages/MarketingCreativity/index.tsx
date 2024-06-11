@@ -95,7 +95,7 @@ const MarketingCreativity: React.FC<MarketingCreativityProps> = () => {
     <div className="w-full h-full">
       <div className="w-full text-[#1a2029] bg-white p-2">
         <p className="text-28 font-600 *:leading-7">AI 营销创意助手</p>
-        <p className="font-400 text-14 mt-3 ">根据企业需求，生成各种营销创意，如广告语、海报设计、视频脚本以及全面的营销方案策划，包括线上线下活动、社交媒体推广等。帮助企业实现营销活动的自动化，提高营销效率，降低人力成本。</p>
+        <p className="font-400 text-14 mt-3 line-clamp-1">根据企业需求，生成各种营销创意，如广告语、海报设计、视频脚本以及全面的营销方案策划，包括线上线下活动、社交媒体推广等。帮助企业实现营销活动的自动化，提高营销效率，降低人力成本。</p>
       </div>
       <div className="marketing-creativity flex pt-5 pl-5 flex-col w-full h-[calc(100vh-112px)] nw-scrollbar bg-[#F3F5F8] overflow-y-auto overflow-hidden">
         {Object.keys(CreativityData.category).length === 0 && (
@@ -265,6 +265,8 @@ const MarketingCreativity: React.FC<MarketingCreativityProps> = () => {
             style={{
               right: 30
             }}
+            visibilityHeight={200}
+            className="hover:opacity-80"
             target={() => document.querySelector('.marketing-creativity') as HTMLElement}
           />
         </div>

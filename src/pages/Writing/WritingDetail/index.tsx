@@ -1,12 +1,11 @@
-import { useKeyPress, useMount, useUnmount } from 'ahooks'
+import { useKeyPress, useMount, useSize, useUnmount, useUpdateEffect } from 'ahooks'
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { initialState as initWritingData, WritingJson, updateCollapsed, updateWritingData } from '@/store/reducers/writing'
+import { initialState as initWritingData, initCurrentCategory, updateCollapsed } from '@/store/reducers/writing'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { Button, Form, Input, Modal, Select, Upload } from 'antd'
-import { CategorysDetail, List, ListDetail } from '../types'
+import { Button, ConfigProvider, FloatButton, Form, Input, Modal, Select, Upload } from 'antd'
 import FormItem from 'antd/es/form/FormItem'
-import TextArea from 'antd/es/input/TextArea'
+import TextArea, { TextAreaProps, TextAreaRef } from 'antd/es/input/TextArea'
 import './index.css'
 import { RcFile, UploadRequestOption } from 'rc-upload/lib/interface'
 import { formatMap, uploadFile } from '@/api/upload'
@@ -24,6 +23,10 @@ import 'highlight.js/styles/atom-one-dark.css'
 import { imgLazyload } from '@mdit/plugin-img-lazyload'
 import { handleCopyClick } from '@/components/Dialogue'
 import { transformObject } from '@/utils'
+import useForm from 'antd/es/form/hooks/useForm'
+import Loading from '@/components/loading'
+import { getHistoryList, getWishList, getWritingCategoryList, getWritingDetail, WritingDetailList } from '@/store/action/writingAction'
+import TinyMCEEditor from '@/components/TinymceEditor'
 type WritingDetailProps = {}
 let sse = true
 let currentMenuKey = 10
@@ -36,54 +39,65 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
   const location = useLocation()
   const dispatch = useAppDispatch()
   const { robotId } = useParams()
-  const [form] = Form.useForm()
+  const [form] = useForm()
   const [modal, contextHolder] = Modal.useModal()
   const WritingData = useAppSelector((state) => state.writingSlice)
-  // 当前选中的分类详情
-  const [currentCategoryDetail, setCurrentCategoryDetail] = useState<CategorysDetail>()
   // 当前上传完成的文件
   const [currentFile, setCurrentFile] = useState<{ file: File; url: string } | null>()
   // loading
   const [loading, setLoading] = useState(false)
   // 是否初始化
   const [isInit, setIsInit] = useState(true)
+  // 原文textarea value
+  const [value, setValue] = useState('')
+  // 堆叠历史记录 不包括当前显示在内容中的 只包括之前的
+  const [befconversitionList, setBefConversitionList] = useState<MessageInfo[]>()
   const scrollBox = useRef<HTMLDivElement>(null)
   const [conversitionList, setConversitionList] = useState<MessageInfo[]>()
   const [currentUUID, setCurrentUUID] = useState('')
   const [controller, setController] = useState<AbortController>()
+  const textareaRef = useRef<TextAreaRef>(null)
+  const afterContentRef = useRef<HTMLDivElement>(null)
+  const afterContentSize = useSize(afterContentRef)
+  const editorRef = useRef<{ setContent: (content: string) => {}; getContent: () => string }>(null)
   const onBack = () => {
     navigate('/writing')
   }
-  const handleAddHistory = (item: List) => {
-    // 如果已经存在
-    if (WritingData.history.list.find((historyItem) => historyItem.uid === item.uid)) return
-    dispatch(
-      updateWritingData({
-        ...WritingData,
-        history: {
-          ...WritingData.history,
-          list: [item, ...WritingData.history.list]
-        }
-      })
-    )
-  }
-  const scrollBottom = () => {
-    // 滚动到底部
-    if (scrollBox.current) {
-      scrollBox.current.scrollTo({
-        top: scrollBox.current.scrollHeight,
-        behavior: 'smooth'
-      })
+  const rest = () => {
+    setIsInit(true)
+    setConversitionList([])
+    setBefConversitionList([])
+    setLoading(false)
+    setValue('')
+    setCurrentUUID('')
+    currentConversation = {
+      conversationId: '',
+      chatId: 0
+    }
+    if (WritingData && WritingData.currentCategory && form) {
+      setTimeout(() => {
+        form.resetFields()
+      }, 0)
     }
   }
+
   // 各分类list 点击
-  const getItemDetail = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, uid: string, type: string) => {
+  const getItemDetail = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: number, type: string) => {
     e.stopPropagation()
-    navigate(`/writing/${uid}`, {
+    if (id === Number(robotId)) return
+    navigate(`/writing/${id}`, {
       state: {
         type
       }
     })
+    dispatch(
+      updateCollapsed({
+        key: type,
+        collapsed: true,
+        closeOthers: true
+      })
+    )
+    rest()
   }
   // 重置
   const onReset = () => {
@@ -109,7 +123,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
     for (let key in values) {
       // 如果某一项没有值，就取它的默认值
       if (!values[key]) {
-        const matchedItem = currentCategoryDetail?.list.find((item) => item.input_name === key)
+        const matchedItem = WritingData.currentCategory && WritingData.currentCategory.list.find((item) => item.input_name === key)
         // 如果找到了匹配的项，就使用这一项的 default 值
         if (matchedItem) {
           form.setFieldsValue({
@@ -118,22 +132,15 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
         }
       }
     }
-    console.log(form.getFieldsValue())
-    console.log(currentCategoryDetail)
     setLoading(true)
-    let prompt = '帮我生成一篇' + currentCategoryDetail?.title + '；' + currentCategoryDetail?.list.map((item) => item.title + '：' + form.getFieldValue(item.input_name)).join('；')
 
     if (isInit) {
-      const targetList = initWritingData.category.flatMap((item) => item.list).find((list) => list.uid === robotId)!
-      handleAddHistory(targetList)
-
       // 创建一个新的会话
       const { payload } = (await dispatch(
         startChat({
           menu: currentMenuKey,
-          prompt:
-            '你是一个文书写作助手,精通各种类型文书写作；包括但不限于:日常办公写作、机关单位写作、分析/研究报告、教育/论文等等各大分类你均可完成。精通各种类型文书写作； 为企业和机关单位提供一个高效的文书撰写和编辑平台，通过智能化的写作辅助和定制化内容生成，帮助用户在各种文书工作中节省时间、提高效率，并确保文书的品质和专业性。格式丰富一点的返回给用户；',
-          promptId: 0
+          prompt: '',
+          promptId: WritingData.currentCategory.id
         })
       )) as { payload: ShartChatResp }
       currentConversation = payload
@@ -142,19 +149,26 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
       setIsInit(false)
     }
     let uuid = UUID()
-    setConversitionList((prevList) => [
-      {
-        id: 0,
-        UUID: uuid,
-        chatId: currentConversation!.chatId,
-        content: '',
-        isLoading: true,
-        type: 1,
-        resource: '',
-        createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
-      },
-      ...(prevList || [])
-    ])
+    setCurrentUUID(uuid)
+    setConversitionList((prevList) => {
+      if (prevList && prevList.length > 0) {
+        setBefConversitionList(prevList)
+      }
+
+      return [
+        {
+          id: 0,
+          UUID: uuid,
+          chatId: currentConversation!.chatId,
+          content: '',
+          isLoading: true,
+          type: 1,
+          resource: '',
+          createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
+        },
+        ...(prevList || [])
+      ]
+    })
     if (sse) {
       const newController = new AbortController()
       setController(newController)
@@ -173,11 +187,12 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
           body: JSON.stringify({
             conversationId: currentConversation!.conversationId,
             menu: 10,
-            query: prompt,
+            query: '',
             inputs: transformObject(form.getFieldsValue())
           }),
           onopen(response) {
             // 建立连接的回调
+            editorRef.current?.setContent('')
             return Promise.resolve()
           },
           onmessage(msg) {
@@ -185,6 +200,10 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
             if (msg.event === 'message') {
               // 处理数据段
               let { message, files } = JSON.parse(msg.data) as unknown as AddChatMessagesData
+              console.log(editorRef.current?.getContent())
+              if (WritingData.currentCategory.categoryId === 33) {
+                editorRef.current?.setContent(md.render(editorRef.current?.getContent() + message))
+              }
               setConversitionList((prev) => {
                 return prev?.map((item) => {
                   if (item.UUID === uuid) {
@@ -197,11 +216,13 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
                   return item
                 }) as MessageInfo[]
               })
+
               // 进行连接正常的操作
             } else if (msg.event === 'message_end') {
               setLoading(false)
               newController.abort()
               setCurrentUUID('')
+              dispatch(getHistoryList())
             }
           },
           onclose() {
@@ -229,7 +250,8 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
           addChatMessages({
             conversationId: currentConversation!.conversationId,
             menu: currentMenuKey,
-            query: prompt
+            query: '',
+            inputs: transformObject(form.getFieldsValue())
           })
         )) as { payload: AddChatMessagesData }
         if (payload) {
@@ -259,6 +281,18 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
           // 滚动到底部
         } else {
           setLoading(false)
+          setConversitionList((prev) => {
+            return prev?.map((item) => {
+              if (item.UUID === uuid) {
+                return {
+                  ...item,
+                  content: '出错了',
+                  isLoading: false
+                }
+              }
+              return item
+            }) as MessageInfo[]
+          })
           return Toast.notify({ type: 'error', message: '出错了' })
         }
       } catch (error) {
@@ -272,7 +306,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
   }
   // 监听回车
   useKeyPress('ctrl.enter', onSubmit)
-  const customRequest = async (options: UploadRequestOption, item: ListDetail) => {
+  const customRequest = async (options: UploadRequestOption, item: WritingDetailList) => {
     console.log(item)
     const { max_size, input_name, accept } = item
     const types = Object.keys(formatMap).filter((key) => formatMap[key].some((mimeType) => accept.split(',').includes(mimeType)))
@@ -311,41 +345,42 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
       max_size * 1024 * 1024
     )
   }
-  // 复制事件
+
   useMount(() => {
     const state = location.state
+    if (WritingData.category.length === 0) {
+      dispatch(getWritingCategoryList())
+      dispatch(getWritingDetail(Number(robotId)))
+    }
+    if (WritingData.wish.list.length === 0) {
+      dispatch(getWishList())
+    }
+    if (WritingData.history.list.length === 0) {
+      dispatch(getHistoryList())
+    }
     if (!state) return
     const { type } = state
     if (!type) return
     dispatch(
       updateCollapsed({
         key: type,
-        collapsed: true
+        collapsed: true,
+        closeOthers: true
       })
     )
   })
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (!robotId) return
-    WritingJson.details[robotId] && setCurrentCategoryDetail(WritingJson.details[robotId])
-    if (currentCategoryDetail) {
-      form.resetFields()
+    const getData = async () => {
+      await dispatch(initCurrentCategory())
+      await dispatch(getWritingDetail(Number(robotId)))
     }
-    setIsInit(true)
-    setConversitionList([])
-    currentConversation = {
-      conversationId: '',
-      chatId: 0
-    }
-    dispatch(updateCollapsed({ key: location.state.type, collapsed: true, closeOthers: true }))
-  }, [robotId, currentCategoryDetail, form, dispatch, location.state.type])
-
+    getData()
+  }, [robotId])
   useUnmount(() => {
-    dispatch(
-      updateWritingData({
-        ...initWritingData
-      })
-    )
+    dispatch(initCurrentCategory())
+    rest()
   })
   // 定义markdown解析
   const md: MarkdownIt = new MarkdownIt({
@@ -391,7 +426,10 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
     const langClass = token.info ? `language-${token.info}` : ''
     const lines = token.content.split('\n').slice(0, -1)
     const lineNumbers = lines.map((line, i) => `<span>${i + 1}</span>`).join('\n')
-    const content = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true }).value
+    const pure = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true })
+    const hasCursor = pure.code?.includes('<span class="gpt-cursor"></span>')
+    const pureCode = pure.code?.replace('<span class="gpt-cursor"></span>', '')
+    const content = hljs.highlight(pureCode!, { language: token.info || 'md', ignoreIllegals: true }).value + `${hasCursor ? '<span class="gpt-cursor"></span>' : ''}`
     // 为每个代码块创建一个唯一的ID
     const uniqueId = `copy-button-${Date.now()}-${Math.random()}`
     // 创建一个复制按钮 在makedown 渲染完成之后在插入
@@ -401,6 +439,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
         copybutton.addEventListener('click', () => handleCopyClick(token.content))
       }
     })
+
     return `
     <div class="${langClass}">
       <div class="top"> <div class="language">${token.info}</div><div class="copy-button" id="${uniqueId}">复制</div></div>
@@ -408,14 +447,18 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
     </div>
     `
   }
+  useUpdateEffect(() => {
+    if (!textareaRef.current || afterContentSize == null) return
+    textareaRef.current.resizableTextArea!.textArea.style.height = `${afterContentSize?.height + 3}px`
+  }, [afterContentSize])
   return (
     <div className="w-full h-full">
       {contextHolder}
       <div className="w-full text-[#1a2029] h-[91px] bg-white p-2 border-b-[1px] border-[rgba(0,0,0,0.1)]">
         <p className="text-28 font-600 *:leading-7">AI 文书写作助手</p>
-        <p className="font-400 text-14 mt-3 ">为企业和机关单位提供一个高效的文书撰写和编辑平台，通过智能化的写作辅助和定制化内容生成，帮助用户在各种文书工作中节省时间、提高效率，并确保文书的品质和专业性。</p>
+        <p className="font-400 text-14 mt-3 line-clamp-1">为企业和机关单位提供一个高效的文书撰写和编辑平台，通过智能化的写作辅助和定制化内容生成，帮助用户在各种文书工作中节省时间、提高效率，并确保文书的品质和专业性。</p>
       </div>
-      <div className="w-full h-[calc(100vh-113px)] bg-[#F3F5F8] flex items-center justify-center overflow-hidden">
+      <div className="w-full h-[calc(100vh-91px)] bg-[#F3F5F8] flex items-center justify-center overflow-hidden">
         {/*  分类树 */}
         <div className="w-[200px] h-full bg-[#fff] border-r-[1px] border-[rgba(0,0,0,0.1)] flex flex-col">
           {/* 头部 返回按钮 */}
@@ -430,7 +473,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
           {/* 树 */}
           <div className="flex-grow overflow-y-scroll nw-scrollbar mr-[2px] h-[calc(100vh-161px)]">
             {/* 最近使用 */}
-            {WritingData && WritingData.history && WritingData.history.list && WritingData.history.list.length > 0 && (
+            {WritingData && WritingData.category && WritingData.history && WritingData.history.list && WritingData.category.length > 0 && WritingData.history.list.length > 0 && (
               <div onClick={() => dispatch(updateCollapsed({ key: WritingData.history.title, collapsed: !WritingData.history.isExpanded }))} className={`w-full overflow-hidden rounded-[4px] bg-[#fff] cursor-pointer ${WritingData.history.isExpanded ? 'h-auto' : ' h-10'}`}>
                 <div className="flex items-center h-[40px] bg-[#fff] pl-3 pr-[6px] py-[10px]">
                   <div
@@ -442,9 +485,9 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
                   <div className="flex-grow text-14 text-[#222]">{WritingData.history.title}</div>
                   <i className={`iconfont ${WritingData.history.isExpanded ? 'icon-shang' : 'icon-xia'} w-[20px] h-[20px] transform !text-10`} />
                 </div>
-                {WritingData.history.list.map((item) => {
+                {WritingData.history.list.map((item, index) => {
                   return (
-                    <div onClick={(e) => getItemDetail(e, item.uid, 'history')} key={item.uid} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${robotId === item.uid ? '!bg-[#F3F5F8] font-bold' : ''}`}>
+                    <div onClick={(e) => getItemDetail(e, item.id, 'history')} key={index} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${Number(robotId) === item.id ? '!bg-[#F3F5F8] font-bold' : ''}`}>
                       <img alt="" className="w-[20px] h-[20px] rounded-[4px]" src={item.icon} />
                       <span className="text-14 text-[#222] leading-[20px] h-[20px] ml-3 truncate">{item.nickname}</span>
                     </div>
@@ -453,7 +496,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
               </div>
             )}
             {/* 收藏 */}
-            {WritingData && WritingData.wish && WritingData.wish.list && WritingData.wish.list.length > 0 && (
+            {WritingData && WritingData.category && WritingData.wish && WritingData.wish.list && WritingData.category.length > 0 && WritingData.wish.list.length > 0 && (
               <div onClick={() => dispatch(updateCollapsed({ key: WritingData.wish.title, collapsed: !WritingData.wish.isExpanded }))} className={`w-full overflow-hidden rounded-[4px] bg-[#fff] cursor-pointer ${WritingData.wish.isExpanded ? 'h-auto' : ' h-10'}`}>
                 <div className="flex items-center h-[40px] bg-[#fff] pl-3 pr-[6px] py-[10px]">
                   <div
@@ -465,9 +508,9 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
                   <div className="flex-grow text-14 text-[#222]">{WritingData.wish.title}</div>
                   <i className={`iconfont ${WritingData.wish.isExpanded ? 'icon-shang' : 'icon-xia'} w-[20px] h-[20px] transform !text-10`} />
                 </div>
-                {WritingData.wish.list.map((item) => {
+                {WritingData.wish.list.map((item, index) => {
                   return (
-                    <div onClick={(e) => getItemDetail(e, item.uid, 'wish')} key={item.uid} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${robotId === item.uid ? '!bg-[#F3F5F8] font-bold' : ''}`}>
+                    <div onClick={(e) => getItemDetail(e, item.id, 'wish')} key={index} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${Number(robotId) === item.id ? '!bg-[#F3F5F8] font-bold' : ''}`}>
                       <img alt="" className="w-[20px] h-[20px] rounded-[4px]" src={item.icon} />
                       <span className="text-14 text-[#222] leading-[20px] h-[20px] ml-3 truncate">{item.nickname}</span>
                     </div>
@@ -476,8 +519,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
               </div>
             )}
             {/* 所有分类 */}
-            {WritingData &&
-              WritingData.category.length > 0 &&
+            {WritingData && WritingData.category && WritingData.category.length > 0 ? (
               WritingData.category.map((item) => {
                 return (
                   <div key={item.title} onClick={() => dispatch(updateCollapsed({ key: item.title, collapsed: !item.isExpanded }))} className={`w-full overflow-hidden rounded-[4px] bg-[#fff] cursor-pointer ${item.isExpanded ? 'h-auto' : ' h-10'}`}>
@@ -491,9 +533,9 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
                       <div className="flex-grow text-14 text-[#222]">{item.title}</div>
                       <i className={`iconfont ${item.isExpanded ? 'icon-shang' : 'icon-xia'} w-[20px] h-[20px] transform !text-10`} />
                     </div>
-                    {item.list.map((list) => {
+                    {item.list.map((list, index) => {
                       return (
-                        <div onClick={(e) => getItemDetail(e, list.uid, item.title)} key={list.uid} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${robotId === list.uid ? '!bg-[#F3F5F8] font-bold' : ''}`}>
+                        <div onClick={(e) => getItemDetail(e, list.id, item.title)} key={index} className={`w-[184px] h-8 my-1 flex items-center group relative mx-2 pl-8 rounded-4px hover:bg-[rgba(243,245,248,0.5)] ${Number(robotId) === list.id ? '!bg-[#F3F5F8] font-bold' : ''}`}>
                           <img alt="" className="w-[20px] h-[20px] rounded-[4px]" src={list.icon} />
                           <span className="text-14 text-[#222] leading-[20px] h-[20px] ml-3 truncate">{list.nickname}</span>
                         </div>
@@ -501,128 +543,329 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
                     })}
                   </div>
                 )
-              })}
-          </div>
-        </div>
-        {/*  内容 */}
-        <div className="w-full h-full bg-[#F3F5F8] flex items-center justify-center overflow-hidden">
-          {/*  详情页 表单 */}
-          {currentCategoryDetail && (
-            <div className="flex flex-col w-1/3 flex-grow h-full bg-[#fff]">
-              <div className="w-full h-full flex flex-col justify-center items-center pb-6">
-                {/* 头部 */}
-                <header className="flex items-center w-full h-[72px] pl-4 border-b-[1px] border-[rgba(0,0,0,0.1)] cursor-pointer">
-                  <img alt="" className="w-7 h-7 rounded-[6px] mx-[10px]" src={currentCategoryDetail.icon} />
-                  <div className="text-20 font-medium">{currentCategoryDetail.title}</div>
-                </header>
-                {/* 表单 */}
-                <div className="w-full px-6 pt-6 h-0 flex-grow overflow-y-scroll nw-scrollbar mr-[2px]">
-                  <Form autoComplete="off" layout="vertical" form={form}>
-                    {currentCategoryDetail.list.map((item) => {
-                      return (
-                        <div key={item.title}>
-                          {item.input_type.startsWith('text') && (
-                            <FormItem label={item.title} name={item.input_name}>
-                              <TextArea className="prompt-textarea" placeholder={item.placeholder} showCount maxLength={parseInt(item.input_type.split('_')[1])} autoSize={{ minRows: Math.min(Math.ceil(parseInt(item.input_type.split('_')[1]) / 15), 4) }} />
-                            </FormItem>
-                          )}
-                          {item.input_type.startsWith('select') && (
-                            <FormItem label={item.title} name={item.input_name} initialValue={item.default || item.option?.[0]}>
-                              <Select options={item.option?.map((option) => ({ label: option, value: option }))} />
-                            </FormItem>
-                          )}
-                          {item.input_type.startsWith('tab') && (
-                            <FormItem label={item.title} name={item.input_name} initialValue={item.default}>
-                              <Select mode="tags" style={{ width: '100%' }} placeholder={item.placeholder} open={false} suffixIcon={null} notFoundContent={null} showSearch={false} maxCount={20} />
-                            </FormItem>
-                          )}
-                          {item.input_type.startsWith('file') && (
-                            <FormItem label={item.title} name={item.input_name} className="no_up_list">
-                              <Upload fileList={[]} accept={item.accept} customRequest={(options) => customRequest(options, item)}>
-                                <Input
-                                  className="cursor-pointer"
-                                  value={currentFile?.file.name}
-                                  readOnly
-                                  size="large"
-                                  addonAfter={
-                                    currentFile ? (
-                                      <i
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          setCurrentFile(undefined)
-                                        }}
-                                        className="iconfont icon-shanchu"
-                                      ></i>
-                                    ) : null
-                                  }
-                                  addonBefore={item.btn_text}
-                                  placeholder={item.placeholder}
-                                />
-                              </Upload>
-                            </FormItem>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </Form>
-                  <div onClick={onReset} className="flex justify-center text-[#5E6770] cursor-pointer items-center">
-                    <i className="iconfont icon-shanchu"></i>
-                    <span className="ml-[5px]">清空录入</span>
-                  </div>
-                </div>
-
-                {/* 提交按钮 */}
-                <div className="flex justify-center px-6 bg-[#fff] mt-2 z-[100] w-full h-11">
-                  <Button loading={loading} onClick={onSubmit} type="primary" className="flex justify-center items-center !w-full !h-11 text-[#fff] font-semibold bg-[#2E65FF] !rounded-[4px] !text-16">
-                    立即生成 <span className="w-[102px] py-1 px-3 ml-3 rounded-[4px]">Ctrl + Enter</span>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-          {/* 右侧内容输出区域 */}
-          <div className="document-container flex flex-col w-2/3 flex-grow h-full">
-            {/* init */}
-            {isInit ? (
-              <div className="flex flex-col gap-[16px] size-full p-6 bg-[#F3F5F8]">
-                <div className="relative w-full h-full flex flex-col flex-grow">
-                  <div className="absolute inset-0 size-full vh-center">
-                    <div className="flex items-center">
-                      <i className="iconfont icon-zuo !text-40 no-draw-arrow"></i>
-                      <span className="text-24 font-bold ml-[10px]">开始生成</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              })
             ) : (
-              // 输出区域
-              <div className="pl-6 py-6 pr-[18px] h-0 flex-grow overflow-y-scroll nw-scrollbar" id="prompt-content-wrap" ref={scrollBox}>
-                {conversitionList &&
-                  conversitionList.length > 0 &&
-                  conversitionList.map((item) => {
-                    return (
-                      <div key={item.id} className="flex flex-col mb-4">
-                        <div className="flex-1 bg-[#fff] flex flex-col text-[#222] text-15 leading-[22px] px-6 py-4">
-                          <div
-                            className="whitespace-pre-wrap break-all text-15 leading-[26px]"
-                            dangerouslySetInnerHTML={{
-                              __html: md.render(item.isLoading ? '<span class="loading loading-dots loading-xs"></span>' : item.content)
-                            }}
-                          ></div>
-                          <div className="flex items-center mt-[15px] pt-[15px] text-14 border-dashed border-t-[1px] border-[rgba(105,117,126,0.3)] justify-end">
-                            <div onClick={() => handleCopyClick(item.content)} className="flex justify-center items-center w-[76px] h-[32px] text-[#0E6CF2] rounded-[4px] cursor-pointer border-[1px] border-[#0E6CF2] group hover:bg-[#0E6CF2] hover:text-[#fff] bg-[#fff]">
-                              <i className="iconfont icon-icon_fuzhi !mr-[5px]"></i>
-                              复制
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
+              <div className="w-full h-full flex justify-center items-center opacity-30">
+                <Loading />
               </div>
             )}
           </div>
         </div>
+        {/*  内容 */}
+        {WritingData && WritingData.category && WritingData.category.length > 0 && Object.keys(WritingData.currentCategory).length > 0 ? (
+          <>
+            {WritingData.currentCategory.extra && Object.keys(WritingData.currentCategory.extra).length === 0 ? (
+              <div className="w-full h-full bg-[#F3F5F8] flex items-center justify-center overflow-hidden">
+                {/*  详情页 表单 */}
+                <div className="flex flex-col w-1/3 flex-grow h-full bg-[#fff]">
+                  <div className="w-full h-full flex flex-col justify-center items-center pb-6">
+                    {/* 头部 */}
+                    <header className="flex items-center w-full h-[72px] pl-4 border-b-[1px] border-[rgba(0,0,0,0.1)] cursor-pointer">
+                      <img alt="" className="w-7 h-7 rounded-[6px] mx-[10px]" src={WritingData.currentCategory.icon} />
+                      <div className="text-20 font-medium line-clamp-2" title={WritingData.currentCategory.description}>
+                        {WritingData.currentCategory.nickname}
+                      </div>
+                    </header>
+                    {/* 表单 */}
+                    <div className="w-full px-6 pt-6 h-0 flex-grow overflow-y-scroll nw-scrollbar mr-[2px]">
+                      <Form autoComplete="off" layout="vertical" form={form}>
+                        {WritingData &&
+                          WritingData.currentCategory &&
+                          WritingData.currentCategory.list &&
+                          WritingData.currentCategory.list.length > 0 &&
+                          WritingData.currentCategory.list.map((item) => {
+                            return (
+                              <div key={item.title}>
+                                {item.input_type.startsWith('text') && (
+                                  <FormItem label={item.title} name={item.input_name}>
+                                    <TextArea className="prompt-textarea" placeholder={item.placeholder} showCount maxLength={parseInt(item.input_type.split('_')[1])} autoSize={{ minRows: Math.min(Math.ceil(parseInt(item.input_type.split('_')[1]) / 15), 4) }} />
+                                  </FormItem>
+                                )}
+                                {item.input_type.startsWith('select') && (
+                                  <FormItem label={item.title} name={item.input_name} initialValue={item.default || item.option?.[0]}>
+                                    <Select options={item.option?.map((option) => ({ label: option, value: option }))} />
+                                  </FormItem>
+                                )}
+                                {item.input_type.startsWith('tab') && (
+                                  <FormItem label={item.title} name={item.input_name} initialValue={item.default}>
+                                    <Select mode="tags" style={{ width: '100%' }} placeholder={item.placeholder} open={false} suffixIcon={null} notFoundContent={null} showSearch={false} maxCount={20} />
+                                  </FormItem>
+                                )}
+                                {item.input_type.startsWith('file') && (
+                                  <FormItem label={item.title} name={item.input_name} className="no_up_list">
+                                    <Upload fileList={[]} accept={item.accept} customRequest={(options) => customRequest(options, item)}>
+                                      <Input
+                                        className="cursor-pointer"
+                                        value={currentFile?.file.name}
+                                        readOnly
+                                        addonAfter={
+                                          currentFile ? (
+                                            <i
+                                              onClick={(e) => {
+                                                e.stopPropagation()
+                                                setCurrentFile(undefined)
+                                              }}
+                                              className="iconfont icon-shanchu"
+                                            ></i>
+                                          ) : null
+                                        }
+                                        addonBefore={item.btn_text}
+                                        placeholder={item.placeholder}
+                                      />
+                                    </Upload>
+                                  </FormItem>
+                                )}
+                              </div>
+                            )
+                          })}
+                      </Form>
+                      <div onClick={onReset} className="flex justify-center text-[#5E6770] cursor-pointer items-center">
+                        <i className="iconfont icon-shanchu"></i>
+                        <span className="ml-[5px]">清空录入</span>
+                      </div>
+                    </div>
+
+                    {/* 提交按钮 */}
+                    <div className="flex justify-center px-6 bg-[#fff] mt-2 z-[100] w-full h-11">
+                      <Button loading={loading} onClick={onSubmit} type="primary" className="flex justify-center items-center !w-full !h-11 text-[#fff] font-semibold bg-[#2E65FF] !rounded-[4px] !text-16">
+                        立即生成 <span className="w-[102px] py-1 px-3 ml-3 rounded-[4px]">Ctrl + Enter</span>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                {/* 右侧内容输出区域 */}
+                <div className="document-container flex flex-col w-2/3 flex-grow h-full">
+                  {/* init */}
+
+                  <>
+                    {isInit ? (
+                      <div className="flex flex-col gap-[16px] size-full p-6 bg-[#F3F5F8]">
+                        <div className="relative w-full h-full flex flex-col flex-grow">
+                          <div className="absolute inset-0 size-full vh-center">
+                            <div className="flex items-center">
+                              <i className="iconfont icon-zuo !text-40 no-draw-arrow"></i>
+                              <span className="text-24 font-bold ml-[10px]">开始生成</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      // 输出区域
+                      <>
+                        <div
+                          className="h-full w-full"
+                          style={{
+                            display: WritingData.currentCategory.categoryId === 33 ? '' : 'none'
+                          }}
+                        >
+                          <TinyMCEEditor ref={editorRef} />
+                        </div>
+                        <div
+                          style={{
+                            display: WritingData.currentCategory.categoryId === 33 ? 'none' : ''
+                          }}
+                          className="pl-6 py-6 pr-[18px] flex-grow overflow-y-scroll nw-scrollbar"
+                          id="prompt-content-wrap"
+                          ref={scrollBox}
+                        >
+                          {conversitionList &&
+                            conversitionList.length > 0 &&
+                            conversitionList.map((item, index) => {
+                              return (
+                                <div key={index} className="flex flex-col mb-4">
+                                  <div className="flex-1 bg-[#fff] flex flex-col text-[#222] text-15 leading-[22px] px-6 py-4">
+                                    <div
+                                      className="markdown-body text-15 leading-[26px]"
+                                      dangerouslySetInnerHTML={{
+                                        __html: md.render(
+                                          item.isLoading ? '<span class="loading loading-dots loading-xs"></span>' : item.content.endsWith('```') || item.content.match(/\B```\b[a-zA-Z]+\b(?!\s)/) ? item.content : item.content + `${currentUUID === item.UUID ? '<span class="gpt-cursor"></span>' : ''}`
+                                        )
+                                      }}
+                                    ></div>
+                                    <div className="flex items-center mt-[15px] pt-[15px] text-14 border-dashed border-t-[1px] border-[rgba(105,117,126,0.3)] justify-end">
+                                      <div onClick={() => handleCopyClick(item.content)} className="flex justify-center items-center w-[76px] h-[32px] text-[#0E6CF2] rounded-[4px] cursor-pointer border-[1px] border-[#0E6CF2] group hover:bg-[#0E6CF2] hover:text-[#fff] bg-[#fff]">
+                                        <i className="iconfont icon-icon_fuzhi !mr-[5px]"></i>
+                                        复制
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )
+                            })}
+                        </div>
+                      </>
+                    )}
+                  </>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-full bg-[#F3F5F8] flex flex-col items-center justify-center">
+                <div className="w-full flex flex-col items-center px-8 pb-10 flex-grow overflow-y-scroll nw-scrollbar">
+                  <div className="flex items-center w-full min-h-[72px] cursor-pointer">
+                    <img className="size-[28px] rounded-[6px] mr-[10px]" alt="" src={WritingData.currentCategory.icon} />
+                    <div className="text-20 font-medium">{WritingData.currentCategory.description}</div>
+                  </div>
+                  <div
+                    className="relative flex w-full bg-[#fff] rounded-[8px] px-6 py-4"
+                    style={{
+                      boxShadow: 'rgba(0, 0, 0, 0.08) 0px 2px 8px 0px'
+                    }}
+                  >
+                    <Form className="flex w-full bg-[#fff]" autoComplete="off" form={form}>
+                      {WritingData.currentCategory.list &&
+                        WritingData.currentCategory.list.length > 0 &&
+                        WritingData.currentCategory.list
+                          .filter((item) => item.input_type.startsWith('text'))
+                          .map((item) => {
+                            return (
+                              <div key={item.input_name} className="flex flex-col w-1/2 flex-grow pr-4 mt-1">
+                                <div className="text-16 font-semibold pb-[17px]">原文</div>
+                                <div className="flex-1 flex flex-col">
+                                  <FormItem className="mb-0" name={item.input_name}>
+                                    <TextArea ref={textareaRef} value={value} onChange={(e) => setValue(e.target.value)} variant="filled" className="rewrite-textarea" placeholder={item.placeholder} maxLength={parseInt(item.input_type.split('_')[1])} autoSize={{ minRows: 15 }} />
+                                  </FormItem>
+                                </div>
+                                <div className="flex justify-between items-center mt-[20px]">
+                                  <div className="flex text-[#0E6CF2] font-medium">
+                                    <span>字数：</span>
+                                    <div className=" text-14  text-[#0E6CF2] font-medium ">
+                                      {value.length} / {parseInt(item.input_type.split('_')[1])}
+                                    </div>
+                                  </div>
+                                  <Button
+                                    loading={loading}
+                                    onClick={() => {
+                                      afterContentRef.current!.style.height = '417px'
+                                      textareaRef.current!.resizableTextArea!.textArea.style.height = `${417}px`
+                                      onSubmit()
+                                    }}
+                                    type="primary"
+                                    disabled={!value.trim()}
+                                    className="h-[32px] font-medium bg-[#0E6CF2] rounded-[4px]"
+                                  >
+                                    {WritingData.currentCategory.description}
+                                  </Button>
+                                </div>
+                              </div>
+                            )
+                          })}
+                      {WritingData.currentCategory.list &&
+                        WritingData.currentCategory.list.length > 0 &&
+                        WritingData.currentCategory.list
+                          .filter((item) => item.input_type.startsWith('select'))
+                          .map((item) => {
+                            return (
+                              <div key={item.input_name} className="flex flex-col w-1/2 flex-grow">
+                                <div className="flex justify-between">
+                                  <div className="text-16 font-semibold py-[6px]">改写</div>
+                                  <div className="">
+                                    <div className="ant-select rewrite-select !h-8 !min-w-[78px] css-htwhyh ant-select-single ant-select-show-arrow">
+                                      <FormItem name={item.input_name} initialValue={item.default || item.option?.[0]}>
+                                        <Select
+                                          style={{
+                                            width: 100
+                                          }}
+                                          options={item.option?.map((option) => ({ label: option, value: option }))}
+                                        />
+                                      </FormItem>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div
+                                  ref={afterContentRef}
+                                  style={{
+                                    minHeight: 417
+                                  }}
+                                  className="flex-1 flex p-[20px] flex-col w-full mt-[10px] border-[1px] border-[rgba(0,0,0,0.1)] rounded-[6px] whitespace-pre-wrap break-all text-15 leading-[26px]"
+                                  dangerouslySetInnerHTML={{
+                                    __html: conversitionList && conversitionList.length > 0 ? md.render(conversitionList[0].content + `${currentUUID === conversitionList[0].UUID ? '<span class="gpt-cursor"></span>' : ''}`) : ''
+                                  }}
+                                />
+                                <div className="mt-[18px]">
+                                  <div className="w-full flex justify-between items-center mt-[2px]">
+                                    <div className="text-[#0E6CF2]">{conversitionList && conversitionList.length > 0 && '字数：' + conversitionList[0].content.length}</div>
+                                    <div
+                                      onClick={() => handleCopyClick(conversitionList && conversitionList.length > 0 ? conversitionList[0].content : '')}
+                                      style={{
+                                        borderColor: conversitionList && conversitionList.length > 0 && conversitionList[0].content ? '#0E6CF2' : '#BBB',
+                                        color: conversitionList && conversitionList.length > 0 && conversitionList[0].content ? '#fff' : '#BBB',
+                                        backgroundColor: conversitionList && conversitionList.length > 0 && conversitionList[0].content ? '#0E6CF2' : ''
+                                      }}
+                                      className="flex justify-center items-center w-[76px] h-[32px] text-[#BBB] border-[1px] border-[#BBB] rounded-[4px] cursor-pointer group hover:bg-[#0E6CF2] hover:border-[#0E6CF2] hover:text-[#fff] bg-[#fff]"
+                                    >
+                                      <i className="iconfont icon-icon_fuzhi !mr-[5px]"></i>
+                                      复制
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })}
+                    </Form>
+
+                    {/* 中间图标 */}
+                    <div
+                      style={{
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%,-50%) translateX(-25%)',
+                        backgroundColor: value.trim() ? '#0E6CF2' : '#fff',
+                        borderColor: value.trim() ? '#0E6CF2' : '#5B6470',
+                        color: value.trim() ? '#fff' : '',
+                        pointerEvents: value.trim() ? 'auto' : 'none'
+                      }}
+                      onClick={() => {
+                        afterContentRef.current!.style.height = '417px'
+                        textareaRef.current!.resizableTextArea!.textArea.style.height = `${417}px`
+                        onSubmit()
+                      }}
+                      className="absolute z-100 cursor-pointer flex justify-center items-center size-[48px] border-[1px] border-[#5B6470] bg-[#fff] rounded-[8px]"
+                    >
+                      <i className="iconfont icon-youjiantou"></i>
+                    </div>
+                  </div>
+                  {befconversitionList &&
+                    befconversitionList.length > 0 &&
+                    befconversitionList.map((item) => {
+                      return (
+                        <div key={item.UUID} className="w-full h-full">
+                          <div className="w-full flex flex-col mt-4 px-6 bg-[#fff] rounded-[8px]">
+                            <div className="flex justify-between items-center py-[17px] border-b border-[rgba(105,117,126,0.3)] border-dashed">
+                              <div className="flex">
+                                <span className="text-16px text-[#000] font-semibold">改写记录</span>
+                                <span className="text-13px text-[#999] mx-4">{item.createtime.replace('T', ' ')}</span>
+                                <span className="text-13px text-[#999] ">文章字数：{item.content.length}</span>
+                              </div>
+                              <div onClick={() => handleCopyClick(item.content)} className="flex justify-center items-center w-[76px] h-[32px] text-[#0E6CF2] rounded-[4px] cursor-pointer border-[1px] border-[#0E6CF2] bg-[#fff]">
+                                <i className="iconfont icon-icon_fuzhi !mr-[5px]"></i>
+                                复制
+                              </div>
+                            </div>
+                            <div className="flex-1 pt-[18px] py-6 text-[#222] text-14px leading-[20px] rounded-6px">
+                              <div className="whitespace-pre-wrap break-all text-15 leading-[26px]">{item.content}</div>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="w-full h-full flex justify-center items-center opacity-30">
+            <Loading />
+          </div>
+        )}
+
+        <FloatButton.BackTop
+          style={{
+            right: 30
+          }}
+          className="hover:opacity-80"
+          visibilityHeight={200}
+          target={() => document.querySelector('#prompt-content-wrap') as HTMLDivElement}
+        />
       </div>
     </div>
   )

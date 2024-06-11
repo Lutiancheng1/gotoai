@@ -5,6 +5,7 @@ const rem = (px) => ({ [px]: `${px / 16}rem` })
 const px = (num) => ({ [num]: `${num}px` })
 
 module.exports = {
+  mode: 'jit',
   content: ['./src/**/*.{html,js,tsx}'],
   theme: {
     extend: {

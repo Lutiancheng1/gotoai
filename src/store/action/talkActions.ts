@@ -30,6 +30,7 @@ export const getHistoryList = createAsyncThunk('talk/getHistoryList', async (par
   } else {
     dispatch(updateHistoryList({ pageCount, pageIndex, recordCount, rows }))
   }
+  return rows
 })
 /**
  * 删除某一条历史记录
@@ -134,4 +135,27 @@ export const getQuesions = createAsyncThunk('talk/getQuesions', async (conversat
   console.log(res)
   if (!res.data && res.code !== 0) return
   return res.data as string[]
+})
+
+//  创建临时会话id
+export const createTempChat = createAsyncThunk('talk/createTempChat', async (menu: number) => {
+  const res = (await http.get(`/Chat/ConversationId?menu=${menu}`)) as { data: string; code: number; msg: string }
+  console.log(res)
+  if (!res.data && res.code !== 0) return
+  return res.data
+})
+
+//  保存临时会话
+export const saveTempChat = createAsyncThunk('talk/saveTempChat', async (params: { conversationId: string; menu: number }) => {
+  const res = (await http.get(`/Chat/SaveChat?menu=${params.menu}&conversationId=${params.conversationId}`)) as {
+    data: {
+      conversationId: string
+      chatId: number
+    }
+    code: number
+    msg: string
+  }
+  console.log(res)
+  if (!res.data && res.code !== 0) return
+  return res.data
 })

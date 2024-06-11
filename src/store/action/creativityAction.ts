@@ -2,9 +2,7 @@
 import { http } from '@/utils/axios'
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import Toast from '@/components/Toast'
-import { updateCollapsed, updateWishList } from '../reducers/creativity'
-import { TypedUseSelectorHook } from 'react-redux'
-import { RootState } from '..'
+import { updateWishList } from '../reducers/creativity'
 export interface CategoryDetailList {
   id: number
   marketingId: number
