@@ -1,4 +1,5 @@
 import Toast from '@/components/Toast'
+import { videoBaseUrl } from './BaseUrlConfig'
 
 export interface TaskVideoRequest {
   video_subject: string
@@ -120,10 +121,7 @@ export interface VideoTermsResponse {
     video_terms: string[]
   }
 }
-
-// export const baseUrl = 'http://192.168.1.137:8080/api/v1/'
-// export const uploadUrl = 'http://192.168.1.137:8501/'
-export const baseUrl = 'https://video.gotoai.world/api/v1/'
+export const baseUrl = videoBaseUrl
 // Generate a short video
 export const createVideo = async (requestBody: TaskVideoRequest): Promise<TaskResponse> => {
   const response = await fetch(`${baseUrl}videos`, {

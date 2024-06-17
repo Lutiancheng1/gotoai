@@ -4,6 +4,16 @@
   min-height: 100% !important;
 }
 
+.tox-tinymce {
+  border-radius: 0 !important;
+  /* border: none !important; */
+  border-left: 1px;
+  border-top: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+
+}
+
 /*Container body*/
 .tox-sidebar-wrap {
   position: absolute;

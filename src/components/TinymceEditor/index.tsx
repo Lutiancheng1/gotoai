@@ -4,6 +4,7 @@ import './index.css'
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import Loading from '../loading'
 import { handleCopyClick } from '../Dialogue'
+import '@/components/MdRender/md.css'
 type TinyMCEEditorProps = {}
 const TinyMCEEditor = forwardRef((props: TinyMCEEditorProps, ref) => {
   const editorRef = useRef<TinyMCEEditorInstance | null>(null)
@@ -38,6 +39,7 @@ const TinyMCEEditor = forwardRef((props: TinyMCEEditorProps, ref) => {
         apiKey="ck9zsnftb0gqb8wtcoi5724vdw44u5j1wixjzu9fmlh5ym64"
         init={{
           language: 'zh_CN',
+          inline_boundaries: false,
           menubar: true, // 顶部菜单栏
           resize: false, // 右下角调整大小
           statusbar: false, // 底部状态栏
@@ -61,7 +63,7 @@ const TinyMCEEditor = forwardRef((props: TinyMCEEditorProps, ref) => {
             })
           },
           plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons accordion',
-          toolbar: 'undo redo | blocks fontsizeinput | copyContent underline strikethrough image link | align numlist bullist | table media emoticonsss | lineheight outdent indent| removeformat | charmap | code fullscreen preview | save print | pagebreak anchor codesample | ltr rtl',
+          toolbar: 'undo redo | blocks fontsizeinput | copyContent underline strikethrough image link | align numlist bullist | table media emoticonsss | lineheight outdent indent| removeformat | charmap | code fullscreen preview | save print | pagebreak anchor codesample | ltr rtl ',
           removed_menuitems: 'newdocument',
           content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
           formats: {
@@ -82,7 +84,9 @@ const TinyMCEEditor = forwardRef((props: TinyMCEEditorProps, ref) => {
           }
         }}
         onEditorChange={(content, editor) => handleEditorChange({ content, editor })}
-        onInit={(evt, editor) => (editorRef.current = editor)}
+        onInit={(evt, editor) => {
+          editorRef.current = editor
+        }}
       />
     </div>
   )

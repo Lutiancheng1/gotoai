@@ -1,0 +1,61 @@
+.ql-snow {
+  .ql-header {
+    &.ql-picker {
+
+      .ql-picker-label,
+      .ql-picker-item {
+        &::before {
+          content: '正文';
+        }
+
+        &[data-value='1']::before {
+          content: '标题1';
+        }
+
+        &[data-value='2']::before {
+          content: '标题2';
+        }
+
+        &[data-value='3']::before {
+          content: '标题3';
+        }
+
+        &[data-value='4']::before {
+          content: '标题4';
+        }
+
+        &[data-value='5']::before {
+          content: '标题5';
+        }
+
+        &[data-value='6']::before {
+          content: '标题6';
+        }
+      }
+    }
+  }
+
+  .ql-tooltip {
+    &::before {
+      content: '访问链接';
+    }
+
+    >.ql-action::after {
+      content: '编辑';
+    }
+
+    >.ql-remove::before {
+      content: '移除';
+    }
+
+    &.ql-editing {
+      &[data-mode='link']::before {
+        content: '链接';
+      }
+
+      .ql-action::after {
+        content: '保存';
+      }
+    }
+  }
+}

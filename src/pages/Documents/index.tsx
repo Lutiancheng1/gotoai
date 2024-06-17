@@ -523,6 +523,14 @@ const Document = ({ isNewDoc, tempConversationId, currentFile, docLoading }: Pro
   // 页面卸载 清空
   useUnmount(() => {
     dispatch(initState())
+    dispatch(clearConversitionDetailList())
+    dispatch(
+      updateCurrentId({
+        conversationId: '',
+        chatId: 0
+      })
+    )
+    dispatch(toggleIsNewChat(true))
   })
   useMount(async () => {
     const res = await getMenuPrologue(menuWarp[location.pathname])

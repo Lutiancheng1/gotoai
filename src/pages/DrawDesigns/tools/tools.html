@@ -642,7 +642,7 @@
         const Key = 'Y38PvAPfOOyaBKOLnQsG'
         const salt = Date.now()
         const sign = MD5(`${AppId}${document.querySelector('textarea.bg-neutral-500').value}${salt}${Key}`)
-        const url = `https://fanyi.gotoai.world/api/trans/vip/translate?q=${encodeURIComponent(document.querySelector('textarea.bg-neutral-500').value)}&from=auto&to=en&appid=${AppId}&salt=${salt}&sign=${sign}`
+        const url = `https://fanyi.cloud-pioneer.com/api/trans/vip/translate?q=${encodeURIComponent(document.querySelector('textarea.bg-neutral-500').value)}&from=auto&to=en&appid=${AppId}&salt=${salt}&sign=${sign}`
         const res = await axios(url, {
           method: 'GET',
           // mode: 'no-cors',

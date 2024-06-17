@@ -1,11 +1,11 @@
 import { useKeyPress, useMount, useSize, useUnmount, useUpdateEffect } from 'ahooks'
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { initialState as initWritingData, initCurrentCategory, updateCollapsed } from '@/store/reducers/writing'
+import { initCurrentCategory, updateCollapsed } from '@/store/reducers/writing'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { Button, ConfigProvider, FloatButton, Form, Input, Modal, Select, Upload } from 'antd'
+import { Button, FloatButton, Form, Input, Modal, Select, Steps, Upload } from 'antd'
 import FormItem from 'antd/es/form/FormItem'
-import TextArea, { TextAreaProps, TextAreaRef } from 'antd/es/input/TextArea'
+import TextArea, { TextAreaRef } from 'antd/es/input/TextArea'
 import './index.css'
 import { RcFile, UploadRequestOption } from 'rc-upload/lib/interface'
 import { formatMap, uploadFile } from '@/api/upload'
@@ -17,16 +17,14 @@ import { UUID } from '@/utils/libs'
 import dayjs from 'dayjs'
 import { getTokenInfo } from '@/utils/storage'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
-import MarkdownIt from 'markdown-it'
-import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css'
-import { imgLazyload } from '@mdit/plugin-img-lazyload'
 import { handleCopyClick } from '@/components/Dialogue'
 import { transformObject } from '@/utils'
 import useForm from 'antd/es/form/hooks/useForm'
 import Loading from '@/components/loading'
 import { getHistoryList, getWishList, getWritingCategoryList, getWritingDetail, WritingDetailList } from '@/store/action/writingAction'
 import TinyMCEEditor from '@/components/TinymceEditor'
+import { renderMarkdown } from '@/components/MdRender/markdownRenderer'
 type WritingDetailProps = {}
 let sse = true
 let currentMenuKey = 10
@@ -59,6 +57,23 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
   const textareaRef = useRef<TextAreaRef>(null)
   const afterContentRef = useRef<HTMLDivElement>(null)
   const afterContentSize = useSize(afterContentRef)
+  const editorContent = useRef('')
+  //  是否有步骤条
+  const [hasSteps, setHasSteps] = useState(false)
+  // 当前阶段
+  const [currentStage, setCurrentStage] = useState(0)
+
+  const changeStage = (stage: number) => {
+    setCurrentStage(stage)
+    editorContent.current = ''
+  }
+  useEffect(() => {
+    if (WritingData.currentCategory.categoryId === 33) {
+      setHasSteps(true)
+    } else {
+      setHasSteps(false)
+    }
+  }, [WritingData.currentCategory])
   const editorRef = useRef<{ setContent: (content: string) => {}; getContent: () => string }>(null)
   const onBack = () => {
     navigate('/writing')
@@ -74,6 +89,9 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
       conversationId: '',
       chatId: 0
     }
+    setCurrentStage(0)
+    editorContent.current = ''
+    editorRef.current?.setContent('')
     if (WritingData && WritingData.currentCategory && form) {
       setTimeout(() => {
         form.resetFields()
@@ -118,6 +136,13 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
   // 保存
   const onSubmit = async () => {
     if (loading) return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
+    if (currentStage === 1) {
+      changeStage(2)
+    }
+    if (currentStage === 2) {
+      changeStage(0)
+      editorContent.current = ''
+    }
     const values = form.getFieldsValue()
     // 遍历 values 对象
     for (let key in values) {
@@ -187,7 +212,17 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
           body: JSON.stringify({
             conversationId: currentConversation!.conversationId,
             menu: 10,
-            query: '',
+            query:
+              currentStage !== 1
+                ? !hasSteps
+                  ? ''
+                  : `帮我根据${WritingData.currentCategory.nickname} 和 ${WritingData.currentCategory.list.map((item) => {
+                      const formValues = form.getFieldsValue() as { [key: string]: string }
+                      const formValue = formValues[item.input_name]
+                      if (!formValue) return ''
+                      return `${item.title}: ${formValue}`
+                    })}生成一个目录大纲,,需要大纲标题`
+                : `帮我根据大纲生成一篇标题为${WritingData.currentCategory.nickname}的word文档,大纲内容为:` + editorRef.current?.getContent(),
             inputs: transformObject(form.getFieldsValue())
           }),
           onopen(response) {
@@ -200,9 +235,10 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
             if (msg.event === 'message') {
               // 处理数据段
               let { message, files } = JSON.parse(msg.data) as unknown as AddChatMessagesData
-              console.log(editorRef.current?.getContent())
-              if (WritingData.currentCategory.categoryId === 33) {
-                editorRef.current?.setContent(md.render(editorRef.current?.getContent() + message))
+              if (hasSteps) {
+                editorContent.current += message
+                console.log(renderMarkdown(editorContent.current, false))
+                editorRef.current?.setContent(renderMarkdown(editorContent.current, false))
               }
               setConversitionList((prev) => {
                 return prev?.map((item) => {
@@ -223,6 +259,9 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
               newController.abort()
               setCurrentUUID('')
               dispatch(getHistoryList())
+              if (hasSteps && currentStage !== 1 && editorRef.current?.getContent().trim()) {
+                changeStage(1)
+              }
             }
           },
           onclose() {
@@ -382,71 +421,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
     dispatch(initCurrentCategory())
     rest()
   })
-  // 定义markdown解析
-  const md: MarkdownIt = new MarkdownIt({
-    html: true,
-    linkify: true,
-    typographer: true,
-    highlight: (str, lang) => {
-      if (lang && hljs.getLanguage(lang)) {
-        try {
-          return `<pre class="hljs"><code>${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`
-        } catch (__) {}
-      }
-      return `<pre class="hljs"><code>${md.utils.escapeHtml(str)}</code></pre>`
-    }
-  }).use(imgLazyload)
 
-  // 保存原始的链接渲染函数
-  const defaultRender =
-    md.renderer.rules.link_open ||
-    function (tokens, idx, options, env, self) {
-      return self.renderToken(tokens, idx, options)
-    }
-  // 自定义链接渲染函数
-  md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-    // 添加 target 和 rel 属性
-    tokens[idx].attrPush(['target', '_blank'])
-    tokens[idx].attrPush(['rel', 'noopener noreferrer'])
-
-    // 调用原始的链接渲染函数
-    return defaultRender(tokens, idx, options, env, self)
-  }
-  // 自定义图片渲染
-  md.renderer.rules.image = (tokens, idx) => {
-    const token = tokens[idx]
-    const src = token.attrGet('src')
-    const alt = token.attrGet('alt')
-    const title = token.attrGet('title')
-    return `<a href="${src}" target="_blank" class="img-preview"><img src="${src}" alt="${alt}" title="${title}" style="width: 300px; height: 300px;"/></a>`
-  }
-  md.renderer.rules.fence = (tokens, idx) => {
-    // 匹配 a标签  给a标签加上  target="_blank" rel="noopener noreferrer"属性
-    const token = tokens[idx]
-    const langClass = token.info ? `language-${token.info}` : ''
-    const lines = token.content.split('\n').slice(0, -1)
-    const lineNumbers = lines.map((line, i) => `<span>${i + 1}</span>`).join('\n')
-    const pure = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true })
-    const hasCursor = pure.code?.includes('<span class="gpt-cursor"></span>')
-    const pureCode = pure.code?.replace('<span class="gpt-cursor"></span>', '')
-    const content = hljs.highlight(pureCode!, { language: token.info || 'md', ignoreIllegals: true }).value + `${hasCursor ? '<span class="gpt-cursor"></span>' : ''}`
-    // 为每个代码块创建一个唯一的ID
-    const uniqueId = `copy-button-${Date.now()}-${Math.random()}`
-    // 创建一个复制按钮 在makedown 渲染完成之后在插入
-    setTimeout(() => {
-      const copybutton = document.getElementById(uniqueId)
-      if (copybutton) {
-        copybutton.addEventListener('click', () => handleCopyClick(token.content))
-      }
-    })
-
-    return `
-    <div class="${langClass}">
-      <div class="top"> <div class="language">${token.info}</div><div class="copy-button" id="${uniqueId}">复制</div></div>
-      <pre class="hljs"><code><span class="line-numbers-rows">${lineNumbers}</span>${content}</code></pre>
-    </div>
-    `
-  }
   useUpdateEffect(() => {
     if (!textareaRef.current || afterContentSize == null) return
     textareaRef.current.resizableTextArea!.textArea.style.height = `${afterContentSize?.height + 3}px`
@@ -558,7 +533,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
               <div className="w-full h-full bg-[#F3F5F8] flex items-center justify-center overflow-hidden">
                 {/*  详情页 表单 */}
                 <div className="flex flex-col w-1/3 flex-grow h-full bg-[#fff]">
-                  <div className="w-full h-full flex flex-col justify-center items-center pb-6">
+                  <div className={`w-full h-full flex flex-col justify-center items-center ${hasSteps ? 'pb-3' : 'pb-6'}`}>
                     {/* 头部 */}
                     <header className="flex items-center w-full h-[72px] pl-4 border-b-[1px] border-[rgba(0,0,0,0.1)] cursor-pointer">
                       <img alt="" className="w-7 h-7 rounded-[6px] mx-[10px]" src={WritingData.currentCategory.icon} />
@@ -631,71 +606,91 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
                         立即生成 <span className="w-[102px] py-1 px-3 ml-3 rounded-[4px]">Ctrl + Enter</span>
                       </Button>
                     </div>
+                    {hasSteps && (
+                      <div className="w-full flex px-6 mt-3">
+                        <Steps
+                          size="small"
+                          current={currentStage}
+                          // onChange={changeStage}
+                          items={[
+                            {
+                              title: '生成大纲'
+                            },
+                            {
+                              title: '编辑大纲'
+                            },
+                            {
+                              title: '生成内容'
+                            }
+                          ]}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
                 {/* 右侧内容输出区域 */}
                 <div className="document-container flex flex-col w-2/3 flex-grow h-full">
                   {/* init */}
-
-                  <>
-                    {isInit ? (
-                      <div className="flex flex-col gap-[16px] size-full p-6 bg-[#F3F5F8]">
-                        <div className="relative w-full h-full flex flex-col flex-grow">
-                          <div className="absolute inset-0 size-full vh-center">
-                            <div className="flex items-center">
-                              <i className="iconfont icon-zuo !text-40 no-draw-arrow"></i>
-                              <span className="text-24 font-bold ml-[10px]">开始生成</span>
-                            </div>
-                          </div>
+                  <div
+                    className="flex flex-col gap-[16px] size-full p-6 bg-[#F3F5F8]"
+                    style={{
+                      display: isInit ? '' : 'none'
+                    }}
+                  >
+                    <div className="relative w-full h-full flex flex-col flex-grow">
+                      <div className="absolute inset-0 size-full vh-center">
+                        <div className="flex items-center">
+                          <i className="iconfont icon-zuo !text-40 no-draw-arrow"></i>
+                          <span className="text-24 font-bold ml-[10px]">开始生成</span>
                         </div>
                       </div>
-                    ) : (
-                      // 输出区域
-                      <>
-                        <div
-                          className="h-full w-full"
-                          style={{
-                            display: WritingData.currentCategory.categoryId === 33 ? '' : 'none'
-                          }}
-                        >
-                          <TinyMCEEditor ref={editorRef} />
-                        </div>
-                        <div
-                          style={{
-                            display: WritingData.currentCategory.categoryId === 33 ? 'none' : ''
-                          }}
-                          className="pl-6 py-6 pr-[18px] flex-grow overflow-y-scroll nw-scrollbar"
-                          id="prompt-content-wrap"
-                          ref={scrollBox}
-                        >
-                          {conversitionList &&
-                            conversitionList.length > 0 &&
-                            conversitionList.map((item, index) => {
-                              return (
-                                <div key={index} className="flex flex-col mb-4">
-                                  <div className="flex-1 bg-[#fff] flex flex-col text-[#222] text-15 leading-[22px] px-6 py-4">
-                                    <div
-                                      className="markdown-body text-15 leading-[26px]"
-                                      dangerouslySetInnerHTML={{
-                                        __html: md.render(
-                                          item.isLoading ? '<span class="loading loading-dots loading-xs"></span>' : item.content.endsWith('```') || item.content.match(/\B```\b[a-zA-Z]+\b(?!\s)/) ? item.content : item.content + `${currentUUID === item.UUID ? '<span class="gpt-cursor"></span>' : ''}`
-                                        )
-                                      }}
-                                    ></div>
-                                    <div className="flex items-center mt-[15px] pt-[15px] text-14 border-dashed border-t-[1px] border-[rgba(105,117,126,0.3)] justify-end">
-                                      <div onClick={() => handleCopyClick(item.content)} className="flex justify-center items-center w-[76px] h-[32px] text-[#0E6CF2] rounded-[4px] cursor-pointer border-[1px] border-[#0E6CF2] group hover:bg-[#0E6CF2] hover:text-[#fff] bg-[#fff]">
-                                        <i className="iconfont icon-icon_fuzhi !mr-[5px]"></i>
-                                        复制
-                                      </div>
-                                    </div>
+                    </div>
+                  </div>
+                  {/*  输出区域 */}
+                  {hasSteps ? (
+                    <div
+                      className="h-full w-full"
+                      style={{
+                        display: isInit ? 'none' : ''
+                      }}
+                    >
+                      <TinyMCEEditor ref={editorRef} />
+                    </div>
+                  ) : (
+                    <div
+                      className="pl-6 py-6 pr-[18px] flex-grow overflow-y-scroll nw-scrollbar"
+                      id="prompt-content-wrap"
+                      ref={scrollBox}
+                      style={{
+                        display: isInit ? 'none' : ''
+                      }}
+                    >
+                      {conversitionList &&
+                        conversitionList.length > 0 &&
+                        conversitionList.map((item, index) => {
+                          return (
+                            <div key={index} className="flex flex-col mb-4">
+                              <div className="flex-1 bg-[#fff] flex flex-col text-[#222] text-15 leading-[22px] px-6 py-4">
+                                <div
+                                  className="markdown-body text-15 leading-[26px]"
+                                  dangerouslySetInnerHTML={{
+                                    __html: renderMarkdown(
+                                      item.isLoading ? '<span class="loading loading-dots loading-xs"></span>' : item.content.endsWith('```') || item.content.match(/\B```\b[a-zA-Z]+\b(?!\s)/) ? item.content : item.content + `${currentUUID === item.UUID ? '<span class="gpt-cursor"></span>' : ''}`
+                                    )
+                                  }}
+                                ></div>
+                                <div className="flex items-center mt-[15px] pt-[15px] text-14 border-dashed border-t-[1px] border-[rgba(105,117,126,0.3)] justify-end">
+                                  <div onClick={() => handleCopyClick(item.content)} className="flex justify-center items-center w-[76px] h-[32px] text-[#0E6CF2] rounded-[4px] cursor-pointer border-[1px] border-[#0E6CF2] group hover:bg-[#0E6CF2] hover:text-[#fff] bg-[#fff]">
+                                    <i className="iconfont icon-icon_fuzhi !mr-[5px]"></i>
+                                    复制
                                   </div>
                                 </div>
-                              )
-                            })}
-                        </div>
-                      </>
-                    )}
-                  </>
+                              </div>
+                            </div>
+                          )
+                        })}
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
@@ -778,7 +773,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
                                   }}
                                   className="flex-1 flex p-[20px] flex-col w-full mt-[10px] border-[1px] border-[rgba(0,0,0,0.1)] rounded-[6px] whitespace-pre-wrap break-all text-15 leading-[26px]"
                                   dangerouslySetInnerHTML={{
-                                    __html: conversitionList && conversitionList.length > 0 ? md.render(conversitionList[0].content + `${currentUUID === conversitionList[0].UUID ? '<span class="gpt-cursor"></span>' : ''}`) : ''
+                                    __html: conversitionList && conversitionList.length > 0 ? renderMarkdown(conversitionList[0].content + `${currentUUID === conversitionList[0].UUID ? '<span class="gpt-cursor"></span>' : ''}`) : ''
                                   }}
                                 />
                                 <div className="mt-[18px]">

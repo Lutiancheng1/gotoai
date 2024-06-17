@@ -34,6 +34,7 @@
     "openai": "^4.29.2",
     "papaparse": "^5.4.1",
     "pdfjs-dist": "^4.1.392",
+    "quill": "^2.0.2",
     "radash": "^12.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

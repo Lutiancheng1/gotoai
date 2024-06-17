@@ -32,6 +32,7 @@ import CSVPreview from '@/components/Csv'
 import { handleCopyClick } from '@/components/Dialogue'
 import { getMessagesSuggested, sendChatMessage } from '@/api/knowledge'
 import { getQuesions } from '@/store/action/talkActions'
+import { renderMarkdown } from '@/components/MdRender/markdownRenderer'
 let conversation_id = ''
 type Props = {
   right?: number
@@ -346,71 +347,6 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
       setSendValue('')
     }
   }
-  // 定义markdown解析
-  const md: MarkdownIt = new MarkdownIt({
-    html: true,
-    linkify: true,
-    typographer: true,
-    highlight: (str, lang) => {
-      if (lang && hljs.getLanguage(lang)) {
-        try {
-          return `<pre class="hljs"><code>${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`
-        } catch (__) {}
-      }
-      return `<pre class="hljs"><code>${md.utils.escapeHtml(str)}</code></pre>`
-    }
-  }).use(imgLazyload)
-
-  // 保存原始的链接渲染函数
-  const defaultRender =
-    md.renderer.rules.link_open ||
-    function (tokens, idx, options, env, self) {
-      return self.renderToken(tokens, idx, options)
-    }
-  // 自定义链接渲染函数
-  md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
-    // 添加 target 和 rel 属性
-    tokens[idx].attrPush(['target', '_blank'])
-    tokens[idx].attrPush(['rel', 'noopener noreferrer'])
-
-    // 调用原始的链接渲染函数
-    return defaultRender(tokens, idx, options, env, self)
-  }
-  // 自定义图片渲染
-  md.renderer.rules.image = (tokens, idx) => {
-    const token = tokens[idx]
-    const src = token.attrGet('src')
-    const alt = token.attrGet('alt')
-    const title = token.attrGet('title')
-    return `<a href="${src}" target="_blank" class="img-preview"><img src="${src}" alt="${alt}" title="${title}" style="width: 300px; height: 300px;"/></a>`
-  }
-  md.renderer.rules.fence = (tokens, idx) => {
-    // 匹配 a标签  给a标签加上  target="_blank" rel="noopener noreferrer"属性
-    const token = tokens[idx]
-    const langClass = token.info ? `language-${token.info}` : ''
-    const lines = token.content.split('\n').slice(0, -1)
-    const lineNumbers = lines.map((line, i) => `<span>${i + 1}</span>`).join('\n')
-    const pure = hljs.highlight(token.content, { language: token.info || 'md', ignoreIllegals: true })
-    const hasCursor = pure.code?.includes('<span class="gpt-cursor"/>')
-    const pureCode = pure.code?.replace('<span class="gpt-cursor"/></span>', '')
-    const content = hljs.highlight(pureCode!, { language: token.info || 'md', ignoreIllegals: true }).value + `${hasCursor ? '<span class="gpt-cursor"/> ' : ''}`
-    // 为每个代码块创建一个唯一的ID
-    const uniqueId = `copy-button-${Date.now()}-${Math.random()}`
-    // 创建一个复制按钮 在makedown 渲染完成之后在插入
-    setTimeout(() => {
-      const copybutton = document.getElementById(uniqueId)
-      if (copybutton) {
-        copybutton.addEventListener('click', () => handleCopyClick(token.content))
-      }
-    })
-
-    return `
-    <div class="${langClass}">
-      <div class="top"> <div class="language">${token.info}</div><div class="copy-button" id="${uniqueId}">复制</div></div>
-      <pre class="hljs"><code><span class="line-numbers-rows">${lineNumbers}</span>${content}</code></pre>
-    </div>
-    `
-  }
   // 当尺寸变化时，滚动到底部
   useUpdateEffect(() => {
     if (currentMessageRef.current) {
@@ -461,7 +397,7 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
                     <div
                       className="markdown-body"
                       dangerouslySetInnerHTML={{
-                        __html: md.render(
+                        __html: renderMarkdown(
                           '您好，欢迎联系GotoAI, GotoAI为深圳市云展信息技术有限公司旗下AI解决方案产品和服务品牌，国内最早提供专业AI 解决方案的提供商，专注于AI战略咨询,AI解决方案设计,AI大语言模型私有化部署,AI大语言模型训练与微调,AIGC 应用定制开发,AI教育培训,AI 工作坊等AI技术服务领域，核心技术骨干来自Microsoft , AWS, Google全球AI领域顶级厂商的技术咨询和服务团队以及国内最早的AI技术社区的布道者，接下来我将为您提供关于GotoAI公司，团队，AI产品和解决方案技术服务相关的咨询，以及售后服务。'
                         )
                       }}
@@ -506,7 +442,7 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
                                 id={item.UUID}
                                 ref={index === conversitionDetailList.length - 1 ? currentMessageRef : null}
                                 dangerouslySetInnerHTML={{
-                                  __html: md.render(
+                                  __html: renderMarkdown(
                                     item.isLoading
                                       ? '<span class="loading loading-dots loading-xs"></span>'
                                       : item.files && item.files.length > 0

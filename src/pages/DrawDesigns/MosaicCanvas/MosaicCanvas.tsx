@@ -1,8 +1,6 @@
 import { Input, Modal, Tooltip } from 'antd'
 import { useRef, useEffect, FC, useState } from 'react'
 import './index.css'
-import TextArea from 'antd/es/input/TextArea'
-import { useUnmount, useUpdateEffect } from 'ahooks'
 import Loading from '@/components/loading'
 interface MosaicCanvasProps {
   imageUrl: string
