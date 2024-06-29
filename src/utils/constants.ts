@@ -7,15 +7,15 @@ export const menuConfig = [
     icon: 'icon-008duihuakuang-8',
     label: '对话'
   },
-  {
-    key: 'document',
-    icon: 'icon-wendang1',
-    label: '文档'
-  },
+  // {
+  //   key: 'document',
+  //   icon: 'icon-wendang1',
+  //   label: '文档'
+  // },
   {
     key: 'documents',
     icon: 'icon-duowendang',
-    label: '多文档'
+    label: '文档解读'
   },
   {
     key: 'code',
@@ -25,7 +25,7 @@ export const menuConfig = [
   {
     key: 'knowledgeBase',
     icon: 'icon-zhishiku',
-    label: '知识库'
+    label: '企业智脑'
   },
   {
     key: 'dataAnalysis',

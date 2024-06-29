@@ -62,9 +62,9 @@ export const createChat = createAsyncThunk('talk/createChat', async (params: New
  * @returns thunk
  */
 export const startChat = createAsyncThunk('talk/startChat', async (params: { menu: number; prompt: string; promptId: number; fileId?: string }, { dispatch }) => {
-  const res = (await http.post('/Chat/StartChat', params)) as { data: ShartChatResp }
+  const res = (await http.post('/Chat/StartChat', params)) as { code: number; data: ShartChatResp }
   console.log(res, 'startChat')
-  if (!res.data) return
+  if (res.code !== 0 && !res.data) return
   dispatch(updateCurrentId(res.data))
   return res.data
 })
@@ -84,11 +84,22 @@ export const getConversitionDetail = createAsyncThunk('talk/getConversitionDetai
  * @param {MessageInfo} params
  * @returns thunk
  */
-export const addMessages = createAsyncThunk('talk/addMessages', async (params: MessageInfo, { dispatch }) => {
+export const addMessages = createAsyncThunk('talk/addMessages', async (params: MessageInfo[], { dispatch }) => {
   const res = await http.post('/Chat/AddMessages', params)
   console.log(res, 'addMessages')
   if (!res.data) return
-  dispatch(updateConversitionDetailList(params))
+  return res.data
+})
+
+/**
+ * 更新会话标题
+ * @param {{ chatId: number; title: string; conversationId: string }} params - 包含 chatId（聊天ID），title（新标题），和 conversationId（会话ID）的对象
+ * @returns thunk - 返回一个异步 thunk 动作，用于更新会话标题
+ */
+export const updateChatTitle = createAsyncThunk('talk/updateChatTitle', async (params: { chatId: number; title: string; conversationId: string }) => {
+  const res = await http.post('/Chat/UpdateChatTitle', params)
+  console.log(res, 'updateChatTitle')
+  if (!res.data) return
   return res.data
 })
 

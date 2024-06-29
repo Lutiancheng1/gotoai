@@ -4,7 +4,8 @@ const archiver = require('archiver')
 const moment = require('moment')
 
 // 创建一个文件来输出压缩文件
-const output = fs.createWriteStream(`./build_${moment().format('YYYY-MM-DD HH_mm_ss')}.zip`)
+const output = fs.createWriteStream(`./WEB_build_${moment().format('YYYY-MM-DD HH_mm_ss')}.zip`)
+// @ts-ignore
 const archive = archiver('zip', {
   zlib: { level: 9 } // 设置压缩级别。
 })

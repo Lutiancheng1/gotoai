@@ -112,7 +112,6 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
   // 不使用 stream流 来发消息
   const sendBeta = async (defaultRule?: boolean, prompt?: UserPrompt) => {
     setQuesions([])
-    console.log(defaultRule, prompt, 'defaultRule', 'prompt')
     // defaultRule 为 true 代表是从 首页预设角色过来的 只需要 传递prompt提词 不用发送用户消息
     // 如果是新会话，则创建一个新的会话
     // 创建一个新的会话

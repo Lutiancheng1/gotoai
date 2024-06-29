@@ -5,9 +5,9 @@ import { menuWarp } from '@/utils/constants'
 import { getMenuPrologue } from '@/api/prologue'
 import { PrologueInfo } from '@/store/types'
 import { UserPrompt } from '@/pages/Talk'
-const titleWarp = {
+export const titleWarp = {
   2: '代码编程助手',
-  3: '知识库助手',
+  3: '企业智脑',
   4: '数据分析助手',
   6: '视频助手'
 } as {

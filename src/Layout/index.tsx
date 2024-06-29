@@ -30,11 +30,10 @@ import { useMount } from 'ahooks'
 const NotFound = React.lazy(() => import('@/pages/NotFound'))
 const Home = React.lazy(() => import('@/pages/Talk'))
 const Loading = React.lazy(() => import('@/pages/Loading'))
-const Document = React.lazy(() => import('@/pages/Document'))
 const Documents = React.lazy(() => import('@/pages/Documents'))
 const Code = React.lazy(() => import('@/pages/Code'))
 const KnowledgeBase = React.lazy(() => import('@/pages/KnowledgeBase'))
-const DataAnalysis = React.lazy(() => import('@/pages/DataAnalysis'))
+const DataAnalysis = React.lazy(() => import('@/pages/DataAnalysis_New'))
 const DrawDesigns = React.lazy(() => import('@/pages/DrawDesigns/index_new_1'))
 const VideoCreation = React.lazy(() => import('@/pages/Creation'))
 const Application = React.lazy(() => import('@/pages/Application'))
@@ -278,7 +277,7 @@ const Index = ({ loading }: Props) => {
             <Suspense fallback={<Loading />}>
               <Routes>
                 <Route path="/talk" element={<Home />} />
-                <Route path="/document" element={<Document />} />
+                {/* <Route path="/document" element={<Document />} /> */}
                 <Route path="/documents" element={<Documents />} />
                 <Route path="/code" element={<Code />} />
                 <Route path="/knowledgeBase" element={<KnowledgeBase />} />

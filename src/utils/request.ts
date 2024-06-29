@@ -1,12 +1,29 @@
 import Toast from '@/components/Toast'
-import { AnnotationReply, MessageEnd, MessageReplace, ThoughtItem, VisionFile } from '@/types/app'
-import { getDifyInfo, hasDifyInfo } from './storage'
+import {
+  AnnotationReply,
+  IterationFinishedResponse,
+  IterationNextedResponse,
+  IterationStartedResponse,
+  MessageEnd,
+  MessageReplace,
+  NodeFinishedResponse,
+  NodeStartedResponse,
+  TextChunkResponse,
+  TextReplaceResponse,
+  ThoughtItem,
+  VisionFile,
+  WorkflowFinishedResponse,
+  WorkflowStartedResponse
+} from '@/types/app'
 const TIME_OUT = 10000
 // const BASE_URL = getDifyInfo().apiUrl || 'http://admin.gotoai.world/v1'
-const BASE_URL = 'https://admin.gotoai.world/v1'
+// const BASE_URL = 'https://admin.gotoai.world/v1'
+// const BASE_URL = 'https://ai.megameta.cn/api'
+const BASE_URL = process.env.REACT_APP_KNOWLEDGE_BASE_URL // 知识库的请求地址
 
 // let token = hasDifyInfo() && getDifyInfo().apikey
-let token = 'app-kY76EflnhU20hspLVuOOLPGq'
+// let token = 'app-kY76EflnhU20hspLVuOOLPGq'
+let token = 'app-8V2dKSV2QgCqQCuI7RXOHgaE'
 const ContentType = {
   json: 'application/json',
   stream: 'text/event-stream',
@@ -42,8 +59,18 @@ export type IOnFile = (file: VisionFile) => void
 export type IOnMessageEnd = (messageEnd: MessageEnd) => void
 export type IOnMessageReplace = (messageReplace: MessageReplace) => void
 export type IOnAnnotationReply = (messageReplace: AnnotationReply) => void
-export type IOnCompleted = (hasError?: boolean) => void
+export type IOnCompleted = (hasError?: boolean, errorMessage?: string) => void
 export type IOnError = (msg: string, code?: string) => void
+
+export type IOnWorkflowStarted = (workflowStarted: WorkflowStartedResponse) => void
+export type IOnWorkflowFinished = (workflowFinished: WorkflowFinishedResponse) => void
+export type IOnNodeStarted = (nodeStarted: NodeStartedResponse) => void
+export type IOnNodeFinished = (nodeFinished: NodeFinishedResponse) => void
+export type IOnIterationStarted = (workflowStarted: IterationStartedResponse) => void
+export type IOnIterationNexted = (workflowStarted: IterationNextedResponse) => void
+export type IOnIterationFinished = (workflowFinished: IterationFinishedResponse) => void
+export type IOnTextChunk = (textChunk: TextChunkResponse) => void
+export type IOnTextReplace = (textReplace: TextReplaceResponse) => void
 
 type ResponseError = {
   code: string
@@ -51,11 +78,12 @@ type ResponseError = {
   status: number
 }
 
-type IOtherOptions = {
-  // isPublicAPI?: boolean
+export type IOtherOptions = {
+  isPublicAPI?: boolean
   bodyStringify?: boolean
   needAllResponseContent?: boolean
   deleteContentType?: boolean
+  silent?: boolean
   onData?: IOnData // for stream
   onThought?: IOnThought
   onFile?: IOnFile
@@ -64,6 +92,16 @@ type IOtherOptions = {
   onError?: IOnError
   onCompleted?: IOnCompleted // for stream
   getAbortController?: (abortController: AbortController) => void
+
+  onWorkflowStarted?: IOnWorkflowStarted
+  onWorkflowFinished?: IOnWorkflowFinished
+  onNodeStarted?: IOnNodeStarted
+  onNodeFinished?: IOnNodeFinished
+  onIterationStart?: IOnIterationStarted
+  onIterationNext?: IOnIterationNexted
+  onIterationFinish?: IOnIterationFinished
+  onTextChunk?: IOnTextChunk
+  onTextReplace?: IOnTextReplace
 }
 function unicodeToChar(text: string) {
   if (!text) return ''
@@ -80,7 +118,24 @@ export function format(text: string) {
   return res.replaceAll('\n', '<br/>').replaceAll('```', '')
 }
 
-const handleStream = (response: Response, onData: IOnData, onCompleted?: IOnCompleted, onThought?: IOnThought, onMessageEnd?: IOnMessageEnd, onMessageReplace?: IOnMessageReplace, onFile?: IOnFile) => {
+const handleStream = (
+  response: Response,
+  onData: IOnData,
+  onCompleted?: IOnCompleted,
+  onThought?: IOnThought,
+  onMessageEnd?: IOnMessageEnd,
+  onMessageReplace?: IOnMessageReplace,
+  onFile?: IOnFile,
+  onWorkflowStarted?: IOnWorkflowStarted,
+  onWorkflowFinished?: IOnWorkflowFinished,
+  onNodeStarted?: IOnNodeStarted,
+  onNodeFinished?: IOnNodeFinished,
+  onIterationStart?: IOnIterationStarted,
+  onIterationNext?: IOnIterationNexted,
+  onIterationFinish?: IOnIterationFinished,
+  onTextChunk?: IOnTextChunk,
+  onTextReplace?: IOnTextReplace
+) => {
   if (!response.ok) throw new Error('Network response was not ok')
 
   const reader = response.body?.getReader()
@@ -119,7 +174,7 @@ const handleStream = (response: Response, onData: IOnData, onCompleted?: IOnComp
                 errorCode: bufferObj?.code
               })
               hasError = true
-              onCompleted?.(true)
+              onCompleted?.(true, bufferObj?.message)
               return
             }
             if (bufferObj.event === 'message' || bufferObj.event === 'agent_message') {
@@ -138,6 +193,24 @@ const handleStream = (response: Response, onData: IOnData, onCompleted?: IOnComp
               onMessageEnd?.(bufferObj as MessageEnd)
             } else if (bufferObj.event === 'message_replace') {
               onMessageReplace?.(bufferObj as MessageReplace)
+            } else if (bufferObj.event === 'workflow_started') {
+              onWorkflowStarted?.(bufferObj as WorkflowStartedResponse)
+            } else if (bufferObj.event === 'workflow_finished') {
+              onWorkflowFinished?.(bufferObj as WorkflowFinishedResponse)
+            } else if (bufferObj.event === 'node_started') {
+              onNodeStarted?.(bufferObj as NodeStartedResponse)
+            } else if (bufferObj.event === 'node_finished') {
+              onNodeFinished?.(bufferObj as NodeFinishedResponse)
+            } else if (bufferObj.event === 'iteration_started') {
+              onIterationStart?.(bufferObj as IterationStartedResponse)
+            } else if (bufferObj.event === 'iteration_next') {
+              onIterationNext?.(bufferObj as IterationNextedResponse)
+            } else if (bufferObj.event === 'iteration_completed') {
+              onIterationFinish?.(bufferObj as IterationFinishedResponse)
+            } else if (bufferObj.event === 'text_chunk') {
+              onTextChunk?.(bufferObj as TextChunkResponse)
+            } else if (bufferObj.event === 'text_replace') {
+              onTextReplace?.(bufferObj as TextReplaceResponse)
             }
           }
         })
@@ -149,7 +222,7 @@ const handleStream = (response: Response, onData: IOnData, onCompleted?: IOnComp
           errorMessage: `${e}`
         })
         hasError = true
-        onCompleted?.(true)
+        onCompleted?.(true, e as string)
         return
       }
       if (!hasError) read()
@@ -157,6 +230,7 @@ const handleStream = (response: Response, onData: IOnData, onCompleted?: IOnComp
   }
   read()
 }
+
 const baseFetch = <T>(url: string, fetchOptions: FetchOptionType, { bodyStringify = true, needAllResponseContent, deleteContentType, getAbortController }: IOtherOptions): Promise<T> => {
   const options: typeof baseOptions & FetchOptionType = Object.assign({}, baseOptions, fetchOptions)
   if (getAbortController) {
@@ -164,9 +238,7 @@ const baseFetch = <T>(url: string, fetchOptions: FetchOptionType, { bodyStringif
     getAbortController(abortController)
     options.signal = abortController.signal
   }
-  if (hasDifyInfo()) {
-    options.headers.set('Authorization', `Bearer ${token}`)
-  }
+  options.headers.set('Authorization', `Bearer ${token}`)
 
   if (deleteContentType) {
     options.headers.delete('Content-Type')
@@ -279,7 +351,11 @@ export const upload = (options: any, url?: string, searchParams?: string): Promi
     xhr.send(options.data)
   })
 }
-export const ssePost = (url: string, fetchOptions: FetchOptionType, { onData, onCompleted, onThought, onFile, onMessageEnd, onMessageReplace, onError, getAbortController }: IOtherOptions) => {
+export const ssePost = (
+  url: string,
+  fetchOptions: FetchOptionType,
+  { onData, onCompleted, onThought, onFile, onMessageEnd, onMessageReplace, onWorkflowStarted, onWorkflowFinished, onNodeStarted, onNodeFinished, onIterationStart, onIterationNext, onIterationFinish, onTextChunk, onTextReplace, onError, getAbortController }: IOtherOptions
+) => {
   const abortController = new AbortController()
 
   const options = Object.assign(
@@ -327,7 +403,16 @@ export const ssePost = (url: string, fetchOptions: FetchOptionType, { onData, on
         onThought,
         onMessageEnd,
         onMessageReplace,
-        onFile
+        onFile,
+        onWorkflowStarted,
+        onWorkflowFinished,
+        onNodeStarted,
+        onNodeFinished,
+        onIterationStart,
+        onIterationNext,
+        onIterationFinish,
+        onTextChunk,
+        onTextReplace
       )
     })
     .catch((e) => {

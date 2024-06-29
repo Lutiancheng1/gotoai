@@ -92,6 +92,12 @@ const talkSlice = createSlice({
     //切换是否是新对话
     toggleIsNewChat(state, { payload }: PayloadAction<boolean>) {
       state.isNewChat = payload
+      if (payload) {
+        state.currentConversation = {
+          conversationId: '',
+          chatId: 0
+        }
+      }
     },
     // 保存列表历史记录 覆盖
     saveHistoryList(state, { payload }: PayloadAction<HistoryState>) {
