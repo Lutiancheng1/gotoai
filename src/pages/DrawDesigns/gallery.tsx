@@ -90,7 +90,7 @@ const Gallery: React.FC<GalleryProps> = ({ itemClick }) => {
     })
   }
   return (
-    <div className="gallery w-full h-auto min-h-[100%] overflow-scroll mt-3 px-3 pb-3">
+    <div className="gallery w-full h-auto overflow-scroll mt-3 px-3 pb-3">
       <Input width={'100%'} className="mb-3 rounded-full" value={searchValue} onChange={(e) => handleSearch(e.target.value)} suffix={<SearchOutlined />} allowClear placeholder="搜索prompt提示或关键词" variant="filled" />
       {!imageList && <Loading />}
       {imageList && imageList.length === 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
