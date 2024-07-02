@@ -1,6 +1,26 @@
 //  知识库 Dify API
 import { ChatPromptConfig, CompletionPromptConfig, ModelModeType } from '@/types/app'
-import { get, IOnCompleted, IOnData, IOnError, IOnFile, IOnIterationNexted, IOnIterationStarted, IOnMessageEnd, IOnMessageReplace, IOnNodeFinished, IOnNodeStarted, IOnTextChunk, IOnTextReplace, IOnThought, IOnWorkflowFinished, IOnWorkflowStarted, post, ssePost } from '@/utils/request'
+import {
+  get,
+  IOnCompleted,
+  IOnData,
+  IOnError,
+  IOnFile,
+  IOnIterationFinished,
+  IOnIterationNexted,
+  IOnIterationStarted,
+  IOnMessageEnd,
+  IOnMessageReplace,
+  IOnNodeFinished,
+  IOnNodeStarted,
+  IOnTextChunk,
+  IOnTextReplace,
+  IOnThought,
+  IOnWorkflowFinished,
+  IOnWorkflowStarted,
+  post,
+  ssePost
+} from '@/utils/request'
 export type AutomaticRes = {
   prompt: string
   variables: string[]
@@ -146,8 +166,10 @@ export const sendChatMessage = async (
     onError,
     getAbortController,
     onMessageEnd,
-    onMessageReplace
-  }: {
+    onMessageReplace,
+    onWorkflowStarted,
+    onWorkflowFinished
+  }: Partial<{
     onData: IOnData
     onCompleted: IOnCompleted
     onFile: IOnFile
@@ -155,8 +177,10 @@ export const sendChatMessage = async (
     onMessageEnd: IOnMessageEnd
     onMessageReplace: IOnMessageReplace
     onError: IOnError
+    onWorkflowStarted?: IOnWorkflowStarted
+    onWorkflowFinished?: IOnWorkflowFinished
     getAbortController?: (abortController: AbortController) => void
-  }
+  }>
 ) => {
   return ssePost(
     `/chat-messages`,
@@ -166,7 +190,7 @@ export const sendChatMessage = async (
         response_mode: 'streaming'
       }
     },
-    { onData, onCompleted, onThought, onFile, onError, getAbortController, onMessageEnd, onMessageReplace }
+    { onData, onCompleted, onThought, onFile, onError, getAbortController, onMessageEnd, onMessageReplace, onWorkflowStarted, onWorkflowFinished }
   ) as void | Promise<ChunkChatCompletionResponse>
 }
 
@@ -220,7 +244,7 @@ export const runWorkflow = async (
     onNodeFinished: IOnNodeFinished
     onIterationStart: IOnIterationStarted
     onIterationNext: IOnIterationNexted
-    onIterationFinish: IOnNodeFinished
+    onIterationFinish: IOnIterationFinished
     onTextChunk: IOnTextChunk
     onTextReplace: IOnTextReplace
     getAbortController?: (abortController: AbortController) => void
@@ -234,6 +258,6 @@ export const runWorkflow = async (
         response_mode: 'streaming'
       }
     },
-    { onData, onCompleted, onThought, onFile, onError, getAbortController, onMessageEnd, onMessageReplace, onWorkflowStarted, onWorkflowFinished, onNodeStarted, onNodeFinished, onIterationStart, onIterationNext, onTextChunk, onTextReplace }
+    { onData, onCompleted, onThought, onFile, onError, getAbortController, onMessageEnd, onMessageReplace, onWorkflowStarted, onWorkflowFinished, onNodeStarted, onNodeFinished, onIterationFinish, onIterationStart, onIterationNext, onTextChunk, onTextReplace }
   ) as void | Promise<ChunkChatCompletionResponse>
 }

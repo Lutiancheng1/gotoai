@@ -33,6 +33,11 @@ export const menuConfig = [
     label: '数据分析'
   },
   {
+    key: 'dataAnalysis1',
+    icon: 'icon-shujufenxi1',
+    label: '数据分析1'
+  },
+  {
     key: 'drawDesigns',
     icon: 'icon-hf_zxphuatu',
     label: '图像创作'
@@ -96,6 +101,7 @@ export const menuWarp = {
   '/code': 2,
   '/knowledgeBase': 3,
   '/dataAnalysis': 4,
+  '/dataAnalysis1':4,
   '/drawDesigns': 5,
   '/video': 6,
   '/application': 7,

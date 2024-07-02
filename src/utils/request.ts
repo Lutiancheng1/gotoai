@@ -23,7 +23,8 @@ const BASE_URL = process.env.REACT_APP_KNOWLEDGE_BASE_URL // 知识库的请求�
 
 // let token = hasDifyInfo() && getDifyInfo().apikey
 // let token = 'app-kY76EflnhU20hspLVuOOLPGq'
-let token = 'app-8V2dKSV2QgCqQCuI7RXOHgaE'
+// let token = 'app-8V2dKSV2QgCqQCuI7RXOHgaE' //workflow的key
+let token = 'app-72RaK2u6tjpzqBaFsLgQALm2'
 const ContentType = {
   json: 'application/json',
   stream: 'text/event-stream',

@@ -238,6 +238,8 @@ export type WorkflowStartedResponse = {
 export type WorkflowFinishedResponse = {
   task_id: string
   workflow_run_id: string
+  conversation_id: string
+  message_id: string
   event: string
   data: {
     id: string

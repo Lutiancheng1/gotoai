@@ -34,6 +34,7 @@ const Documents = React.lazy(() => import('@/pages/Documents'))
 const Code = React.lazy(() => import('@/pages/Code'))
 const KnowledgeBase = React.lazy(() => import('@/pages/KnowledgeBase'))
 const DataAnalysis = React.lazy(() => import('@/pages/DataAnalysis_New'))
+const DataAnalysis1 = React.lazy(() => import('@/pages/DataAnalysis_New_1'))
 const DrawDesigns = React.lazy(() => import('@/pages/DrawDesigns/index_new_1'))
 const VideoCreation = React.lazy(() => import('@/pages/Creation'))
 const Application = React.lazy(() => import('@/pages/Application'))
@@ -282,6 +283,7 @@ const Index = ({ loading }: Props) => {
                 <Route path="/code" element={<Code />} />
                 <Route path="/knowledgeBase" element={<KnowledgeBase />} />
                 <Route path="/dataAnalysis" element={<DataAnalysis />} />
+                <Route path="/dataAnalysis1" element={<DataAnalysis1 />} />
                 <Route path="/drawDesigns" element={<DrawDesigns />} />
                 <Route path="/videoCreation" element={<VideoCreation />} />
                 <Route path="/application" element={<Application />} />
