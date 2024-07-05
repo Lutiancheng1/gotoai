@@ -32,6 +32,173 @@ let currentConversation = {
   conversationId: '',
   chatId: 0
 }
+
+interface TableOfContentsItem {
+  chapter?: number
+  title: string
+  subsections: {
+    title: string
+    content?: string
+  }[]
+  content?: string
+}
+
+interface JsonInput {
+  title: string
+  subtitle?: string
+  table_of_contents: TableOfContentsItem[]
+}
+
+export function jsonToMarkdown(json: JsonInput): string {
+  let markdown = `# ${json.title}\n`
+  if (json.subtitle) {
+    markdown += `## ${json.subtitle}\n`
+  }
+  json.table_of_contents.forEach((item) => {
+    if (item.chapter) {
+      markdown += `\n### ${item.chapter} ${item.title}\n`
+      item.subsections.forEach((subsection) => {
+        markdown += `#### ${subsection.title}\n`
+        if (subsection.content) {
+          markdown += `${subsection.content}\n`
+        }
+      })
+    }
+    if (item.content) {
+      markdown += `${item.content}\n`
+    }
+  })
+
+  return renderMarkdown(markdown)
+}
+export function jsonToText(json: JsonInput): string {
+  let text = `${json.title}\n`
+  if (json.subtitle) {
+    text += `${json.subtitle}\n`
+  }
+  json.table_of_contents.forEach((item) => {
+    if (item.chapter) {
+      text += `\n${item.chapter} ${item.title}\n`
+      item.subsections.forEach((subsection) => {
+        text += `${subsection.title}\n`
+        if (subsection.content) {
+          text += `${subsection.content}\n`
+        }
+      })
+    }
+    if (item.content) {
+      text += `${item.content}\n`
+    }
+  })
+
+  return text
+}
+export function htmlToJson(html: string): JsonInput {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(html, 'text/html')
+
+  const title = doc.querySelector('h1')?.textContent || ''
+  const subtitle = doc.querySelector('h2')?.textContent || ''
+
+  const tableOfContents: TableOfContentsItem[] = []
+  const chapters = doc.querySelectorAll('h3')
+
+  chapters.forEach((chapter) => {
+    const chapterText = chapter.textContent || ''
+    const chapterMatch = chapterText.match(/^(\d+)\s+(.*)$/)
+    const chapterNumber = chapterMatch ? parseInt(chapterMatch[1], 10) : undefined
+    const chapterTitle = chapterMatch ? chapterMatch[2] : chapterText
+
+    const subsections: { title: string; content?: string }[] = []
+    let nextElement = chapter.nextElementSibling
+
+    while (nextElement && nextElement.tagName === 'H4') {
+      const subsectionTitle = nextElement.textContent || ''
+      let subsectionContent: string | undefined = undefined
+
+      nextElement = nextElement.nextElementSibling
+      const contentParts: string[] = []
+
+      while (nextElement && nextElement.tagName === 'P') {
+        contentParts.push(nextElement.textContent || '')
+        nextElement = nextElement.nextElementSibling
+      }
+
+      if (contentParts.length > 0) {
+        subsectionContent = contentParts.join('\n')
+      }
+
+      subsections.push({
+        title: subsectionTitle,
+        content: subsectionContent
+      })
+    }
+
+    const contentParts: string[] = []
+    while (nextElement && nextElement.tagName === 'P') {
+      contentParts.push(nextElement.textContent || '')
+      nextElement = nextElement.nextElementSibling
+    }
+
+    tableOfContents.push({
+      chapter: chapterNumber,
+      title: chapterTitle,
+      subsections: subsections,
+      content: contentParts.length > 0 ? contentParts.join('\n') : undefined
+    })
+  })
+
+  return {
+    title: title,
+    subtitle: subtitle,
+    table_of_contents: tableOfContents
+  }
+}
+
+async function fillContent(query: string, onUpdate: (content: string) => void): Promise<string> {
+  let T = ''
+  try {
+    const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+    await fetchEventSource(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+        Authorization: `Bearer ${getTokenInfo().token}`
+      },
+      body: JSON.stringify({
+        conversationId: currentConversation!.conversationId,
+        menu: 10,
+        query: query,
+        inputs: {}
+      }),
+      onmessage(msg) {
+        // 接收一次数据段时回调，因为是流式返回，所以这个回调会被调用多次
+        if (msg.event === 'message') {
+          // 处理数据段
+          let { message } = JSON.parse(msg.data) as unknown as AddChatMessagesData
+          T += message
+          // 调用回调函数更新内容
+          onUpdate(T)
+        }
+      },
+      onerror(err) {
+        // 连接出现异常回调
+        // 必须抛出错误才会停止
+        throw err
+      }
+    })
+  } catch (err) {
+    Toast.notify({
+      type: 'error',
+      message: '网络错误'
+    })
+    console.error('Fetch error:', err)
+  }
+  return T
+}
+
 const WritingDetail: React.FC<WritingDetailProps> = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -57,15 +224,15 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
   const textareaRef = useRef<TextAreaRef>(null)
   const afterContentRef = useRef<HTMLDivElement>(null)
   const afterContentSize = useSize(afterContentRef)
-  const editorContent = useRef('')
+  // const editorContent = useRef('')
   //  是否有步骤条
   const [hasSteps, setHasSteps] = useState(false)
   // 当前阶段
   const [currentStage, setCurrentStage] = useState(0)
-
+  // json格式的大纲 json大纲
+  const jsonOutline = useRef<JsonInput | null>(null)
   const changeStage = (stage: number) => {
     setCurrentStage(stage)
-    editorContent.current = ''
   }
   useEffect(() => {
     if (WritingData.currentCategory.categoryId === 33) {
@@ -74,7 +241,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
       setHasSteps(false)
     }
   }, [WritingData.currentCategory])
-  const editorRef = useRef<{ setContent: (content: string) => {}; getContent: () => string }>(null)
+  const editorRef = useRef<{ setContent: (content: string) => {}; getContent: () => string; getFormatContent: () => string }>(null)
   const onBack = () => {
     navigate('/writing')
   }
@@ -90,7 +257,6 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
       chatId: 0
     }
     setCurrentStage(0)
-    editorContent.current = ''
     editorRef.current?.setContent('')
     if (WritingData && WritingData.currentCategory && form) {
       setTimeout(() => {
@@ -130,19 +296,20 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
       onOk() {
         form.resetFields()
         setCurrentFile(undefined)
+        setCurrentStage(0)
       }
     })
   }
   // 保存
   const onSubmit = async () => {
     if (loading) return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
-    if (currentStage === 1) {
-      changeStage(2)
-    }
-    if (currentStage === 2) {
-      changeStage(0)
-      editorContent.current = ''
-    }
+    // if (currentStage === 1) {
+    //   changeStage(2)
+    // }
+    // if (currentStage === 2) {
+    //   changeStage(0)
+    //   editorContent.current = ''
+    // }
     const values = form.getFieldsValue()
     // 遍历 values 对象
     for (let key in values) {
@@ -195,93 +362,170 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
       ]
     })
     if (sse) {
-      const newController = new AbortController()
-      setController(newController)
-      const signal = newController.signal
-      try {
-        const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
-        fetchEventSource(url, {
-          method: 'POST',
-          signal: signal,
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache',
-            Connection: 'keep-alive',
-            Authorization: `Bearer ${getTokenInfo().token}`
-          },
-          body: JSON.stringify({
-            conversationId: currentConversation!.conversationId,
-            menu: 10,
-            query:
-              currentStage !== 1
-                ? !hasSteps
-                  ? ''
-                  : `帮我根据${WritingData.currentCategory.nickname} 和 ${WritingData.currentCategory.list.map((item) => {
-                      const formValues = form.getFieldsValue() as { [key: string]: string }
-                      const formValue = formValues[item.input_name]
-                      if (!formValue) return ''
-                      return `${item.title}: ${formValue}`
-                    })}生成一个目录大纲,,需要大纲标题`
-                : `帮我根据大纲生成一篇标题为${WritingData.currentCategory.nickname}的word文档,大纲内容为:` + editorRef.current?.getContent(),
-            inputs: transformObject(form.getFieldsValue())
-          }),
-          onopen(response) {
-            // 建立连接的回调
-            editorRef.current?.setContent('')
-            return Promise.resolve()
-          },
-          onmessage(msg) {
-            // 接收一次数据段时回调，因为是流式返回，所以这个回调会被调用多次
-            if (msg.event === 'message') {
-              // 处理数据段
-              let { message, files } = JSON.parse(msg.data) as unknown as AddChatMessagesData
-              if (hasSteps) {
-                editorContent.current += message
-                console.log(renderMarkdown(editorContent.current, false))
-                editorRef.current?.setContent(renderMarkdown(editorContent.current, false))
+      // 如果有步骤条 说明是生成大纲或者生成内容
+      if (hasSteps) {
+        if (currentStage === 0) {
+          //  生成大纲
+          try {
+            const { payload } = (await dispatch(
+              addChatMessages({
+                conversationId: currentConversation!.conversationId,
+                menu: currentMenuKey,
+                query: `帮我根据标题${WritingData.currentCategory.nickname} 和 ${WritingData.currentCategory.list.map((item) => {
+                  const formValues = form.getFieldsValue() as { [key: string]: string }
+                  const formValue = formValues[item.input_name]
+                  if (!formValue) return ''
+                  return `${item.title}: ${formValue}`
+                })}生成一个目录大纲,请直接返回json数据的大纲文本，不要包含任何Markdown语法。格式为{"title": "xxx","subtitle": "xxx","table_of_contents": [{"chapter": 1,"title": "xxx","subsections": [{"title":"1.1 xxx"},...],...]。`,
+                inputs: transformObject(form.getFieldsValue())
+              })
+            )) as { payload: AddChatMessagesData }
+            if (payload) {
+              let { message, files } = payload
+              if (files.length > 0) {
+                message += '</p><p>'
+                message += files
+                  .map((file) => {
+                    const isImage = file.type ? /(image|jpeg|jpg|gif|png)$/.test(file.type) : file.url.endsWith('.gif') || file.url.endsWith('.png') || file.url.endsWith('.jpg') || file.url.endsWith('.jpeg')
+                    return isImage ? `![图片](${file.url})` : `[文件](${file.url})`
+                  })
+                  .join('\n\n')
               }
               setConversitionList((prev) => {
                 return prev?.map((item) => {
                   if (item.UUID === uuid) {
                     return {
                       ...item,
-                      content: item.content + message,
+                      content: message,
                       isLoading: false
                     }
                   }
                   return item
                 }) as MessageInfo[]
               })
-
-              // 进行连接正常的操作
-            } else if (msg.event === 'message_end') {
+              // eslint-disable-next-line no-useless-escape
+              message = message.replace(/\`\`\`json\n|\n\`\`\`/g, '')
+              // 赋值编辑器内容
+              editorRef.current?.setContent(jsonToMarkdown(JSON.parse(message) as JsonInput))
+              // 保存json大纲
+              jsonOutline.current = JSON.parse(message) as JsonInput
+              changeStage(1)
               setLoading(false)
-              newController.abort()
-              setCurrentUUID('')
-              dispatch(getHistoryList())
-              if (hasSteps && currentStage !== 1 && editorRef.current?.getContent().trim()) {
-                changeStage(1)
+            } else {
+              setLoading(false)
+              setConversitionList((prev) => {
+                return prev?.map((item) => {
+                  if (item.UUID === uuid) {
+                    return {
+                      ...item,
+                      content: '出错了',
+                      isLoading: false
+                    }
+                  }
+                  return item
+                }) as MessageInfo[]
+              })
+              return Toast.notify({ type: 'error', message: '出错了' })
+            }
+          } catch (error) {
+            setLoading(false)
+            Toast.notify({
+              type: 'error',
+              message: '出错了'
+            })
+          }
+        } else if (currentStage === 1) {
+          if (!jsonOutline.current) return
+          setCurrentStage(2)
+          // 根据段落生成内容
+          // 循环调用
+          const outlineCopy = JSON.parse(JSON.stringify(jsonOutline.current)) as JsonInput
+          // 遍历每个章节
+          for (const chapter of outlineCopy.table_of_contents) {
+            // 遍历每个小节
+            for (const subsection of chapter.subsections) {
+              if (!subsection.content) {
+                // 生成小节内容
+                subsection.content = await fillContent(`帮我根据大纲为${jsonToText(jsonOutline.current!)}去编写填充${subsection.title}这小节的内容。格式为改小节的纯文本内容,不需要重复返回类似${subsection.title}这种的小节标题。`, (content) => {
+                  subsection.content = content
+                  editorRef.current?.setContent(jsonToMarkdown(outlineCopy))
+                })
               }
             }
-          },
-          onclose() {
-            // 正常结束的回调
-            newController.abort() // 关闭连接
-            setLoading(false)
-          },
-          onerror(err) {
-            // 连接出现异常回调
-            // 必须抛出错误才会停止
-            throw err
           }
-        })
-      } catch (err) {
-        setLoading(false)
-        Toast.notify({
-          type: 'error',
-          message: '网络错误'
-        })
-        console.error('Fetch error:', err)
+          setLoading(false)
+        }
+      } else {
+        const newController = new AbortController()
+        setController(newController)
+        const signal = newController.signal
+        try {
+          const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+          fetchEventSource(url, {
+            method: 'POST',
+            signal: signal,
+            headers: {
+              'Content-Type': 'application/json',
+              'Cache-Control': 'no-cache',
+              Connection: 'keep-alive',
+              Authorization: `Bearer ${getTokenInfo().token}`
+            },
+            body: JSON.stringify({
+              conversationId: currentConversation!.conversationId,
+              menu: 10,
+              query: '',
+              inputs: transformObject(form.getFieldsValue())
+            }),
+            onopen(response) {
+              // 建立连接的回调
+              editorRef.current?.setContent('')
+              return Promise.resolve()
+            },
+            onmessage(msg) {
+              // 接收一次数据段时回调，因为是流式返回，所以这个回调会被调用多次
+              if (msg.event === 'message') {
+                // 处理数据段
+                let { message, files } = JSON.parse(msg.data) as unknown as AddChatMessagesData
+                setConversitionList((prev) => {
+                  return prev?.map((item) => {
+                    if (item.UUID === uuid) {
+                      return {
+                        ...item,
+                        content: item.content + message,
+                        isLoading: false
+                      }
+                    }
+                    return item
+                  }) as MessageInfo[]
+                })
+
+                // 进行连接正常的操作
+              } else if (msg.event === 'message_end') {
+                setLoading(false)
+                newController.abort()
+                setCurrentUUID('')
+                dispatch(getHistoryList())
+              }
+            },
+            onclose() {
+              // 正常结束的回调
+              newController.abort() // 关闭连接
+              setLoading(false)
+            },
+            onerror(err) {
+              // 连接出现异常回调
+              // 必须抛出错误才会停止
+              throw err
+            }
+          })
+        } catch (err) {
+          setLoading(false)
+          Toast.notify({
+            type: 'error',
+            message: '网络错误'
+          })
+          console.error('Fetch error:', err)
+        }
       }
     } else {
       try {
@@ -417,6 +661,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
     }
     getData()
   }, [robotId])
+
   useUnmount(() => {
     dispatch(initCurrentCategory())
     rest()
@@ -654,7 +899,15 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
                         display: isInit ? 'none' : ''
                       }}
                     >
-                      <TinyMCEEditor ref={editorRef} />
+                      <TinyMCEEditor
+                        onChange={(content) => {
+                          if (content && currentStage === 1) {
+                            jsonOutline.current = htmlToJson(content)
+                            console.log(jsonOutline.current, 'jsonOutline')
+                          }
+                        }}
+                        ref={editorRef}
+                      />
                     </div>
                   ) : (
                     <div

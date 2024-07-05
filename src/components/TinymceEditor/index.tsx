@@ -5,8 +5,14 @@ import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import Loading from '../loading'
 import { handleCopyClick } from '../Dialogue'
 import '@/components/MdRender/md.css'
-type TinyMCEEditorProps = {}
-const TinyMCEEditor = forwardRef((props: TinyMCEEditorProps, ref) => {
+import { asBlob } from 'html-docx-js-typescript'
+import { saveAs } from 'file-saver'
+import dayjs from 'dayjs'
+import Toast from '../Toast'
+type TinyMCEEditorProps = {
+  onChange?: (content: string) => void
+}
+const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
   const editorRef = useRef<TinyMCEEditorInstance | null>(null)
   const [loading, setLoading] = useState(true) // 加载状态
   useImperativeHandle(ref, () => ({
@@ -17,13 +23,21 @@ const TinyMCEEditor = forwardRef((props: TinyMCEEditorProps, ref) => {
     },
     getContent: () => {
       if (editorRef.current) {
+        return editorRef.current.getContent()
+      }
+      return ''
+    },
+    getFormatContent: () => {
+      if (editorRef.current) {
         return editorRef.current.getContent({ format: 'text' })
       }
       return ''
     }
   }))
 
-  const handleEditorChange = ({ content, editor }: { content: string; editor: TinyMCEEditorInstance }) => {}
+  const handleEditorChange = ({ content, editor }: { content: string; editor: TinyMCEEditorInstance }) => {
+    onChange && onChange(content)
+  }
 
   return (
     <div className="editor-container h-full relative">
@@ -61,9 +75,35 @@ const TinyMCEEditor = forwardRef((props: TinyMCEEditorProps, ref) => {
                 handleCopyClick(content)
               }
             })
+            editor.ui.registry.addButton('downWord', {
+              icon: 'save',
+              tooltip: '保存文档',
+              onAction: async function () {
+                const content = editor.getContent()
+                console.log(content)
+
+                if (!content) return
+                try {
+                  const docxBuffer = await asBlob(content)
+                  const docxBlob = new Blob([docxBuffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+                  const match = content.match(/<h1>(.*?)<\/h1>/)?.[1]
+                  const fileName = match ? match : 'document' // 如果没有匹配到，则使用 '默认文件名'
+                  saveAs(docxBlob, `${fileName} _${dayjs().format('YYYY-MM-DD')}.docx`)
+                  Toast.notify({
+                    type: 'success',
+                    message: '文档保存成功'
+                  })
+                } catch (error) {
+                  Toast.notify({
+                    type: 'error',
+                    message: '文档保存失败'
+                  })
+                }
+              }
+            })
           },
           plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons accordion',
-          toolbar: 'undo redo | blocks fontsizeinput | copyContent underline strikethrough image link | align numlist bullist | table media emoticonsss | lineheight outdent indent| removeformat | charmap | code fullscreen preview | save print | pagebreak anchor codesample | ltr rtl ',
+          toolbar: 'undo redo | blocks fontsizeinput | copyContent downWord underline strikethrough image link | align numlist bullist | table media emoticonsss | lineheight outdent indent| removeformat | charmap | code fullscreen preview | save print | pagebreak anchor codesample | ltr rtl ',
           removed_menuitems: 'newdocument',
           content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
           formats: {

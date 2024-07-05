@@ -35,7 +35,6 @@ import PDFViewer from '../PDFViewer'
 import CSVPreview from '../Csv'
 import { formatFileSize, formatFileType } from '@/utils/format'
 import { renderMarkdown } from '../MdRender/markdownRenderer'
-import { JsonToTable } from 'react-json-to-table'
 import { runWorkflow, sendChatMessage } from '@/api/knowledge'
 // 定义一个文件信息的类型
 export type FileInfo = {
@@ -763,27 +762,22 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                         </div>
 
                         <div className="chat-bubble answer">
-                          {currentMenuKey.current === 4 && !sse ? (
-                            <JsonToTable json={JSON.parse(item.content)} />
-                          ) : (
-                            <div
-                              className="markdown-body"
-                              id={item.UUID}
-                              ref={index === conversitionDetailList.length - 1 ? currentMessageRef : null}
-                              dangerouslySetInnerHTML={{
-                                __html: renderMarkdown(
-                                  item.isLoading
-                                    ? '<span class="loading loading-dots loading-xs"></span>'
-                                    : item.files && item.files.length > 0
-                                    ? item.content + '\n\n' + item.files.map((file) => (file.mimetype?.startsWith('image') ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
-                                    : item.content.endsWith('```') || item.content.match(/\B```\b[a-zA-Z]+\b(?!\s)/)
-                                    ? item.content
-                                    : item.content + `${currentUUID === item.UUID ? '<span class="gpt-cursor"></span>' : ''}`
-                                )
-                              }}
-                            ></div>
-                          )}
-
+                          <div
+                            className="markdown-body"
+                            id={item.UUID}
+                            ref={index === conversitionDetailList.length - 1 ? currentMessageRef : null}
+                            dangerouslySetInnerHTML={{
+                              __html: renderMarkdown(
+                                item.isLoading
+                                  ? '<span class="loading loading-dots loading-xs"></span>'
+                                  : item.files && item.files.length > 0
+                                  ? item.content + '\n\n' + item.files.map((file) => (file.mimetype?.startsWith('image') ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n')
+                                  : item.content.endsWith('```') || item.content.match(/\B```\b[a-zA-Z]+\b(?!\s)/)
+                                  ? item.content
+                                  : item.content + `${currentUUID === item.UUID ? '<span class="gpt-cursor"></span>' : ''}`
+                              )
+                            }}
+                          ></div>
                           <div className="interact">
                             <div className="interact-operate">
                               <Tooltip title={'收藏'} placement="top">

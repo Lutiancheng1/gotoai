@@ -35,7 +35,6 @@ import PDFViewer from '../PDFViewer'
 import CSVPreview from '../Csv'
 import { formatFileSize, formatFileType } from '@/utils/format'
 import { renderMarkdown } from '../MdRender/markdownRenderer'
-import { JsonToTable } from 'react-json-to-table'
 // 定义一个文件信息的类型
 export type FileInfo = {
   // 文件的 id
