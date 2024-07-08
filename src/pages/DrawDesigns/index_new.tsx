@@ -1740,6 +1740,7 @@ const DrawDesigns = () => {
               style={{
                 right: 30
               }}
+              tooltip="回到顶部"
               target={() => document.querySelector('.draw-content') as HTMLElement}
             />
           </>

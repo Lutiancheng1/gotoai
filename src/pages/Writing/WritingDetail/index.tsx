@@ -1110,6 +1110,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
           style={{
             right: 30
           }}
+          tooltip="回到顶部"
           className="hover:opacity-80"
           visibilityHeight={200}
           target={() => document.querySelector('#prompt-content-wrap') as HTMLDivElement}

@@ -1,9 +1,9 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4472296 */
-  src: url('//at.alicdn.com/t/c/font_4472296_r5q8g6m14lh.woff2?t=1717500284298') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4472296_r5q8g6m14lh.woff?t=1717500284298') format('woff'),
-       url('//at.alicdn.com/t/c/font_4472296_r5q8g6m14lh.ttf?t=1717500284298') format('truetype'),
-       url('//at.alicdn.com/t/c/font_4472296_r5q8g6m14lh.svg?t=1717500284298#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/c/font_4472296_qjjy5aycfle.woff2?t=1720434083710') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4472296_qjjy5aycfle.woff?t=1720434083710') format('woff'),
+       url('//at.alicdn.com/t/c/font_4472296_qjjy5aycfle.ttf?t=1720434083710') format('truetype'),
+       url('//at.alicdn.com/t/c/font_4472296_qjjy5aycfle.svg?t=1720434083710#iconfont') format('svg');
 }
 
 .iconfont {
@@ -12,6 +12,14 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-fanhui1:before {
+  content: "\e700";
+}
+
+.icon-anlizhongxin:before {
+  content: "\e7ed";
 }
 
 .icon-duowendang:before {

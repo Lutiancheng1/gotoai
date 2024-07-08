@@ -265,6 +265,7 @@ const Writing: React.FC<WritingProps> = () => {
             style={{
               right: 30
             }}
+            tooltip="回到顶部"
             target={() => document.querySelector('.writing') as HTMLElement}
           />
         </div>

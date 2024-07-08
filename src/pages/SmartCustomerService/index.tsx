@@ -2,6 +2,7 @@ import { ConfigProvider, Tabs } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 import './index.css'
 import * as echarts from 'echarts'
+import customerPng from '@/assets/images/customer.png'
 const tabsWarp = [
   {
     label: 'AI 客服数据看板',
@@ -21,6 +22,10 @@ const tabsWarp = [
     label: 'AI 客户跟进历史',
     key: 'aiCustomersFollowUpHistory',
     disabled: true
+  },
+  {
+    label: 'AI 智能客服流程',
+    key: 'aiSmartCustomerServiceProcess'
   }
 ]
 type SmartCustomerServiceWrapperProps = {}
@@ -343,16 +348,18 @@ const SmartCustomerServiceWrapper: React.FC<SmartCustomerServiceWrapperProps> = 
   const progressChartRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (eventChartRef.current && channelChartRef.current && progressChartRef.current) {
-      let myEventChart = echarts.init(eventChartRef.current)
-      let myChannelChart = echarts.init(channelChartRef.current)
-      let myProgressChart = echarts.init(progressChartRef.current)
+    if (activeKey === 'aiCustomerServiceViewBoard') {
+      if (eventChartRef.current && channelChartRef.current && progressChartRef.current) {
+        let myEventChart = echarts.init(eventChartRef.current)
+        let myChannelChart = echarts.init(channelChartRef.current)
+        let myProgressChart = echarts.init(progressChartRef.current)
 
-      myEventChart.setOption(eventChartOption)
-      myChannelChart.setOption(channelChartOption)
-      myProgressChart.setOption(progressChartOption)
+        myEventChart.setOption(eventChartOption)
+        myChannelChart.setOption(channelChartOption)
+        myProgressChart.setOption(progressChartOption)
+      }
     }
-  }, [])
+  }, [activeKey])
   return (
     <div className="customer_service h-full">
       {/* 上方tab切换*/}
@@ -379,19 +386,26 @@ const SmartCustomerServiceWrapper: React.FC<SmartCustomerServiceWrapperProps> = 
       </section>
       {/* 下方内容区域 */}
       <div className="smart_customer_service w-full h-[calc(100vh-46px)] p-3">
-        <div className="mt-1 mb-2">统一集成全网营销渠道，网站AI客服机器人，微信，App, 小程序，400电话，抖音等其他引流媒介，快速触达并留住潜在客户，专注提升问题解决率，超越真人的服务体验，真正实现客户自助服务，想你所想，答你所问，智能 AI 真非同凡响，让企业客户服务效率飞起来。</div>
         {activeKey === 'aiCustomerServiceViewBoard' && (
-          <div className="w-full h-[calc(100%-46px-42px)] flex flex-col">
-            <div className="flex-1 flex h-full mb-1 border-b">
-              {/* 事件图表 */}
-              <div ref={eventChartRef} className="border-r h-full w-[50%] p-3"></div>
-              {/* 渠道图表 */}
-              <div ref={channelChartRef} className="h-full w-[50%] p-3"></div>
+          <>
+            <div className="mt-1 mb-2">统一集成全网营销渠道，网站AI客服机器人，微信，App, 小程序，400电话，抖音等其他引流媒介，快速触达并留住潜在客户，专注提升问题解决率，超越真人的服务体验，真正实现客户自助服务，想你所想，答你所问，智能 AI 真非同凡响，让企业客户服务效率飞起来。</div>
+            <div className="w-full h-[calc(100%-46px-42px)] flex flex-col">
+              <div className="flex-1 flex h-full mb-1 border-b">
+                {/* 事件图表 */}
+                <div ref={eventChartRef} className="border-r h-full w-[50%] p-3"></div>
+                {/* 渠道图表 */}
+                <div ref={channelChartRef} className="h-full w-[50%] p-3"></div>
+              </div>
+              {/* 进度图表 */}
+              <div className="flex-1 h-full">
+                <div className="w-[50%] h-full border-r p-3" ref={progressChartRef}></div>
+              </div>
             </div>
-            {/* 进度图表 */}
-            <div className="flex-1 h-full">
-              <div className="w-[50%] h-full border-r p-3" ref={progressChartRef}></div>
-            </div>
+          </>
+        )}
+        {activeKey === 'aiSmartCustomerServiceProcess' && (
+          <div className="w-full h-full vh-center flex flex-col">
+            <img src={customerPng} className="pointer-events-none" alt="" />
           </div>
         )}
       </div>

@@ -137,6 +137,7 @@ const Gallery: React.FC<GalleryProps> = ({ itemClick }) => {
         style={{
           right: 30
         }}
+        tooltip="回到顶部"
         className="hover:bg-slate-100"
         target={() => document.querySelector('.gallery') as HTMLElement}
       />

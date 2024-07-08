@@ -1,0 +1,248 @@
+.case-center {
+
+  margin-right: auto;
+  margin-left: auto;
+
+  /* padding-left: 15px; */
+  /* padding-right: 12px; */
+
+
+  hr,
+  hr.c-divider {
+    border-top: 1px solid rgba(0, 0, 0, .1);
+  }
+
+  .collapse-arrow>.collapse-title:after {
+    top: 11px;
+  }
+
+  .collapse {
+    border-radius: 0 !important;
+    padding: 10px 0px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+    cursor: pointer;
+
+    &[open].dark {
+      outline: 1px dashed black;
+      color: black;
+    }
+
+    .collapse-title {
+      padding: 0;
+      min-height: 0;
+    }
+
+    .collapse[open]> :where(.collapse-content) {
+      padding-bottom: 0;
+    }
+
+    .collapse-content {
+      &.dark {
+        color: rgba(0, 0, 0, .6);
+
+        >p {
+          &:hover {
+            background: rgba(0, 0, 0, .1);
+            color: black;
+          }
+        }
+      }
+
+      padding: 0;
+
+      >p {
+        padding-left: 1rem;
+        width: 100%;
+        padding: 6px 12px;
+        font-size: inherit;
+        cursor: pointer;
+
+        &:hover {
+          background: rgba(0, 0, 0, .2);
+
+        }
+
+      }
+    }
+  }
+
+  .active-facets {
+    color: white;
+    background-color: #0067B8;
+    margin-bottom: 16px;
+    padding: 16px;
+  }
+
+  .active-facets button,
+  .active-facets button:hover,
+  .active-facets button.c-refine-item {
+    color: #fff;
+    background: transparent;
+  }
+
+  .active-facets button.c-refine-item:hover,
+  .active-facets button.c-refine-item:focus,
+  .active-facets button.c-refine-item:active {
+    color: #fff;
+  }
+
+  .active-facets .c-glyph {
+    padding: 4px 0;
+  }
+
+  .active-facets h4.active-facets-headline {
+    color: #fff;
+    font-size: 24px;
+    font: -apple-system-body;
+    padding: 0;
+    margin-bottom: 16px;
+  }
+
+  .active-facets .c-drawer {
+    margin: 8px 0 0 0;
+    border: 0;
+  }
+
+  .active-facets .c-drawer>div {
+    margin: 0;
+  }
+
+  .sl-results {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+  }
+
+  .search-result-container {
+    display: flex;
+    flex-direction: column;
+    margin: 0 16px 16px 0;
+    width: calc(25% - 12px);
+    cursor: pointer;
+  }
+
+  .search-result-container:nth-child(4n+4) {
+    margin-right: 0;
+  }
+
+  .search-result {
+    margin: 0;
+    display: block;
+    background-color: #fff;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, .15);
+    position: relative;
+    top: 0;
+    transition: top ease 0.2s;
+    height: 100%;
+  }
+
+  .search-result:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    top: -5px;
+  }
+
+  .search-result:focus {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    top: -5px;
+  }
+
+  .search-result:focus,
+  .search-result:active {
+    background-color: #e2f0fa;
+  }
+
+  @media all and (max-width: 1160px) {
+    .search-result-container {
+      width: calc(50% - 8px);
+    }
+
+    .search-result-container:nth-child(2n+2) {
+      margin-right: 0;
+    }
+  }
+
+  @media all and (max-width: 510px) {
+    .search-result-container {
+      width: 100%;
+      margin: 0 0 16px 0;
+    }
+  }
+
+  .similar-story {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.14);
+  }
+
+  .similar-story img,
+  .search-result img {
+    max-height: 175px;
+    object-fit: contain;
+    display: block;
+    position: absolute;
+    overflow: hidden;
+    margin: 0 0.4% 0 0.5%;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+
+  .search-result.contain img {
+    background-size: contain;
+  }
+
+  .result_success_image {
+    width: 99.2%;
+  }
+
+  .search-result__data {
+    padding: 175px 15% 15% !important;
+  }
+
+  #socialicons {
+    text-align: center;
+
+  }
+
+  .facet-type {
+    text-transform: none;
+    font-size: 13px;
+    font: -apple-system-body;
+    color: #008272;
+    padding-bottom: 8px;
+    padding-top: 5px;
+    font-weight: 600;
+    overflow: hidden;
+  }
+
+
+  #socialicons .icon {
+    background: #3C3C3C;
+    display: inline-block;
+    color: white;
+    font-size: 22px;
+    font: -apple-system-body;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    vertical-align: middle;
+    -webkit-border-radius: 17px;
+    -moz-border-radius: 17px;
+    border-radius: 17px;
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
+  }
+
+  #socialicons .icon:hover {
+    background: rgb(152, 147, 145);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    top: -5px;
+  }
+
+  i {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+}

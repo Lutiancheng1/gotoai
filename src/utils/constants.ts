@@ -78,6 +78,11 @@ export const menuConfig = [
     label: '商机获客'
   },
   {
+    key: 'caseCenter',
+    icon: 'icon-anlizhongxin',
+    label: '案例中心'
+  },
+  {
     key: 'application',
     icon: 'icon-yingyong',
     label: '应用'
@@ -101,7 +106,7 @@ export const menuWarp = {
   '/code': 2,
   '/knowledgeBase': 3,
   '/dataAnalysis': 4,
-  '/dataAnalysis1':4,
+  '/dataAnalysis1': 4,
   '/drawDesigns': 5,
   '/video': 6,
   '/application': 7,

@@ -1,0 +1,55 @@
+.case-detail {
+  .c-hero {
+    position: relative;
+    overflow: hidden;
+    height: 440px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  .c-hero .c-heading {
+    color: #fff;
+    max-height: 130px;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: inline-block;
+    padding: 16px;
+    overflow: hidden !important;
+    font-size: 22px;
+    width: 520px;
+  }
+
+  .story-meta a,
+  .story-meta a:focus,
+  .story-meta a:hover,
+  .story-meta a:link,
+  .story-meta a:visited,
+  a.c-hyperlink,
+  a.c-hyperlink:focus,
+  a.c-hyperlink:hover,
+  a.c-hyperlink:link,
+  a.c-hyperlink:visited {
+    color: #0067B8;
+  }
+
+  .c-paragraph-1,
+  .type-p1,
+  .c-paragraph-2,
+  .type-p2,
+  .c-paragraph-3,
+  .c-paragraph-4,
+  .type-p3,
+  .type-p4,
+  p {
+    padding: 0;
+    margin: 0 0 24px 0;
+  }
+
+}
