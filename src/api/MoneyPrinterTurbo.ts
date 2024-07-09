@@ -1,5 +1,4 @@
 import Toast from '@/components/Toast'
-import { videoBaseUrl } from './BaseUrlConfig'
 
 export interface TaskVideoRequest {
   video_subject: string
@@ -121,10 +120,10 @@ export interface VideoTermsResponse {
     video_terms: string[]
   }
 }
-export const baseUrl = videoBaseUrl
+export const baseUrl = process.env.REACT_APP_VIDEO_BASE_URL
 // Generate a short video
 export const createVideo = async (requestBody: TaskVideoRequest): Promise<TaskResponse> => {
-  const response = await fetch(`${baseUrl}videos`, {
+  const response = await fetch(`${baseUrl}/videos`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(requestBody)
@@ -150,7 +149,7 @@ export const createVideo = async (requestBody: TaskVideoRequest): Promise<TaskRe
 
 // Query task status
 export const getTaskStatus = async (taskId: string): Promise<TaskQueryResponse> => {
-  const response = await fetch(`${baseUrl}tasks/${taskId}`, {
+  const response = await fetch(`${baseUrl}/tasks/${taskId}`, {
     method: 'GET'
   })
   const data = (await response.json()) as TaskQueryResponse
@@ -159,7 +158,7 @@ export const getTaskStatus = async (taskId: string): Promise<TaskQueryResponse> 
 
 // Delete a generated short video task
 export const deleteVideoTask = async (taskId: string): Promise<TaskDeletionResponse> => {
-  const response = await fetch(`${baseUrl}tasks/${taskId}`, {
+  const response = await fetch(`${baseUrl}/tasks/${taskId}`, {
     method: 'DELETE'
   })
   const data = (await response.json()) as TaskDeletionResponse
@@ -168,7 +167,7 @@ export const deleteVideoTask = async (taskId: string): Promise<TaskDeletionRespo
 
 // Retrieve local BGM files
 export const getBgmList = async (): Promise<BgmRetrieveResponse> => {
-  const response = await fetch(`${baseUrl}musics`, {
+  const response = await fetch(`${baseUrl}/musics`, {
     method: 'GET'
   })
   const data = (await response.json()) as BgmRetrieveResponse
@@ -186,7 +185,7 @@ export const uploadLocalFile = async (formData: FormData) => {
 
 // Upload the BGM file to the songs directory
 export const uploadBgmFile = async (formData: FormData): Promise<BgmUploadResponse> => {
-  const response = await fetch(`${baseUrl}musics`, {
+  const response = await fetch(`${baseUrl}/musics`, {
     method: 'POST',
     body: formData
   })
@@ -196,7 +195,7 @@ export const uploadBgmFile = async (formData: FormData): Promise<BgmUploadRespon
 
 // Stream video
 export const streamVideo = async (filePath: string): Promise<Response> => {
-  const response = await fetch(`${baseUrl}stream/${filePath}`, {
+  const response = await fetch(`${baseUrl}/stream/${filePath}`, {
     method: 'GET'
   })
   return response
@@ -204,7 +203,7 @@ export const streamVideo = async (filePath: string): Promise<Response> => {
 
 // Download video
 export const downloadVideo = async (filePath: string): Promise<Response> => {
-  const response = await fetch(`${baseUrl}download/${filePath}`, {
+  const response = await fetch(`${baseUrl}/download/${filePath}`, {
     method: 'GET'
   })
   return response
@@ -213,7 +212,7 @@ export const downloadVideo = async (filePath: string): Promise<Response> => {
 // Create a script for the video
 // 为视频创建脚本
 export const generateVideoScript = async (requestBody: VideoScriptRequest): Promise<VideoScriptResponse> => {
-  const response = await fetch(`${baseUrl}scripts`, {
+  const response = await fetch(`${baseUrl}/scripts`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(requestBody)
@@ -225,7 +224,7 @@ export const generateVideoScript = async (requestBody: VideoScriptRequest): Prom
 // Generate video terms based on the video script
 // 根据视频脚本生成视频术语
 export const generateVideoTerms = async (requestBody: VideoTermsRequest): Promise<VideoTermsResponse> => {
-  const response = await fetch(`${baseUrl}terms`, {
+  const response = await fetch(`${baseUrl}/terms`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(requestBody)
