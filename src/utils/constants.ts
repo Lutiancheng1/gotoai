@@ -78,14 +78,14 @@ export const menuConfig = [
     label: '商机获客'
   },
   {
-    key: 'caseCenter',
-    icon: 'icon-anlizhongxin',
-    label: '案例中心'
-  },
-  {
     key: 'application',
     icon: 'icon-yingyong',
     label: '应用'
+  },
+  {
+    key: 'caseCenter',
+    icon: 'icon-anlizhongxin',
+    label: '案例中心'
   }
 ] as {
   key: string

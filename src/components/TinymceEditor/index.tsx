@@ -9,9 +9,11 @@ import { asBlob } from 'html-docx-js-typescript'
 import { saveAs } from 'file-saver'
 import dayjs from 'dayjs'
 import Toast from '../Toast'
+import { fillContent } from '@/pages/Writing/WritingDetail'
 type TinyMCEEditorProps = {
   onChange?: (content: string) => void
 }
+
 const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
   const editorRef = useRef<TinyMCEEditorInstance | null>(null)
   const [loading, setLoading] = useState(true) // 加载状态
@@ -34,11 +36,20 @@ const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
       return ''
     }
   }))
+  // 一些自定义操作按钮的点击事件
+  const handleButtonClick = async (prompt: string) => {
+    if (!editorRef.current) return
+    const selectedText = editorRef.current.selection.getContent({ format: 'text' })
+    if (!selectedText) return
+
+    await fillContent(`${prompt}${selectedText},禁止出现不恰当、多余的引号。`, (content) => {
+      editorRef.current?.selection.setContent(content)
+    })
+  }
 
   const handleEditorChange = ({ content, editor }: { content: string; editor: TinyMCEEditorInstance }) => {
     onChange && onChange(content)
   }
-
   return (
     <div className="editor-container h-full relative">
       {loading && (
@@ -62,7 +73,8 @@ const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
           autosave_interval: '30s', // 自动保存时间
           image_advtab: true, // 高级选项
           branding: false, // 去除底部品牌
-          quickbars_selection_toolbar: 'bold italic | forecolor backcolor | quicklink h2 h3 blockquote quickimage quicktable', // 快速工具栏
+          // quickbars_selection_toolbar: 'bold italic | forecolor backcolor | quicklink h2 h3 blockquote quickimage quicktable', // 快速工具栏
+          quickbars_selection_toolbar: 'bold italic forecolor backcolor quicklink quickimage quicktable | recommendedSentences recommendedParagraph continuationOfContent rewrite polish expand abbreviation', // 快速工具栏
           image_caption: true,
           default_link_target: '_blank',
           setup(editor) {
@@ -74,6 +86,41 @@ const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
                 if (!content) return
                 handleCopyClick(content)
               }
+            })
+            editor.ui.registry.addButton('recommendedSentences', {
+              icon: 'ai-prompt',
+              tooltip: '推荐句子',
+              onAction: () => handleButtonClick('请为以下的内容推荐一个更合适、更生动的句子来替换原句，以增强表达效果:')
+            })
+            editor.ui.registry.addButton('recommendedParagraph', {
+              icon: 'typography',
+              tooltip: '推荐段落',
+              onAction: () => handleButtonClick('请为以下的内容推荐一个全新段落，要求与原段落主题相关，但表达方式和角度应有所不同，以增加文章的丰富性和深度:')
+            })
+            editor.ui.registry.addButton('continuationOfContent', {
+              icon: 'permanent-pen',
+              tooltip: '续写内容',
+              onAction: () => handleButtonClick(' 请根据以下的内容，为其续写新的内容，保持原有的主题和风格，同时引入新的观点或信息，使文章更加完整:')
+            })
+            editor.ui.registry.addButton('rewrite', {
+              icon: 'reload',
+              tooltip: '章节重写',
+              onAction: () => handleButtonClick('请对以下的章节进行重写，要求保持原有的主题和要点，但采用全新的结构和表达方式，以提高文章的质量和吸引力:')
+            })
+            editor.ui.registry.addButton('polish', {
+              icon: 'fill',
+              tooltip: '润色',
+              onAction: () => handleButtonClick(' 请对以下的内容进行润色，修正语法错误、拼写错误、标点符号使用等问题，并优化句子结构和词汇选择，使文章表达更加精准、流畅、保留原文语言不要进行翻译:')
+            })
+            editor.ui.registry.addButton('expand', {
+              icon: 'text-size-increase',
+              tooltip: '扩写',
+              onAction: () => handleButtonClick('请对以下的内容进行扩写，增加更多细节、例子或相关观点，以丰富文章的内容，提高文章的深度和广度:')
+            })
+            editor.ui.registry.addButton('abbreviation', {
+              icon: 'text-size-decrease',
+              tooltip: '缩写',
+              onAction: () => handleButtonClick('请对以下的内容进行缩写，精简语言，去除冗余信息，保留核心观点和关键信息，以使文章更加简洁明了:')
             })
             editor.ui.registry.addButton('downWord', {
               icon: 'save',

@@ -116,6 +116,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   // 使用 useSize 监听 scrollBoxRef 元素的尺寸变化
   const size = useSize(currentMessageRef)
   const user = useAppSelector((state) => state.profileSlice.user)
+  // 是否显示重新生成按钮
+  const [showRefresh, setShowRefresh] = useState(false)
   const scrollBottom = () => {
     // 滚动到底部
     if (scrollBox.current) {
@@ -526,6 +528,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       controller?.abort()
       setMessageLoading(false)
       await dispatch(updateConversitionDetail({ UUID: currentUUID, content: '\n\n本次回答已被终止' }))
+      setCurrentUUID('')
+      setShowRefresh(true)
     }
   }
   // 定义enterMessage函数，接收一个React.KeyboardEvent<HTMLTextAreaElement>类型的参数e
@@ -678,6 +682,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     setQuesions([])
     tempQuestionId.current = ''
     console.log('切换对话了', currentConversation)
+    setShowRefresh(false)
   }, [currentConversation])
 
   useMount(() => {
@@ -687,6 +692,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   // 初始化
   useUnmount(() => {
     currentMenuKey.current !== 11 && dispatch(initState())
+    setShowRefresh(false)
   })
   return (
     <div className="dialogue-detail" style={style}>
@@ -846,18 +852,28 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
             })}
         </div>
         <div className="last-div">
-          {/* <div className="input-msg flex" style={{ display: 'none' }}>
-            <div>
-              <img src={refreshIcon} alt="" />
-              <span>重新生成</span>
+          {showRefresh && (
+            <div
+              className="input-msg flex"
+              onClick={() => {
+                sendBeta(false, {
+                  content: conversitionDetailList![conversitionDetailList!.length - 2].content
+                } as UserPrompt)
+                setShowRefresh(false)
+              }}
+            >
+              <div>
+                <img src={refreshIcon} alt="" />
+                <span>重新生成</span>
+              </div>
             </div>
-          </div>
+          )}
           <div className="input-msg flex" style={{ display: sse && messageLoading ? '' : 'none' }}>
             <div onClick={stopMessage}>
               <img src={stopIcon} alt="" />
               <span>停止生成</span>
             </div>
-          </div> */}
+          </div>
         </div>
       </div>
       <Search

@@ -87,7 +87,7 @@ const Index = ({ loading }: Props) => {
       return setCurrentPath('marketingCreativity')
     } else if (location.pathname.substr(1).startsWith('writing/')) {
       return setCurrentPath('writing')
-    } else if (location.pathname.substr(1).startsWith('caseDetail/')) {
+    } else if (location.pathname.substr(1).startsWith('caseDetail')) {
       return setCurrentPath('caseCenter')
     }
     setCurrentPath(location.pathname.substr(1))
@@ -299,7 +299,7 @@ const Index = ({ loading }: Props) => {
                 <Route path="/smartCustomerService" element={<SmartCustomerService />} />
                 <Route path="/businessOpportunities" element={<BusinessOpportunities />} />
                 <Route path="/caseCenter" element={<CaseCenter />} />
-                <Route path="/caseDetail/:id" element={<CaseDetail />} />
+                <Route path="/caseDetail" element={<CaseDetail />} />
                 <Route path="/*" element={<NotFound />} />
               </Routes>
             </Suspense>

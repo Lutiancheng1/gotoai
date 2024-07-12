@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { initCurrentCategory, updateCollapsed } from '@/store/reducers/writing'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { Button, FloatButton, Form, Input, Modal, Select, Steps, Upload } from 'antd'
+import { Button, FloatButton, Form, Input, Modal, Popover, Select, Steps, Tooltip, Upload } from 'antd'
 import FormItem from 'antd/es/form/FormItem'
 import TextArea, { TextAreaRef } from 'antd/es/input/TextArea'
 import './index.css'
@@ -155,11 +155,15 @@ export function htmlToJson(html: string): JsonInput {
   }
 }
 
-async function fillContent(query: string, onUpdate: (content: string) => void): Promise<string> {
+// 没有增量返回
+export async function fillContent(query: string, onUpdate: (content: string) => void): Promise<string> {
+  const newController = new AbortController()
+  const signal = newController.signal
   let T = ''
   try {
     const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
     await fetchEventSource(url, {
+      signal: signal,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -180,8 +184,12 @@ async function fillContent(query: string, onUpdate: (content: string) => void): 
           let { message } = JSON.parse(msg.data) as unknown as AddChatMessagesData
           T += message
           // 调用回调函数更新内容
-          onUpdate(T)
+          onUpdate(message)
         }
+      },
+      onclose() {
+        // 正常结束的回调
+        newController.abort() // 关闭连接
       },
       onerror(err) {
         // 连接出现异常回调
@@ -231,9 +239,72 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
   const [currentStage, setCurrentStage] = useState(0)
   // json格式的大纲 json大纲
   const jsonOutline = useRef<JsonInput | null>(null)
+  const [isCancelled, setIsCancelled] = useState(false)
+  //  生成风格
+  const styles = [
+    { label: '常规风格', value: '请以常规风格生成全文，保持语言通顺、条理清晰，使文章易于理解和接受。' },
+    { label: '华丽风格', value: '请以华丽风格生成全文，运用丰富的修辞手法和高级词汇，增加文章的艺术性和表现力。' },
+    { label: '技术科技范式', value: '请以技术科技范式生成全文，使用专业术语和精准的数据，突出文章在科技领域的专业性和权威性。' },
+    { label: '严肃风格', value: '请以严肃风格生成全文，采用正式的语言和严谨的态度，使文章显得庄重和权威。' },
+    { label: '学术风格', value: '请以学术风格生成全文，注重理论的阐述和逻辑的严密，引用相关研究和文献，提高文章的学术价值。' },
+    { label: '互联网风格', value: '请以互联网风格生成全文，运用网络流行语、轻松幽默的表达方式，使文章更加接地气，贴近大众阅读习惯。' }
+  ]
   const changeStage = (stage: number) => {
     setCurrentStage(stage)
   }
+
+  async function fillContent(query: string, onUpdate: (content: string) => void): Promise<string> {
+    const newController = new AbortController()
+    const signal = newController.signal
+    setController(() => newController)
+    let T = ''
+    try {
+      const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+      await fetchEventSource(url, {
+        signal: signal,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
+          Authorization: `Bearer ${getTokenInfo().token}`
+        },
+        body: JSON.stringify({
+          conversationId: currentConversation!.conversationId,
+          menu: 10,
+          query: query,
+          inputs: {}
+        }),
+        onmessage(msg) {
+          // 接收一次数据段时回调，因为是流式返回，所以这个回调会被调用多次
+          if (msg.event === 'message') {
+            // 处理数据段
+            let { message } = JSON.parse(msg.data) as unknown as AddChatMessagesData
+            T += message
+            // 调用回调函数更新内容
+            onUpdate(T)
+          }
+        },
+        onclose() {
+          // 正常结束的回调
+          newController.abort() // 关闭连接
+        },
+        onerror(err) {
+          // 连接出现异常回调
+          // 必须抛出错误才会停止
+          throw err
+        }
+      })
+    } catch (err) {
+      Toast.notify({
+        type: 'error',
+        message: '网络错误'
+      })
+      console.error('Fetch error:', err)
+    }
+    return T
+  }
+
   useEffect(() => {
     if (WritingData.currentCategory.categoryId === 33) {
       setHasSteps(true)
@@ -301,15 +372,8 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
     })
   }
   // 保存
-  const onSubmit = async () => {
+  const onSubmit = async (key?: string) => {
     if (loading) return Toast.notify({ type: 'info', message: '请等待上条信息响应完成' })
-    // if (currentStage === 1) {
-    //   changeStage(2)
-    // }
-    // if (currentStage === 2) {
-    //   changeStage(0)
-    //   editorContent.current = ''
-    // }
     const values = form.getFieldsValue()
     // 遍历 values 对象
     for (let key in values) {
@@ -371,12 +435,12 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
               addChatMessages({
                 conversationId: currentConversation!.conversationId,
                 menu: currentMenuKey,
-                query: `帮我根据标题${WritingData.currentCategory.nickname} 和 ${WritingData.currentCategory.list.map((item) => {
+                query: `请根据以下文章标题: ${WritingData.currentCategory.nickname} 和 ${WritingData.currentCategory.list.map((item) => {
                   const formValues = form.getFieldsValue() as { [key: string]: string }
                   const formValue = formValues[item.input_name]
                   if (!formValue) return ''
                   return `${item.title}: ${formValue}`
-                })}生成一个目录大纲,请直接返回json数据的大纲文本，不要包含任何Markdown语法。格式为{"title": "xxx","subtitle": "xxx","table_of_contents": [{"chapter": 1,"title": "xxx","subsections": [{"title":"1.1 xxx"},...],...]。`,
+                })}生成一个详细的文档大纲。大纲应包括至少三个主要部分，每个部分下应有至少两个子点。请确保大纲能够全面覆盖文章主题，同时保持逻辑清晰。请直接返回json数据的大纲文本，不要包含任何Markdown语法。格式为{"title": "xxx","subtitle": "xxx","table_of_contents": [{"chapter": 1,"title": "xxx","subsections": [{"title":"1.1 xxx"},...],...]。`,
                 inputs: transformObject(form.getFieldsValue())
               })
             )) as { payload: AddChatMessagesData }
@@ -444,15 +508,22 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
           for (const chapter of outlineCopy.table_of_contents) {
             // 遍历每个小节
             for (const subsection of chapter.subsections) {
-              if (!subsection.content) {
+              console.log(subsection)
+
+              if (!subsection.content || subsection.content === '') {
                 // 生成小节内容
-                subsection.content = await fillContent(`帮我根据大纲为${jsonToText(jsonOutline.current!)}去编写填充${subsection.title}这小节的内容。格式为改小节的纯文本内容,不需要重复返回类似${subsection.title}这种的小节标题。`, (content) => {
-                  subsection.content = content
-                  editorRef.current?.setContent(jsonToMarkdown(outlineCopy))
-                })
+                subsection.content = await fillContent(
+                  `请根据以下文档大纲的：${subsection.title}，自动生成详细的内容。${key ?? ''}请直接输出内容,禁止出现大纲标题:${subsection.title}。内容应包括至少三个主要观点，每个观点下应有详细解释和例子。请确保内容能够深入探讨该部分的主题，同时保持语言流畅和易懂。`,
+                  (content) => {
+                    subsection.content = content
+                    editorRef.current?.setContent(jsonToMarkdown(outlineCopy))
+                  }
+                )
               }
             }
           }
+          jsonOutline.current = htmlToJson(editorRef.current!.getContent())
+          setIsCancelled(false)
           setLoading(false)
         }
       } else {
@@ -587,8 +658,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
       }
     }
   }
-  // 监听回车
-  useKeyPress('ctrl.enter', onSubmit)
+
   const customRequest = async (options: UploadRequestOption, item: WritingDetailList) => {
     console.log(item)
     const { max_size, input_name, accept } = item
@@ -667,10 +737,19 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
     rest()
   })
 
+  // 停止操作
+  useUpdateEffect(() => {
+    // 如果点击了取消 就全部取消
+    if (isCancelled) {
+      controller?.abort()
+    }
+  }, [controller])
+
   useUpdateEffect(() => {
     if (!textareaRef.current || afterContentSize == null) return
     textareaRef.current.resizableTextArea!.textArea.style.height = `${afterContentSize?.height + 3}px`
   }, [afterContentSize])
+
   return (
     <div className="w-full h-full">
       {contextHolder}
@@ -847,9 +926,62 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
 
                     {/* 提交按钮 */}
                     <div className="flex justify-center px-6 bg-[#fff] mt-2 z-[100] w-full h-11">
-                      <Button loading={loading} onClick={onSubmit} type="primary" className="flex justify-center items-center !w-full !h-11 text-[#fff] font-semibold bg-[#2E65FF] !rounded-[4px] !text-16">
-                        立即生成 <span className="w-[102px] py-1 px-3 ml-3 rounded-[4px]">Ctrl + Enter</span>
-                      </Button>
+                      {hasSteps && currentStage === 1 ? (
+                        <Popover
+                          placement="top"
+                          trigger={['hover', 'click']}
+                          overlayInnerStyle={{
+                            padding: 6
+                          }}
+                          content={
+                            <div>
+                              {styles.map((item, index) => (
+                                <span key={index} className="cursor-pointer mr-1 hover:text-[#4096ff]" onClick={() => onSubmit(item.value)}>
+                                  <span className="mr-1 text-[#ccc]"> {index !== 0 && '|'}</span>
+                                  {item.label}
+                                </span>
+                              ))}
+                            </div>
+                          }
+                        >
+                          <Button loading={loading} type="primary" className="flex justify-center items-center !w-full !h-11 text-[#fff] font-semibold bg-[#2E65FF] !rounded-[4px] !text-16">
+                            立即生成 <i className="ml-1 iconfont icon-xia"></i>
+                          </Button>
+                        </Popover>
+                      ) : loading && currentStage === 2 ? (
+                        <Popover
+                          placement="top"
+                          trigger={['hover']}
+                          overlayInnerStyle={{
+                            padding: 6
+                          }}
+                          content={
+                            <>
+                              <p>单击取消生成当前段落</p>
+                              <p>双击取消生成全文</p>
+                            </>
+                          }
+                        >
+                          <Button
+                            type="primary"
+                            onClick={async () => {
+                              controller?.abort()
+                            }}
+                            onDoubleClick={() => {
+                              controller?.abort()
+                              setIsCancelled(true)
+                              setCurrentStage(1)
+                            }}
+                            className="flex justify-center items-center !w-full !h-11 text-[#fff] font-semibold bg-[#2E65FF] !rounded-[4px] !text-16"
+                          >
+                            停止生成
+                          </Button>
+                        </Popover>
+                      ) : (
+                        <Button loading={loading} onClick={() => onSubmit()} type="primary" className="flex justify-center items-center !w-full !h-11 text-[#fff] font-semibold bg-[#2E65FF] !rounded-[4px] !text-16">
+                          立即生成
+                        </Button>
+                      )}
                     </div>
                     {hasSteps && (
                       <div className="w-full flex px-6 mt-3">

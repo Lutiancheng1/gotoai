@@ -1,21 +1,123 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { FloatButton } from 'antd'
+import { Empty, FloatButton } from 'antd'
 import './inxdex.css'
-import { useState } from 'react'
-import { useUpdateEffect } from 'ahooks'
+import { useEffect, useRef, useState } from 'react'
+import { useMount, useScroll, useUpdateEffect } from 'ahooks'
 import { useNavigate } from 'react-router-dom'
+import { CaseData, getCustomerStoryList, getIndustryList, getOrganizationsizeList, getProductList } from '@/api/customerstory'
+import Loading from '@/components/loading'
+
+type FilterData = {
+  id: number
+  title: string
+  desc: string
+}[]
+
 const CaseCenter: React.FC = () => {
   const naviagte = useNavigate()
   // 当前筛选条件
-  const [currentFilter, setCurrentFilter] = useState({
-    industry: ['content 1', 'content 2'],
-    product: ['content 1'],
-    scale: ['content 1']
+  const [currentFilter, setCurrentFilter] = useState<{
+    industry: string
+    product: string[]
+    scale: string
+  }>({
+    industry: '',
+    product: [],
+    scale: ''
+  })
+  // 行业
+  const [industryList, setIndustryList] = useState<FilterData>([])
+  // 组织规模
+  const [organizationSizeList, setOrganizationSizeList] = useState<FilterData>([])
+  //  产品
+  const [productList, setProductList] = useState<FilterData>([])
+  // dataSource
+  const [dataSource, setDataSource] = useState<CaseData[]>([])
+  // loading
+  const [loading, setLoading] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const scroll = useScroll(scrollRef)
+  const [pagenation, setPagenation] = useState({
+    page: 1,
+    pageSize: 12,
+    total: 0
+  })
+
+  useUpdateEffect(() => {
+    // 这个是滚动容器的高度
+    const scrollBoxHeight = window.innerHeight - 149
+    // 当前滚动位置
+    const scrollPosition = scrollRef.current!.scrollTop + scrollBoxHeight
+    // 滚动容器的总高度减去100px
+    const bottomPosition = scrollRef.current!.scrollHeight - 100
+    if (scrollPosition >= bottomPosition) {
+      // loadmore
+      if (pagenation.page * pagenation.pageSize < pagenation.total) {
+        getDataSource(pagenation.page + 1)
+      }
+    }
+  }, [scroll])
+
+  const getDataSource = async (page?: number) => {
+    if (loading) return
+    setLoading(true)
+    const res = await getCustomerStoryList({ page: page ?? pagenation.page, pageSize: pagenation.pageSize, industry: currentFilter.industry, product: currentFilter.product.toString(), organizationSize: currentFilter.scale })
+    if (res.code === 0 && res.rows) {
+      setPagenation((prev) => {
+        return {
+          ...prev,
+          page: res.pageIndex,
+          total: res.recordCount
+        }
+      })
+      if (page && page > 1) {
+        setDataSource((prev) => {
+          return [...prev, ...res.rows]
+        })
+      } else {
+        setDataSource(res.rows)
+      }
+    }
+    setLoading(false)
+  }
+
+  useUpdateEffect(() => {
+    getDataSource(1)
+  }, [currentFilter])
+
+  const clearAll = () => {
+    setCurrentFilter({
+      industry: '',
+      product: [],
+      scale: ''
+    })
+  }
+  useMount(async () => {
+    const res1 = await getIndustryList()
+    if (res1.code === 0 && res1.data) {
+      setIndustryList(res1.data)
+    }
+    const res2 = await getOrganizationsizeList()
+    if (res2.code === 0 && res2.data) {
+      setOrganizationSizeList(res2.data)
+    }
+    const res3 = await getProductList()
+    if (res3.code === 0 && res3.data) {
+      setProductList(res3.data)
+    }
+    setLoading(false)
+    getDataSource()
   })
 
   // 新增筛选条件的函数
   const addFilterItem = (type: 'industry' | 'product' | 'scale', item: string) => {
     setCurrentFilter((prev) => {
+      if (type === 'scale' || type === 'industry') {
+        return {
+          ...prev,
+          [type]: item
+        }
+      }
       // 检查是否已经存在该筛选条件
       if (prev[type].includes(item)) {
         return prev // 如果已经存在，则不做任何修改
@@ -29,21 +131,17 @@ const CaseCenter: React.FC = () => {
 
   // 删除筛选条件的函数
   const removeFilterItem = (type: 'industry' | 'product' | 'scale', item: string) => {
-    setCurrentFilter((prev) => ({
-      ...prev,
-      [type]: prev[type].filter((i) => i !== item)
-    }))
-  }
-
-  useUpdateEffect(() => {
-    console.log(currentFilter, 'currentFilter')
-  }, [currentFilter])
-
-  const clearAll = () => {
-    setCurrentFilter({
-      industry: [],
-      product: [],
-      scale: []
+    setCurrentFilter((prev) => {
+      if (type === 'scale' || type === 'industry') {
+        return {
+          ...prev,
+          [type]: ''
+        }
+      }
+      return {
+        ...prev,
+        [type]: prev[type].filter((i) => i !== item)
+      }
     })
   }
   return (
@@ -63,20 +161,18 @@ const CaseCenter: React.FC = () => {
             清除筛选器
           </div>
           <div className="h-[calc(100%-26px)] nw-no-scroll overflow-y-auto pl-1 px-3">
-            {Object.values(currentFilter).flat().length > 0 && (
+            {currentFilter && (Object.values(Object.assign(currentFilter.industry, currentFilter.product)).flat().length > 0 || currentFilter.scale) && (
               <>
                 <br />
                 <div className="active-facets">
                   <h4>当前筛选</h4>
-                  {currentFilter.industry.length > 0 && (
+                  {currentFilter.industry && (
                     <details className="collapse collapse-arrow mb-2 !text-white" open>
                       <summary className="collapse-title">行业</summary>
                       <div className="collapse-content">
-                        {currentFilter.industry.map((item, index) => (
-                          <p className="flex justify-between" key={index} onClick={() => removeFilterItem('industry', item)}>
-                            {item} <i className="iconfont icon-x"></i>
-                          </p>
-                        ))}
+                        <p className="flex justify-between" onClick={() => removeFilterItem('industry', currentFilter.industry)}>
+                          {currentFilter.industry} <i className="iconfont icon-x"></i>
+                        </p>
                       </div>
                     </details>
                   )}
@@ -92,15 +188,13 @@ const CaseCenter: React.FC = () => {
                       </div>
                     </details>
                   )}
-                  {currentFilter.scale.length > 0 && (
+                  {currentFilter.scale && (
                     <details className="collapse collapse-arrow" open>
                       <summary className="collapse-title">组织规模</summary>
                       <div className="collapse-content">
-                        {currentFilter.scale.map((item, index) => (
-                          <p className="flex justify-between" key={index} onClick={() => removeFilterItem('scale', item)}>
-                            {item} <i className="iconfont icon-x"></i>
-                          </p>
-                        ))}
+                        <p className="flex justify-between" onClick={() => removeFilterItem('scale', currentFilter.scale)}>
+                          {currentFilter.scale} <i className="iconfont icon-x"></i>
+                        </p>
                       </div>
                     </details>
                   )}
@@ -111,52 +205,68 @@ const CaseCenter: React.FC = () => {
             <details className="collapse collapse-arrow mb-2 dark">
               <summary className="collapse-title">行业</summary>
               <div className="collapse-content dark">
-                {Array.from({ length: 10 }).map((_, index) => (
-                  <p key={index} onClick={() => addFilterItem('industry', `content ${index}`)}>
-                    content {index}
-                  </p>
-                ))}
+                {industryList &&
+                  industryList.length > 0 &&
+                  industryList.map((item) => (
+                    <p key={item.id} className={`${currentFilter.industry === item.title ? 'active' : ''}`} onClick={() => addFilterItem('industry', item.title)}>
+                      {item.title}
+                    </p>
+                  ))}
               </div>
             </details>
             <details className="collapse collapse-arrow mb-2 dark">
               <summary className="collapse-title">产品与服务</summary>
               <div className="collapse-content dark">
-                {Array.from({ length: 10 }).map((_, index) => (
-                  <p key={index} onClick={() => addFilterItem('product', `content ${index}`)}>
-                    content {index}
-                  </p>
-                ))}
+                {productList &&
+                  productList.length > 0 &&
+                  productList.map((item, index) => (
+                    <p key={index} className={`${currentFilter.product.includes(item.title) ? 'active' : ''}`} onClick={() => addFilterItem('product', item.title)}>
+                      {item.title}
+                    </p>
+                  ))}
               </div>
             </details>
             <details className="collapse collapse-arrow dark">
               <summary className="collapse-title">组织规模</summary>
               <div className="collapse-content dark">
-                {Array.from({ length: 10 }).map((_, index) => (
-                  <p key={index} onClick={() => addFilterItem('scale', `content ${index}`)}>
-                    content {index}
-                  </p>
-                ))}
+                {organizationSizeList &&
+                  organizationSizeList.length > 0 &&
+                  organizationSizeList.map((item) => (
+                    <p key={item.id} className={`${currentFilter.scale === item.title ? 'active' : ''}`} onClick={() => addFilterItem('scale', item.title)}>
+                      {item.title}
+                    </p>
+                  ))}
               </div>
             </details>
           </div>
         </div>
-        <div className="w-3/4 sl-results nw-scrollbar overflow-y-auto pr-[15px]">
-          {Array.from({ length: 10 }).map((_, index) => (
-            <div className="search-result-container" key={index} onClick={() => naviagte(`/caseDetail/${index}`)}>
-              <div className="search-result">
-                <div className="search-result__inner">
-                  <img alt="" className="result_success_image" src="https://ms-f7-sites-prod-cdn.akamaized.net/docs/stories/1784294520000231012-joyson-microsoft-sentine-automotive-zh-china/resources/fede45c6-a4c7-4b64-8361-81368c18c30a/asset1787552665889865835_1787552665889865835" />
-                  <div className="search-result__data">
-                    <div className="facet-type">
-                      <span>Automotive</span>
+        <div className="w-3/4 sl-results nw-scrollbar overflow-y-auto pr-[15px]" ref={scrollRef}>
+          {dataSource &&
+            dataSource.map((item, index) => (
+              <div
+                className="search-result-container max-h-[50%]"
+                key={index}
+                onClick={() =>
+                  naviagte(`/caseDetail`, {
+                    state: item
+                  })
+                }
+              >
+                <div className="search-result">
+                  <div className="search-result__inner">
+                    <img alt="" className="result_success_image" src={item.logo ?? ''} />
+                    <div className="search-result__data">
+                      <div className="facet-type">
+                        <span>{item.industry}</span>
+                      </div>
+                      <h3>{item.title}</h3>
                     </div>
-                    <h3 lang="zh">均胜电子携手微软 SOC 解决方案构筑现代化信息安全运维体系，守护客户信任与品牌价值</h3>
-                    <div className="search-result__indicators"></div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          {loading && <Loading />}
+          {pagenation.total > 0 && pagenation.page * pagenation.pageSize > pagenation.total && <p className="w-full vh-center mb-2">没有更多了</p>}
         </div>
       </div>
       <FloatButton.BackTop

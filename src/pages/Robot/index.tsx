@@ -364,8 +364,9 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
   }, [autoToBottom && conversitionDetailList!?.length > 0])
   return (
     <div
-      className="robot absolute h-[610px] z-50 w-[450px] bg-white animate__animated animate__fadeInUp animate__faster"
+      className="robot absolute h-[610px] w-[450px] bg-white animate__animated animate__fadeInUp animate__faster"
       style={{
+        zIndex: 100,
         right,
         bottom,
         ...style

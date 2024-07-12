@@ -46,6 +46,11 @@
             background: rgba(0, 0, 0, .1);
             color: black;
           }
+
+          &.active {
+            background: rgba(0, 0, 0, .1);
+            color: black;
+          }
         }
       }
 
@@ -184,6 +189,10 @@
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
+  }
+
+  .search-result__inner {
+    /* margin-top: 20px; */
   }
 
   .search-result.contain img {

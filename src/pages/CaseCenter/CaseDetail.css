@@ -17,7 +17,6 @@
 
   .c-hero .c-heading {
     color: #fff;
-    max-height: 130px;
     background-color: rgba(0, 0, 0, 0.5);
     display: inline-block;
     padding: 16px;
@@ -26,17 +25,13 @@
     width: 520px;
   }
 
-  .story-meta a,
-  .story-meta a:focus,
-  .story-meta a:hover,
-  .story-meta a:link,
-  .story-meta a:visited,
-  a.c-hyperlink,
-  a.c-hyperlink:focus,
-  a.c-hyperlink:hover,
-  a.c-hyperlink:link,
-  a.c-hyperlink:visited {
+  p.c-hyperlink,
+  p.c-hyperlink:focus,
+  p.c-hyperlink:hover,
+  p.c-hyperlink:link,
+  p.c-hyperlink:visited {
     color: #0067B8;
+    margin: 0;
   }
 
   .c-paragraph-1,

@@ -568,7 +568,7 @@ const Document = ({ isNewDoc, tempConversationId, currentFile, docLoading }: Pro
         styles={{
           body: {
             height: 350,
-            overflowY: 'scroll'
+            overflowY: 'auto'
           }
         }}
         cancelText="取消"
