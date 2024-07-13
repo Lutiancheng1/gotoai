@@ -684,6 +684,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     tempQuestionId.current = ''
     console.log('切换对话了', currentConversation)
     setShowRefresh(false)
+    setMessageLoading(false)
   }, [currentConversation])
 
   useMount(() => {
@@ -853,28 +854,32 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
             })}
         </div>
         <div className="last-div">
-          {showRefresh && (
-            <div
-              className="input-msg flex"
-              onClick={() => {
-                sendBeta(false, {
-                  content: conversitionDetailList![conversitionDetailList!.length - 2].content
-                } as UserPrompt)
-                setShowRefresh(false)
-              }}
-            >
-              <div>
-                <img src={refreshIcon} alt="" />
-                <span>重新生成</span>
+          {currentMenuKey.current !== 4 && (
+            <>
+              {showRefresh && (
+                <div
+                  className="input-msg flex"
+                  onClick={() => {
+                    sendBeta(false, {
+                      content: conversitionDetailList![conversitionDetailList!.length - 2].content
+                    } as UserPrompt)
+                    setShowRefresh(false)
+                  }}
+                >
+                  <div>
+                    <img src={refreshIcon} alt="" />
+                    <span>重新生成</span>
+                  </div>
+                </div>
+              )}
+              <div className="input-msg flex" style={{ display: sse && messageLoading ? '' : 'none' }}>
+                <div onClick={stopMessage}>
+                  <img src={stopIcon} alt="" />
+                  <span>停止生成</span>
+                </div>
               </div>
-            </div>
+            </>
           )}
-          <div className="input-msg flex" style={{ display: sse && messageLoading ? '' : 'none' }}>
-            <div onClick={stopMessage}>
-              <img src={stopIcon} alt="" />
-              <span>停止生成</span>
-            </div>
-          </div>
         </div>
       </div>
       <Search

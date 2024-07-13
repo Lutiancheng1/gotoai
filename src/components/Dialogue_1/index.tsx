@@ -539,6 +539,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     setInitQuesions(true)
     setQuesions([])
     setShowRefresh(false)
+    setMessageLoading(false)
   }, [currentConversation])
 
   useMount(() => {
