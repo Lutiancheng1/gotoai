@@ -144,7 +144,17 @@ const Application: React.FC = ({ isNewChat }: Props) => {
         )}
         <Dialogue ref={dialogueRef} style={{ display: !isNewChat ? 'flex' : 'none' }} sse={true} />
       </div>
-      {!isNewChat && <FloatButton style={{ bottom: '50%', transform: 'translateY(-50%)' }} icon={<img src={backIcon} alt="" />} tooltip={'返回应用中心'} onClick={() => back()} />}
+      {!isNewChat && (
+        <FloatButton
+          style={{
+            right: 30,
+            bottom: 100
+          }}
+          icon={<img src={backIcon} alt="" />}
+          tooltip={'返回应用中心'}
+          onClick={() => back()}
+        />
+      )}
     </div>
   )
 }

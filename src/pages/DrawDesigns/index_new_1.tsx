@@ -57,6 +57,13 @@ export interface TaskList {
   status: string
   progress: string
   failReason: string
+  properties: string
+  userNotifyHook: string | null
+  isdel: number
+  thridTaskId: string
+  customId: string
+  atype: string
+  lastTime: string | null
   buttons: Mjbutton[]
 }
 const labelMappings = {
@@ -724,12 +731,15 @@ const DrawDesigns = () => {
         const res = await submitModal({
           maskBase64: imageData,
           prompt,
-          taskId: data.data
+          taskId: task.taskId
         })
         if (res.code === 0) {
           setCanvasLoading(false)
           setIsShowCanvas(false)
           getTaskLists()
+        } else {
+          Toast.notify({ type: 'error', message: res.msg })
+          setCanvasLoading(false)
         }
       }
     } catch (error) {

@@ -112,15 +112,19 @@ const CaseCenter: React.FC = () => {
   // 新增筛选条件的函数
   const addFilterItem = (type: 'industry' | 'product' | 'scale', item: string) => {
     setCurrentFilter((prev) => {
+      // 对于 'industry' 和 'scale' 类型的筛选条件，直接比较值
       if (type === 'scale' || type === 'industry') {
+        if (prev[type] === item) {
+          return prev // 如果传入的值与当前值相同，则不做任何修改
+        }
         return {
           ...prev,
           [type]: item
         }
       }
-      // 检查是否已经存在该筛选条件
+      // 对于 'product' 类型的筛选条件，需要检查数组中是否已包含该值
       if (prev[type].includes(item)) {
-        return prev // 如果已经存在，则不做任何修改
+        return prev // 如果数组中已包含该值，则不做任何修改
       }
       return {
         ...prev,
@@ -161,7 +165,7 @@ const CaseCenter: React.FC = () => {
             清除筛选器
           </div>
           <div className="h-[calc(100%-26px)] nw-no-scroll overflow-y-auto pl-1 px-3">
-            {currentFilter && (Object.values(Object.assign(currentFilter.industry, currentFilter.product)).flat().length > 0 || currentFilter.scale) && (
+            {currentFilter && (currentFilter.industry || currentFilter.product.length > 0 || currentFilter.scale) && (
               <>
                 <br />
                 <div className="active-facets">
