@@ -7,7 +7,7 @@ import Toast from '@/components/Toast'
 import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
 import { robotInitialState, toggleFirstSend, toggleIsNewChat, updateConversitionDetail, updateConversitionDetailList, updateCurrentId } from '@/store/reducers/robot'
-import { addChatMessages, AddChatMessagesData, startChat } from '@/store/action/robotActions'
+import { addChatMessages, AddChatMessagesData, AddScore, CancelScore, startChat } from '@/store/action/robotActions'
 import dayjs from 'dayjs'
 import { Tooltip } from 'antd'
 import copy from 'copy-to-clipboard'
@@ -33,6 +33,7 @@ import { handleCopyClick } from '@/components/Dialogue'
 import { getMessagesSuggested, sendChatMessage } from '@/api/knowledge'
 import { getQuesions } from '@/store/action/talkActions'
 import { renderMarkdown } from '@/components/MdRender/markdownRenderer'
+import { MessageInfo } from '@/store/types'
 let conversation_id = ''
 type Props = {
   right?: number
@@ -142,7 +143,7 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
         sse
           ? [
               {
-                id: 0,
+                id: updateConversitionDetailList.length,
                 chatId: currentConversation!.chatId,
                 content: prompt?.content || sendValue,
                 type: 0,
@@ -150,19 +151,20 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
                 createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
               },
               {
-                id: 0,
+                id: updateConversitionDetailList.length + 1,
                 UUID: uuid,
                 chatId: currentConversation!.chatId,
                 content: '',
                 isLoading: true,
                 type: 1,
                 resource: '',
+                score: null,
                 createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
               }
             ]
           : {
               id: 0,
-              chatId: currentConversation!.chatId,
+              chatId: updateConversitionDetailList.length,
               content: prompt?.content || sendValue,
               type: 0,
               resource: '',
@@ -301,6 +303,7 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
               content: message,
               type: 1,
               resource: '',
+              score: null,
               createtime: dayjs().format('YYYY-MM-DD HH:mm:ss')
             })
           )
@@ -362,6 +365,21 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
     scrollBottom()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoToBottom && conversitionDetailList!?.length > 0])
+
+  const handleScoreClick = (item: MessageInfo, score: 'good' | 'bad') => {
+    console.log(item.score, score)
+    if (!item.score || (item.score === 'bad' && score === 'good') || (item.score === 'good' && score === 'bad')) {
+      dispatch(
+        AddScore({
+          messageId: item.id,
+          score
+        })
+      )
+    } else {
+      dispatch(CancelScore(item.id))
+    }
+  }
+
   return (
     <div
       className="robot absolute h-[610px] w-[450px] bg-white animate__animated animate__fadeInUp animate__faster"
@@ -461,13 +479,13 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
                                     </i>
                                   </Tooltip>
                                   <Tooltip title={'答的不错'} placement="top">
-                                    <i className="shim">
-                                      <div className="thumbs-up"></div>
+                                    <i className="shim" onClick={() => handleScoreClick(item, 'good')}>
+                                      <div className={`${item.score && item.score === 'good' ? 'thumbs-up-active' : 'thumbs-up'}`}></div>
                                     </i>
                                   </Tooltip>
                                   <Tooltip title={'还不够好'} placement="top">
-                                    <i className="shim">
-                                      <div className="thumbs-down"></div>
+                                    <i className="shim" onClick={() => handleScoreClick(item, 'bad')}>
+                                      <div className={`${item.score && item.score === 'bad' ? 'thumbs-down-active' : 'thumbs-down'}`}></div>
                                     </i>
                                   </Tooltip>
                                   <Tooltip title={'点击可复制'} placement="top">

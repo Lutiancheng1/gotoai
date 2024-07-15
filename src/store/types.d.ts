@@ -70,6 +70,7 @@ export interface MessageInfo {
   resource: string
   UUID?: string
   isLoading?: boolean
+  score?: 'good' | 'bad' | null
   files?: {
     id: number | string
     chatMessageId?: number

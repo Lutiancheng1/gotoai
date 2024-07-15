@@ -1,7 +1,7 @@
 import { http } from '@/utils/axios'
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { ChatMessages, GetHistoryFroMenu, HistoryList, MessageInfo, NewQuestion } from '../types'
-import { delHistory, saveHistoryList, updateConversitionDetailList, updateCurrentId, updateHistoryList } from '../reducers/talk'
+import { delHistory, saveHistoryList, updateConversitionDetailList, updateCurrentId, updateHistoryList, updateScore } from '../reducers/talk'
 import { ShartChatResp } from '@/types/app'
 import { FileInfo } from '@/components/Dialogue'
 import { AxiosResponse } from 'axios'
@@ -168,5 +168,28 @@ export const saveTempChat = createAsyncThunk('talk/saveTempChat', async (params:
   }
   console.log(res)
   if (!res.data && res.code !== 0) return
+  return res.data
+})
+
+type AddScoreParams = {
+  messageId: string | number
+  score: 'bad' | 'good'
+  tags?: string
+}
+// 添加点赞/点踩
+export const AddScore = createAsyncThunk('talk/AddScore', async (params: AddScoreParams, { dispatch }) => {
+  const res = await http.post('/Chat/AddScore', params)
+  console.log(res, 'AddScore')
+  if (!res.data) return
+  dispatch(updateScore({ messageId: params.messageId, score: params.score }))
+  return res.data
+})
+
+// 取消点赞/点踩
+export const CancelScore = createAsyncThunk('talk/DelScore', async (messageId: string | number, { dispatch }) => {
+  const res = await http.get(`/Chat/DelScore?msgId=${messageId}`)
+  console.log(res, 'CancelScore')
+  if (!res.data) return
+  dispatch(updateScore({ messageId, score: null }))
   return res.data
 })

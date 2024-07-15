@@ -129,6 +129,13 @@ const talkSlice = createSlice({
       state.loading = false
       state.isNewChat = true
       state.firstSend = true
+    },
+    // 更新点赞点踩状态
+    updateScore(state, { payload }: PayloadAction<{ messageId: string | number; score: 'bad' | 'good' | null }>) {
+      const target = state.conversitionDetailList.find((item) => item.id === payload.messageId)
+      if (target) {
+        target.score = payload.score
+      }
     }
   },
 
@@ -150,5 +157,5 @@ const talkSlice = createSlice({
   }
 })
 
-export const { updateCurrentId, updateConversitionDetailList, delHistory, updateLoading, clearConversitionDetailList, initState, toggleIsNewChat, updateHistoryList, clearHistoryList, saveHistoryList, toggleFirstSend, updateConversitionDetail } = talkSlice.actions
+export const { updateCurrentId, updateConversitionDetailList, delHistory, updateLoading, clearConversitionDetailList, initState, toggleIsNewChat, updateHistoryList, clearHistoryList, saveHistoryList, toggleFirstSend, updateConversitionDetail, updateScore } = talkSlice.actions
 export default talkSlice.reducer

@@ -273,7 +273,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
           conversationId: currentConversation!.conversationId,
           menu: 10,
           query: query,
-          inputs: {}
+          inputs: transformObject(form.getFieldsValue())
         }),
         onmessage(msg) {
           // 接收一次数据段时回调，因为是流式返回，所以这个回调会被调用多次
@@ -513,7 +513,9 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
               if (!subsection.content || subsection.content === '') {
                 // 生成小节内容
                 subsection.content = await fillContent(
-                  `请根据以下文档大纲的：${subsection.title}，自动生成详细的内容。${key ?? ''}请直接输出内容,禁止出现大纲标题:${subsection.title}。内容应包括至少三个主要观点，每个观点下应有详细解释和例子。请确保内容能够深入探讨该部分的主题，同时保持语言流畅和易懂。`,
+                  `请根据文档大纲为 ${jsonToText(jsonOutline.current!)}。自动生成《${subsection.title}》详细的内容。${key ?? ''}请直接输出内容,禁止出现大纲标题:${
+                    subsection.title
+                  }。内容应包括至少三个主要观点，每个观点下应有详细解释和例子。请确保内容能够深入探讨该部分的主题，同时保持语言流畅和易懂。`,
                   (content) => {
                     subsection.content = content
                     editorRef.current?.setContent(jsonToMarkdown(outlineCopy))
