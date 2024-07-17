@@ -7,7 +7,7 @@ import Toast from '../Toast'
 import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
 import { initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateConversitionDetail, updateConversitionDetailList, updateCurrentId } from '@/store/reducers/talk'
-import { addChatMessages, AddChatMessagesData, getHistoryList, getQuesions, startChat } from '@/store/action/talkActions'
+import { addChatMessages, AddChatMessagesData, AddScore, CancelScore, getHistoryList, getQuesions, startChat } from '@/store/action/talkActions'
 import dayjs from 'dayjs'
 import { useLocation } from 'react-router-dom'
 import { menuType, menuWarp } from '@/utils/constants'
@@ -35,6 +35,7 @@ import PDFViewer from '../PDFViewer'
 import CSVPreview from '../Csv'
 import { formatFileSize, formatFileType } from '@/utils/format'
 import { renderMarkdown } from '../MdRender/markdownRenderer'
+import { MessageInfo } from '@/store/types'
 // 定义一个文件信息的类型
 export type FileInfo = {
   // 文件的 id
@@ -551,6 +552,20 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
     currentMenuKey.current !== 11 && dispatch(initState())
     setShowRefresh(false)
   })
+
+  const handleScoreClick = (item: MessageInfo, score: 'good' | 'bad') => {
+    console.log(item.score, score)
+    if (!item.score || (item.score === 'bad' && score === 'good') || (item.score === 'good' && score === 'bad')) {
+      dispatch(
+        AddScore({
+          messageId: item.id,
+          score
+        })
+      )
+    } else {
+      dispatch(CancelScore(item.id))
+    }
+  }
   return (
     <div className="dialogue-detail" style={style}>
       <div className="session-box" ref={scrollBox}>
@@ -649,13 +664,13 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
                                 </i>
                               </Tooltip>
                               <Tooltip title={'答的不错'} placement="top">
-                                <i className="shim">
-                                  <div className="thumbs-up"></div>
+                                <i className="shim" onClick={() => handleScoreClick(item, 'good')}>
+                                  <div className={`${item.score && item.score === 'good' ? 'thumbs-up-active' : 'thumbs-up'}`}></div>
                                 </i>
                               </Tooltip>
                               <Tooltip title={'还不够好'} placement="top">
-                                <i className="shim">
-                                  <div className="thumbs-down"></div>
+                                <i className="shim" onClick={() => handleScoreClick(item, 'bad')}>
+                                  <div className={`${item.score && item.score === 'bad' ? 'thumbs-down-active' : 'thumbs-down'}`}></div>
                                 </i>
                               </Tooltip>
                               <Tooltip title={'点击可复制'} placement="top">
