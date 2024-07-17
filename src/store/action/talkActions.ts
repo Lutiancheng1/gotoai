@@ -180,8 +180,8 @@ type AddScoreParams = {
 export const AddScore = createAsyncThunk('talk/AddScore', async (params: AddScoreParams, { dispatch }) => {
   const res = await http.post('/Chat/AddScore', params)
   console.log(res, 'AddScore')
-  if (!res.data) return
   dispatch(updateScore({ messageId: params.messageId, score: params.score }))
+  if (!res.data) return
   return res.data
 })
 
@@ -189,7 +189,7 @@ export const AddScore = createAsyncThunk('talk/AddScore', async (params: AddScor
 export const CancelScore = createAsyncThunk('talk/DelScore', async (messageId: string | number, { dispatch }) => {
   const res = await http.get(`/Chat/DelScore?msgId=${messageId}`)
   console.log(res, 'CancelScore')
-  if (!res.data) return
   dispatch(updateScore({ messageId, score: null }))
+  if (!res.data) return
   return res.data
 })
