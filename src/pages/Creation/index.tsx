@@ -17,12 +17,11 @@ const tabsWarp = [
   },
   {
     label: 'AI 音乐创作',
-    key: 'musicCreation',
-    disabled: true
+    key: 'musicCreation'
   }
 ]
 const CreationWrapper: React.FC<CreationWrapperProps> = () => {
-  const [activeKey, setActiveKey] = useState('videoCreation')
+  const [activeKey, setActiveKey] = useState('musicCreation')
   return (
     <div className="creation_wrapper">
       {/* 上方tab切换*/}
@@ -48,7 +47,7 @@ const CreationWrapper: React.FC<CreationWrapperProps> = () => {
         </ConfigProvider>
       </section>
       {/* 下方内容区域 */}
-      <div className="creation-content w-full h-[calc(100%-46px)] p-3">
+      <div className="creation-content w-full h-[calc(100%-46px)]">
         {activeKey === 'videoCreation' && <VideoCreation />}
         {activeKey === 'videoEditing' && <VideoEditing />}
         {activeKey === 'musicCreation' && <MusicCreation />}

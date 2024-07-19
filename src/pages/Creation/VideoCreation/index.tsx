@@ -472,7 +472,7 @@ const VideoCreation: React.FC<{}> = () => {
     }
   ]
   return (
-    <div className="video-creation bg-[#f6f7f9] overflow-scroll nw-scrollbar w-full h-full">
+    <div className="video-creation bg-[#f6f7f9] overflow-scroll nw-scrollbar w-full h-full p-3">
       <div className="ml-1 ">
         <p>基于强大的类似Sora AI模型，任意文本、图片都能快速生成高质量视频。无论是新手小白，还是对视频有高标准严要求的专业人士，GotoAI视频生成器都能轻松满足您的需求，让每一个想法都大放异彩，适用于抖音，快手，西瓜视频，今日头条视频。</p>
       </div>

@@ -1,0 +1,39 @@
+.music {
+  .required::after {
+    display: inline-block;
+    margin-inline-start: 4px;
+    color: #ff4d4f;
+    font-size: 14px;
+    font-family: SimSun, sans-serif;
+    line-height: 1;
+    content: "*";
+  }
+
+  .creative-model {
+    .model-item.suno {
+      background: url('@/assets/images/suno.jpg') no-repeat;
+      background-size: 100% 100%;
+    }
+  }
+
+  .model-item.active {
+    border: 2px solid #4096ff;
+    color: #ccc !important;
+  }
+
+  .lrc-textarea .ant-input-data-count {
+    bottom: 5px;
+    right: 8px;
+  }
+
+  .music-content header .title {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+    align-items: center;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 36px;
+  }
+}
