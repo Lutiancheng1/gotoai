@@ -3,7 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 import { ChatMessages, GetHistoryFroMenu, HistoryList, MessageInfo, NewQuestion } from '../types'
 import { delHistory, saveHistoryList, updateConversitionDetailList, updateCurrentId, updateHistoryList, updateScore } from '../reducers/talk'
 import { ShartChatResp } from '@/types/app'
-import { FileInfo } from '@/components/Dialogue'
+import { FileInfo } from '@/components/Dialogue_agent'
 import { AxiosResponse } from 'axios'
 
 export type HisResponse = {

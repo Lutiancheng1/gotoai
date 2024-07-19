@@ -5,7 +5,7 @@ import { clearConversitionDetailList, talkInitialState, toggleIsNewChat, updateC
 import { useEffect, useRef, useState } from 'react'
 import { UserPrompt } from '../Talk'
 import { getPromptList, getPromptTypes } from '@/api/prompt'
-import Dialogue from '@/components/Dialogue'
+import Dialogue from '@/components/Dialogue_agent'
 import './index.css'
 import itemIcon from '@/assets/images/ai-icon.svg'
 import backIcon from '@/assets/images/back.svg'

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useMount } from 'ahooks'
 import { Empty, FloatButton, Input, Skeleton, Tag } from 'antd'
-import { handleCopyClick } from '@/components/Dialogue'
+import { handleCopyClick } from '@/components/Dialogue_agent'
 import { downloadImage } from './index_new'
 import { SearchOutlined } from '@ant-design/icons'
 import { ITab } from './constant'

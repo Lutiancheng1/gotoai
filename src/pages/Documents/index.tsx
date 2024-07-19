@@ -19,7 +19,7 @@ import { copyDocument, delChatDocument, delDocument, getDocumentList, getDocumen
 import { DocFile, DocumentInitState, initState, toggleIsNewDoc, updateCurrentFile, updateDocLoading } from '@/store/reducers/document'
 import SplitPane, { Pane } from 'split-pane-react'
 import 'split-pane-react/esm/themes/default.css'
-import Dialogue from '@/components/Dialogue'
+import Dialogue from '@/components/Dialogue_agent'
 import { LoadingOutlined } from '@ant-design/icons'
 import { clearConversitionDetailList, talkInitialState, toggleFirstSend, toggleIsNewChat, updateCurrentId, updateLoading } from '@/store/reducers/talk'
 import UploadErrorImg from '@/assets/images/upload-error.svg'

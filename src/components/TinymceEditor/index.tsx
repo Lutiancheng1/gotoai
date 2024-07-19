@@ -3,7 +3,7 @@ import { Editor as TinyMCEEditorInstance } from 'tinymce'
 import './index.css'
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import Loading from '../loading'
-import { handleCopyClick } from '../Dialogue'
+import { handleCopyClick } from '../Dialogue_agent'
 import '@/components/MdRender/md.css'
 import { asBlob } from 'html-docx-js-typescript'
 import { saveAs } from 'file-saver'
@@ -13,10 +13,47 @@ import { fillContent } from '@/pages/Writing/WritingDetail'
 type TinyMCEEditorProps = {
   onChange?: (content: string) => void
 }
+const content_style = `
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 14px;
+}
+p {
+  text-indent: 4ch;
+  line-height: 24px;
+}
+h1, h2, h3, h4 {
+  text-align: center;
+}  
+`
 
 const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
   const editorRef = useRef<TinyMCEEditorInstance | null>(null)
   const [loading, setLoading] = useState(true) // 加载状态
+
+  const getStyledHtml = () => {
+    if (editorRef.current) {
+      let content = editorRef.current.getContent()
+      const parser = new DOMParser()
+      const doc = parser.parseFromString(content, 'text/html')
+
+      // 为 p 标签添加样式
+      doc.querySelectorAll('p').forEach((p) => {
+        p.style.textIndent = '4ch'
+        p.style.lineHeight = '24px'
+      })
+
+      // 为 h1, h2, h3, h4 标签添加样式
+      doc.querySelectorAll('h1, h2, h3, h4').forEach((header: any) => {
+        header.style.textAlign = 'center'
+      })
+
+      // 将修改后的 HTML 转换回字符串
+      content = doc.body.innerHTML
+      return content
+    }
+    return '' // 如果编辑器未初始化，返回空字符串
+  }
   useImperativeHandle(ref, () => ({
     setContent: (content: string) => {
       if (editorRef.current) {
@@ -67,7 +104,7 @@ const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
           inline_boundaries: false,
           menubar: true, // 顶部菜单栏
           resize: false, // 右下角调整大小
-          statusbar: false, // 底部状态栏
+          // statusbar: false, // 底部状态栏
           autoresize_on_init: true, // 自动调整大小
           object_resizing: false, // 禁止设置媒体大小
           autosave_interval: '30s', // 自动保存时间
@@ -77,6 +114,7 @@ const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
           quickbars_selection_toolbar: 'bold italic forecolor backcolor quicklink quickimage quicktable | recommendedSentences recommendedParagraph continuationOfContent rewrite polish expand abbreviation', // 快速工具栏
           image_caption: true,
           default_link_target: '_blank',
+          content_style,
           setup(editor) {
             editor.ui.registry.addButton('copyContent', {
               icon: 'copy',
@@ -126,14 +164,14 @@ const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
               icon: 'save',
               tooltip: '保存文档',
               onAction: async function () {
-                const content = editor.getContent()
+                const content = getStyledHtml()
                 console.log(content)
 
                 if (!content) return
                 try {
                   const docxBuffer = await asBlob(content)
                   const docxBlob = new Blob([docxBuffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
-                  const match = content.match(/<h1>(.*?)<\/h1>/)?.[1]
+                  const match = content.match(/<h1(.*?)>(.*?)<\/h1>/)?.[1]
                   const fileName = match ? match : 'document' // 如果没有匹配到，则使用 '默认文件名'
                   saveAs(docxBlob, `${fileName} _${dayjs().format('YYYY-MM-DD')}.docx`)
                   Toast.notify({
@@ -152,7 +190,6 @@ const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
           plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons accordion',
           toolbar: 'undo redo | blocks fontsizeinput | copyContent downWord underline strikethrough image link | align numlist bullist | table media emoticonsss | lineheight outdent indent| removeformat | charmap | code fullscreen preview | save print | pagebreak anchor codesample | ltr rtl ',
           removed_menuitems: 'newdocument',
-          content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
           formats: {
             alignleft: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'left' },
             aligncenter: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'center' },
@@ -163,8 +200,8 @@ const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
             underline: { inline: 'span', classes: 'underline', exact: true },
             strikethrough: { inline: 'del' },
             forecolor: { inline: 'span', classes: 'forecolor', styles: { color: '%value' } },
-            hilitecolor: { inline: 'span', classes: 'hilitecolor', styles: { backgroundColor: '%value' } }
-            // custom_format: { block: 'h1', attributes: { title: 'Header' }, styles: { color: 'red' } }
+            hilitecolor: { inline: 'span', classes: 'hilitecolor', styles: { backgroundColor: '%value' } },
+            custom_format: { block: 'h1', attributes: { title: 'Header' }, styles: { color: 'red' } }
           },
           init_instance_callback: (editor) => {
             setLoading(false) // 当编辑器初始化完成后，关闭加载状态

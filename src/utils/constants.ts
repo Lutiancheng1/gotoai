@@ -32,11 +32,11 @@ export const menuConfig = [
     icon: 'icon-shujufenxi1',
     label: '数据分析'
   },
-  {
-    key: 'dataAnalysis1',
-    icon: 'icon-shujufenxi1',
-    label: '数据分析1'
-  },
+  // {
+  //   key: 'dataAnalysis1',
+  //   icon: 'icon-shujufenxi1',
+  //   label: '数据分析1'
+  // },
   {
     key: 'drawDesigns',
     icon: 'icon-hf_zxphuatu',

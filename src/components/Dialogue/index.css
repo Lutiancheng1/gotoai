@@ -47,16 +47,8 @@
           background-image: url('@/assets/images/thumb_up_pc.svg');
         }
 
-        .thumbs-up-active {
-          background-image: url('@/assets/images/thumb_up_pc_active.svg');
-        }
-
         .thumbs-down {
           background-image: url('@/assets/images/thumb_down_pc.svg');
-        }
-
-        .thumbs-down-active {
-          background-image: url('@/assets/images/thumb_down_pc_active.svg');
         }
 
         .copy {

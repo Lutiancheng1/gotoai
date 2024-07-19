@@ -2,7 +2,7 @@
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import { imgLazyload } from '@mdit/plugin-img-lazyload'
-import { handleCopyClick } from '../Dialogue'
+import { handleCopyClick } from '../Dialogue_agent'
 import './md.css'
 const md: MarkdownIt = new MarkdownIt({
   html: true,

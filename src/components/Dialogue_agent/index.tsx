@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { useAppDispatch } from '@/store/hooks'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import Search, { getIconUrlByFileType } from '../Search'
 import './index.css'
 import '@/components/MdRender/md.css'
@@ -7,7 +7,7 @@ import Toast from '../Toast'
 import { connect } from 'react-redux'
 import { AppDispatch, RootState } from '@/store'
 import { initState, talkInitialState, toggleFirstSend, toggleIsNewChat, updateConversitionDetail, updateConversitionDetailList, updateCurrentId } from '@/store/reducers/talk'
-import { addChatMessages, AddChatMessagesData, AddScore, CancelScore, getHistoryList, getQuesions, startChat } from '@/store/action/talkActions'
+import { addChatMessages, AddChatMessagesData, addMessages, AddScore, CancelScore, getHistoryList, getQuesions, startChat, updateChatTitle } from '@/store/action/talkActions'
 import dayjs from 'dayjs'
 import { useLocation } from 'react-router-dom'
 import { menuType, menuWarp } from '@/utils/constants'
@@ -35,6 +35,7 @@ import PDFViewer from '../PDFViewer'
 import CSVPreview from '../Csv'
 import { formatFileSize, formatFileType } from '@/utils/format'
 import { renderMarkdown } from '../MdRender/markdownRenderer'
+import { runWorkflow, sendChatMessage } from '@/api/knowledge'
 import { MessageInfo } from '@/store/types'
 // 定义一个文件信息的类型
 export type FileInfo = {
@@ -83,6 +84,9 @@ type Props = {
 const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConversation, style, firstSend, placeholder = '输入你的问题或需求', hasUploadBtn = false, initChildren, autoToBottom = true, fileId, sse = false, hasFooter = true, multiple, fileIds }: Props, ref) => {
   // 初始化问题Id
   let currentQuestion = currentConversation
+  // 数据分析的临时 questionId 和text
+  const tempQuestionId = useRef('')
+  const tempText = useRef('')
   const location = useLocation()
   // 获取 dispatch 对象，用于触发 actions
   const dispatch = useAppDispatch()
@@ -112,6 +116,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   const currentMessageRef = useRef<HTMLDivElement>(null)
   // 使用 useSize 监听 scrollBoxRef 元素的尺寸变化
   const size = useSize(currentMessageRef)
+  const user = useAppSelector((state) => state.profileSlice.user)
+  // 是否显示重新生成按钮
   const [showRefresh, setShowRefresh] = useState(false)
   const scrollBottom = () => {
     // 滚动到底部
@@ -124,6 +130,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   }
 
   const getConversationQuestions = async (id?: string) => {
+    //  菜单为数据分析 直接跳出
+    if (currentMenuKey.current === 4) return
     setQuesions([])
     try {
       setQuesionsLoading(true)
@@ -158,7 +166,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   const sendBeta = async (defaultRule?: boolean, prompt?: UserPrompt) => {
     setQuesions([])
     setShowRefresh(false)
-    console.log(defaultRule, prompt, 'defaultRule', 'prompt')
+    // console.log(defaultRule, prompt, 'defaultRule', 'prompt')
     // defaultRule 为 true 代表是从 首页预设角色过来的 只需要 传递prompt提词 不用发送用户消息
     // 如果是新会话，则创建一个新的会话
     if (isNewChat && currentMenuKey.current !== 1) {
@@ -243,78 +251,206 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       // 滚动到底部
       scrollBottom()
       if (sse) {
-        const newController = new AbortController()
-        setController(newController)
-        const signal = newController.signal
-        try {
-          const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
-          fetchEventSource(url, {
-            method: 'POST',
-            signal: signal,
-            headers: {
-              'Content-Type': 'application/json',
-              'Cache-Control': 'no-cache',
-              Connection: 'keep-alive',
-              Authorization: `Bearer ${getTokenInfo().token}`
-            },
-            body: JSON.stringify({
-              conversationId: currentQuestion!.conversationId,
-              menu: currentMenuKey.current,
-              query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
-              files: fileIds
-            }),
-            onopen(response) {
-              // 建立连接的回调
-              if (isNewChat || firstSend) {
-                // 刷新当前历史记录
-                // 获取历史列表
-                refreshHistoryList()
-              }
-              // 当前发送完成后 不是第一次发送
-              dispatch(toggleFirstSend(false))
-              // 当前发送完成后 不是第一次发送
-              dispatch(toggleFirstSend(false))
-              return Promise.resolve()
-            },
-            onmessage(msg) {
-              // 接收一次数据段时回调，因为是流式返回，所以这个回调会被调用多次
-              if (msg.event === 'message') {
-                // 处理数据段
-                let { message, files } = JSON.parse(msg.data) as unknown as AddChatMessagesData
-                let file = files && files.length > 0 ? files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n') : ''
-                dispatch(updateConversitionDetail({ UUID: uuid, content: message ? message + file : file }))
-                // 进行连接正常的操作
-              } else if (msg.event === 'message_end') {
-                setMessageLoading(false)
-                newController.abort()
-                setCurrentUUID('')
-                // 更新左侧历史title
-                refreshHistoryList()
-                dispatch(updateConversitionDetail({ UUID: uuid, content: '' }))
-                getConversationQuestions()
-              }
-            },
-            onclose() {
-              // 正常结束的回调
-              newController.abort() // 关闭连接
-            },
-            onerror(err) {
-              console.log(err, 'err')
-              // 连接出现异常回调
-              // 必须抛出错误才会停止
-              setMessageLoading(false)
-              setSendValue('')
-              throw err
+        if (currentMenuKey.current === 4) {
+          try {
+            // 首次更新消息title
+            if (conversitionDetailList && conversitionDetailList.length === 0) {
+              await dispatch(
+                updateChatTitle({
+                  chatId: currentQuestion!.chatId,
+                  conversationId: currentQuestion!.conversationId,
+                  title: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
+                })
+              )
+              refreshHistoryList()
             }
-          })
-        } catch (err) {
-          setMessageLoading(false)
-          setSendValue('')
-          Toast.notify({
-            type: 'error',
-            message: '网络错误'
-          })
-          console.error('Fetch error:', err)
+            // await runWorkflow(
+            //   {
+            //     inputs: {
+            //       query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, '')
+            //     },
+            //     user: user.username,
+            //     conversation_id: currentQuestion!.conversationId
+            //   },
+            //   {
+            //     onTextChunk: ({ data: { text } }) => {
+            //       dispatch(updateConversitionDetail({ UUID: uuid, content: text }))
+            //       // console.log(text)
+            //     },
+            //     onWorkflowFinished: ({ data: { outputs } }) => {
+            //       //  更新消息历史
+            //       dispatch(
+            //         addMessages([
+            //           {
+            //             chatId: currentQuestion!.chatId,
+            //             content: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
+            //             id: 0,
+            //             createtime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            //             type: 0,
+            //             resource: ''
+            //           },
+            //           {
+            //             chatId: currentQuestion!.chatId,
+            //             content: outputs.text,
+            //             id: 0,
+            //             createtime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+            //             type: 1,
+            //             resource: ''
+            //           }
+            //         ])
+            //       )
+            //       setCurrentUUID('')
+            //       dispatch(updateConversitionDetail({ UUID: uuid, content: '' }))
+            //       setMessageLoading(false)
+            //     },
+            //     onError: (error) => {
+            //       console.log(error)
+            //       setMessageLoading(false)
+            //       setSendValue('')
+            //       Toast.notify({
+            //         type: 'error',
+            //         message: error
+            //       })
+            //     }
+            //   }
+            // )
+            await sendChatMessage(
+              {
+                inputs: {},
+                query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
+                user: user.username,
+                conversation_id: tempQuestionId.current
+              },
+              {
+                onData(message) {
+                  tempText.current += message
+                  dispatch(updateConversitionDetail({ UUID: uuid, content: message }))
+                },
+                onWorkflowFinished: ({ conversation_id }) => {
+                  tempQuestionId.current = conversation_id
+                  //  更新消息历史
+                  dispatch(
+                    addMessages([
+                      {
+                        chatId: currentQuestion!.chatId,
+                        content: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
+                        id: 0,
+                        createtime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                        type: 0,
+                        resource: tempQuestionId.current
+                      },
+                      {
+                        chatId: currentQuestion!.chatId,
+                        content: tempText.current,
+                        id: 0,
+                        createtime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+                        type: 1,
+                        resource: ''
+                      }
+                    ])
+                  )
+                  setCurrentUUID('')
+                  dispatch(updateConversitionDetail({ UUID: uuid, content: '' }))
+                  setMessageLoading(false)
+                  tempText.current = ''
+                },
+                onFile(file) {
+                  console.log(file, 'file')
+                },
+                onError(msg) {
+                  setMessageLoading(false)
+                  setCurrentUUID('')
+                  setSendValue('')
+                  Toast.notify({
+                    type: 'error',
+                    message: msg
+                  })
+                }
+              }
+            )
+          } catch (error) {
+            setMessageLoading(false)
+            setSendValue('')
+            setCurrentUUID('')
+            tempText.current = ''
+            Toast.notify({
+              type: 'error',
+              message: '网络错误'
+            })
+            console.error('Fetch error:', error)
+          }
+        } else {
+          const newController = new AbortController()
+          setController(newController)
+          const signal = newController.signal
+          try {
+            const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+            fetchEventSource(url, {
+              method: 'POST',
+              signal: signal,
+              headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
+                Connection: 'keep-alive',
+                Authorization: `Bearer ${getTokenInfo().token}`
+              },
+              body: JSON.stringify({
+                conversationId: currentQuestion!.conversationId,
+                menu: currentMenuKey.current,
+                query: prompt?.content || sendValue.replace(/\r/gi, '').replace(/\n/gi, ''),
+                files: fileIds
+              }),
+              onopen(response) {
+                // 建立连接的回调
+                if (isNewChat || firstSend) {
+                  // 刷新当前历史记录
+                  // 获取历史列表
+                  refreshHistoryList()
+                }
+                // 当前发送完成后 不是第一次发送
+                dispatch(toggleFirstSend(false))
+                // 当前发送完成后 不是第一次发送
+                dispatch(toggleFirstSend(false))
+                return Promise.resolve()
+              },
+              onmessage(msg) {
+                // 接收一次数据段时回调，因为是流式返回，所以这个回调会被调用多次
+                if (msg.event === 'message') {
+                  // 处理数据段
+                  let { message, files } = JSON.parse(msg.data) as unknown as AddChatMessagesData
+                  let file = files && files.length > 0 ? files.map((file) => (file.type === 'image' ? `![图片](${file.url})` : `[文件](${file.url})`)).join('\n\n') : ''
+                  dispatch(updateConversitionDetail({ UUID: uuid, content: message ? message + file : file }))
+                  // 进行连接正常的操作
+                } else if (msg.event === 'message_end') {
+                  setMessageLoading(false)
+                  newController.abort()
+                  setCurrentUUID('')
+                  // 更新左侧历史title
+                  refreshHistoryList()
+                  dispatch(updateConversitionDetail({ UUID: uuid, content: '' }))
+                  getConversationQuestions()
+                }
+              },
+              onclose() {
+                // 正常结束的回调
+                newController.abort() // 关闭连接
+              },
+              onerror(err) {
+                console.log(err, 'err')
+                // 连接出现异常回调
+                // 必须抛出错误才会停止
+                throw err
+              }
+            })
+          } catch (err) {
+            setMessageLoading(false)
+            setSendValue('')
+            Toast.notify({
+              type: 'error',
+              message: '网络错误'
+            })
+            console.error('Fetch error:', err)
+          }
         }
       } else {
         try {
@@ -521,6 +657,13 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   useEffect(() => {
     // 滚动到底部
     scrollBottom()
+    // 通过resource 来设置切换问题时的 数据分析的id同步的问题
+    if (tempQuestionId.current === '') {
+      if (conversitionDetailList && conversitionDetailList.length > 0) {
+        tempQuestionId.current = conversitionDetailList[0].resource
+        console.log(tempQuestionId.current)
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoToBottom && conversitionDetailList!?.length > 0])
 
@@ -539,6 +682,8 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
   useUpdateEffect(() => {
     setInitQuesions(true)
     setQuesions([])
+    tempQuestionId.current = ''
+    console.log('切换对话了', currentConversation)
     setShowRefresh(false)
     setMessageLoading(false)
   }, [currentConversation])
@@ -566,6 +711,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
       dispatch(CancelScore(item.id))
     }
   }
+
   return (
     <div className="dialogue-detail" style={style}>
       <div className="session-box" ref={scrollBox}>
@@ -724,28 +870,32 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
             })}
         </div>
         <div className="last-div">
-          {showRefresh && (
-            <div
-              className="input-msg flex"
-              onClick={() => {
-                sendBeta(false, {
-                  content: conversitionDetailList![conversitionDetailList!.length - 2].content
-                } as UserPrompt)
-                setShowRefresh(false)
-              }}
-            >
-              <div>
-                <img src={refreshIcon} alt="" />
-                <span>重新生成</span>
+          {currentMenuKey.current !== 4 && (
+            <>
+              {showRefresh && (
+                <div
+                  className="input-msg flex"
+                  onClick={() => {
+                    sendBeta(false, {
+                      content: conversitionDetailList![conversitionDetailList!.length - 2].content
+                    } as UserPrompt)
+                    setShowRefresh(false)
+                  }}
+                >
+                  <div>
+                    <img src={refreshIcon} alt="" />
+                    <span>重新生成</span>
+                  </div>
+                </div>
+              )}
+              <div className="input-msg flex" style={{ display: sse && messageLoading ? '' : 'none' }}>
+                <div onClick={stopMessage}>
+                  <img src={stopIcon} alt="" />
+                  <span>停止生成</span>
+                </div>
               </div>
-            </div>
+            </>
           )}
-          <div className="input-msg flex" style={{ display: sse && messageLoading ? '' : 'none' }}>
-            <div onClick={stopMessage}>
-              <img src={stopIcon} alt="" />
-              <span>停止生成</span>
-            </div>
-          </div>
         </div>
       </div>
       <Search
