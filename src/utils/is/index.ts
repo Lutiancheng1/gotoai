@@ -68,3 +68,80 @@ export function isPdfFile(fileName: string): boolean {
 export function isCsvFile(fileName: string): boolean {
   return /\.csv$/i.test(fileName)
 }
+export function isPptFile(fileName: string): boolean {
+  return /\.(ppt|pptx)$/i.test(fileName)
+}
+
+export function isTxtFile(fileName: string): boolean {
+  return /\.txt$/i.test(fileName)
+}
+
+export function isXmlFile(fileName: string): boolean {
+  return /\.xml$/i.test(fileName)
+}
+
+export function isHtmlFile(fileName: string): boolean {
+  return /\.(htm|html)$/i.test(fileName)
+}
+
+const shortTypeToMimeType: { [key: string]: string[] } = {
+  image: ['jpeg', 'jpg', 'png', 'gif'],
+  word: ['doc', 'docx'],
+  excel: ['xls', 'xlsx'],
+  pdf: ['pdf'],
+  csv: ['csv'],
+  video: ['mp4', 'avi', 'mkv', 'mov', 'wmv'],
+  audio: ['mp3', 'wav', 'flac', 'aac'],
+  text: ['txt'],
+  zip: ['zip', 'rar', '7z'],
+  html: ['html', 'htm'] // 添加HTML文件类型
+}
+
+// 判断是否为图片文件
+export function isImageFileType(fileType: string): boolean {
+  return shortTypeToMimeType.image.includes(fileType)
+}
+
+// 判断是否为Word文件
+export function isWordFileType(fileType: string): boolean {
+  return shortTypeToMimeType.word.includes(fileType)
+}
+
+// 判断是否为Excel文件
+export function isExcelFileType(fileType: string): boolean {
+  return shortTypeToMimeType.excel.includes(fileType)
+}
+
+// 判断是否为PDF文件
+export function isPdfFileType(fileType: string): boolean {
+  return shortTypeToMimeType.pdf.includes(fileType)
+}
+
+// 判断是否为CSV文件
+export function isCsvFileType(fileType: string): boolean {
+  return shortTypeToMimeType.csv.includes(fileType)
+}
+
+// 判断是否为视频文件
+export function isVideoFileType(fileType: string): boolean {
+  return shortTypeToMimeType.video.includes(fileType)
+}
+
+// 判断是否为音频文件
+export function isAudioFileType(fileType: string): boolean {
+  return shortTypeToMimeType.audio.includes(fileType)
+}
+
+// 判断是否为文本文件
+export function isTextFileType(fileType: string): boolean {
+  return shortTypeToMimeType.text.includes(fileType)
+}
+
+// 判断是否为压缩文件
+export function isZipFileType(fileType: string): boolean {
+  return shortTypeToMimeType.zip.includes(fileType)
+}
+// 判断是否为HTML文件
+export function isHtmlFileType(fileType: string): boolean {
+  return shortTypeToMimeType.html.includes(fileType)
+}

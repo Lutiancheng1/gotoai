@@ -42,7 +42,7 @@ const CSVPreview: React.FC<CSVPreviewProps> = ({ url }) => {
   }, [url])
 
   return (
-    <div className="excel-preview-container relative h-[500px]">
+    <div className="excel-preview-container relative">
       <table>
         <tbody>
           {data.map((row, rowIndex) => (
@@ -54,11 +54,11 @@ const CSVPreview: React.FC<CSVPreviewProps> = ({ url }) => {
           ))}
         </tbody>
       </table>
-      {/* <div id="loadingBar">
+      <div id="loadingBar">
         <div className="progress">
           <div className="glimmer"></div>
         </div>
-      </div> */}
+      </div>
     </div>
   )
 }

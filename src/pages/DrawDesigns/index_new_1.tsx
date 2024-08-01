@@ -23,6 +23,7 @@ import Gallery from './gallery'
 import MosaicCanvas from './MosaicCanvas/MosaicCanvas'
 import { ZoomIn, ZoomOut } from '@/icons/src/vender/line/editor'
 import { RefreshCcw01 } from '@/icons/src/vender/line/arrows'
+import { REACT_APP_BASE_URL_CONFIG } from '@/config'
 
 export interface Property {
   notifyHook?: any
@@ -508,7 +509,7 @@ const DrawDesigns = () => {
     const Key = 'Y38PvAPfOOyaBKOLnQsG'
     const salt = Date.now()
     const sign = MD5(`${AppId}${target === 'prompt' ? prompt : ignoreElements}${salt}${Key}`)
-    const url = `${process.env.REACT_APP_FANYI_BASE_URL}/trans/vip/translate?q=${encodeURIComponent(target === 'prompt' ? prompt : ignoreElements)}&from=auto&to=en&appid=${AppId}&salt=${salt}&sign=${sign}`
+    const url = `${REACT_APP_BASE_URL_CONFIG.REACT_APP_FANYI_BASE_URL}/api/trans/vip/translate?q=${encodeURIComponent(target === 'prompt' ? prompt : ignoreElements)}&from=auto&to=en&appid=${AppId}&salt=${salt}&sign=${sign}`
 
     try {
       if (target === 'prompt') {

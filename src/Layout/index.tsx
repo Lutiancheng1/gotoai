@@ -45,6 +45,7 @@ const SmartCustomerService = React.lazy(() => import('@/pages/SmartCustomerServi
 const BusinessOpportunities = React.lazy(() => import('@/pages/BusinessOpportunities'))
 const CaseCenter = React.lazy(() => import('@/pages/CaseCenter'))
 const CaseDetail = React.lazy(() => import('@/pages/CaseCenter/CaseDetail'))
+const Translate = React.lazy(() => import('@/pages/Translate'))
 
 type Props = {} & Partial<talkInitialState>
 const Index = ({ loading }: Props) => {
@@ -296,6 +297,7 @@ const Index = ({ loading }: Props) => {
                 <Route path="/writing/:robotId" element={<WritingDetail />} />
                 <Route path="/smartCustomerService" element={<SmartCustomerService />} />
                 <Route path="/businessOpportunities" element={<BusinessOpportunities />} />
+                <Route path="/translate" element={<Translate />} />
                 <Route path="/caseCenter" element={<CaseCenter />} />
                 <Route path="/caseDetail" element={<CaseDetail />} />
                 <Route path="/*" element={<NotFound />} />

@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { initCurrentCategory, updateCollapsed } from '@/store/reducers/writing'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { Button, FloatButton, Form, Input, Modal, Popover, Select, Steps, Tooltip, Upload } from 'antd'
+import { Button, ConfigProvider, FloatButton, Form, Input, Modal, Popover, Select, Steps, Tooltip, Upload } from 'antd'
 import FormItem from 'antd/es/form/FormItem'
 import TextArea, { TextAreaRef } from 'antd/es/input/TextArea'
 import './index.css'
@@ -25,6 +25,7 @@ import Loading from '@/components/loading'
 import { getHistoryList, getWishList, getWritingCategoryList, getWritingDetail, WritingDetailList } from '@/store/action/writingAction'
 import TinyMCEEditor from '@/components/TinymceEditor'
 import { renderMarkdown } from '@/components/MdRender/markdownRenderer'
+import { REACT_APP_BASE_URL_CONFIG } from '@/config'
 type WritingDetailProps = {}
 let sse = true
 let currentMenuKey = 10
@@ -39,6 +40,7 @@ interface TableOfContentsItem {
   subsections: {
     title: string
     content?: string
+    overview?: string
   }[]
   content?: string
 }
@@ -59,6 +61,9 @@ export function jsonToMarkdown(json: JsonInput): string {
       markdown += `\n### ${item.chapter} ${item.title}\n`
       item.subsections.forEach((subsection) => {
         markdown += `#### ${subsection.title}\n`
+        if (subsection.overview) {
+          markdown += `##### ${subsection.overview}\n`
+        }
         if (subsection.content) {
           markdown += `${subsection.content}\n`
         }
@@ -81,6 +86,9 @@ export function jsonToText(json: JsonInput): string {
       text += `\n${item.chapter} ${item.title}\n`
       item.subsections.forEach((subsection) => {
         text += `${subsection.title}\n`
+        if (subsection.overview) {
+          text += `${subsection.overview}\n`
+        }
         if (subsection.content) {
           text += `${subsection.content}\n`
         }
@@ -109,15 +117,25 @@ export function htmlToJson(html: string): JsonInput {
     const chapterNumber = chapterMatch ? parseInt(chapterMatch[1], 10) : undefined
     const chapterTitle = chapterMatch ? chapterMatch[2] : chapterText
 
-    const subsections: { title: string; content?: string }[] = []
+    const subsections: { title: string; overview?: string; content?: string }[] = []
     let nextElement = chapter.nextElementSibling
 
-    while (nextElement && nextElement.tagName === 'H4') {
-      const subsectionTitle = nextElement.textContent || ''
+    while (nextElement && (nextElement.tagName === 'H4' || nextElement.tagName === 'H5')) {
+      let subsectionTitle = ''
+      let subsectionOverview: string | undefined = undefined
       let subsectionContent: string | undefined = undefined
 
-      nextElement = nextElement.nextElementSibling
+      if (nextElement.tagName === 'H4') {
+        subsectionTitle = nextElement.textContent || ''
+        nextElement = nextElement.nextElementSibling
+      }
+
       const contentParts: string[] = []
+
+      if (nextElement && nextElement.tagName === 'H5') {
+        subsectionOverview = nextElement.textContent || ''
+        nextElement = nextElement.nextElementSibling
+      }
 
       while (nextElement && nextElement.tagName === 'P') {
         contentParts.push(nextElement.textContent || '')
@@ -130,6 +148,7 @@ export function htmlToJson(html: string): JsonInput {
 
       subsections.push({
         title: subsectionTitle,
+        overview: subsectionOverview,
         content: subsectionContent
       })
     }
@@ -161,7 +180,7 @@ export async function fillContent(query: string, onUpdate: (content: string) => 
   const signal = newController.signal
   let T = ''
   try {
-    const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+    const url = `${REACT_APP_BASE_URL_CONFIG.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
     await fetchEventSource(url, {
       signal: signal,
       method: 'POST',
@@ -259,7 +278,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
     setController(() => newController)
     let T = ''
     try {
-      const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+      const url = `${REACT_APP_BASE_URL_CONFIG.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
       await fetchEventSource(url, {
         signal: signal,
         method: 'POST',
@@ -368,6 +387,11 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
         form.resetFields()
         setCurrentFile(undefined)
         setCurrentStage(0)
+        // 停止
+        controller?.abort()
+        setIsCancelled(true)
+        setCurrentStage(0)
+        setLoading(false)
       }
     })
   }
@@ -440,7 +464,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
                   const formValue = formValues[item.input_name]
                   if (!formValue) return ''
                   return `${item.title}: ${formValue}`
-                })}生成一个详细的文档大纲。大纲应包括至少三个主要部分，每个部分下应有至少两个子点。请确保大纲能够全面覆盖文章主题，同时保持逻辑清晰。请直接返回json数据的大纲文本，不要包含任何Markdown语法。格式为{"title": "xxx","subtitle": "xxx","table_of_contents": [{"chapter": 1,"title": "xxx","subsections": [{"title":"1.1 xxx"},...],...]。`,
+                })}生成一个详细的文档大纲。大纲应包括至少三个主要部分，每个部分下应有至少两个子点。请确保大纲能够全面覆盖文章主题，同时保持逻辑清晰。请直接返回json数据的大纲文本，不要包含任何Markdown语法。格式为{"title": "xxx","subtitle": "xxx","table_of_contents": [{"chapter": 1,"title": "xxx","subsections": [{"title":"1.1 xxx","overview":"该小节的概述"},...],...]。`,
                 inputs: transformObject(form.getFieldsValue())
               })
             )) as { payload: AddChatMessagesData }
@@ -511,9 +535,13 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
               console.log(subsection)
 
               if (!subsection.content || subsection.content === '') {
+                // 复制当前小节概述
+                let overview = subsection.overview
+                // 清空小节概述
+                subsection.overview = ''
                 // 生成小节内容
                 subsection.content = await fillContent(
-                  `请根据文档大纲为 ${jsonToText(jsonOutline.current!)}。自动生成《${subsection.title}》详细的内容。${key ?? ''}请直接输出内容,禁止出现大纲标题:${
+                  `请根据文档大纲为 ${jsonToText(jsonOutline.current!)}。根据该小节概述:《${overview}》, 自动生成《${subsection.title}》详细的内容。${key ?? ''}请直接输出内容,禁止出现大纲标题:${
                     subsection.title
                   }。内容应包括至少三个主要观点，每个观点下应有详细解释和例子。请确保内容能够深入探讨该部分的主题，同时保持语言流畅和易懂。`,
                   (content) => {
@@ -533,7 +561,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
         setController(newController)
         const signal = newController.signal
         try {
-          const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+          const url = `${REACT_APP_BASE_URL_CONFIG.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
           fetchEventSource(url, {
             method: 'POST',
             signal: signal,
@@ -861,7 +889,7 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
                 <div className="flex flex-col w-1/3 flex-grow h-full bg-[#fff]">
                   <div className={`w-full h-full flex flex-col justify-center items-center ${hasSteps ? 'pb-3' : 'pb-6'}`}>
                     {/* 头部 */}
-                    <header className="flex items-center w-full h-[72px] pl-4 border-b-[1px] border-[rgba(0,0,0,0.1)] cursor-pointer">
+                    <header className="flex items-center w-full h-[72px] pl-4 border-b-[1px] border-[rgba(0,0,0,0.1)]">
                       <img alt="" className="w-7 h-7 rounded-[6px] mx-[10px]" src={WritingData.currentCategory.icon} />
                       <div className="text-20 font-medium line-clamp-2" title={WritingData.currentCategory.description}>
                         {WritingData.currentCategory.nickname}
@@ -987,22 +1015,32 @@ const WritingDetail: React.FC<WritingDetailProps> = () => {
                     </div>
                     {hasSteps && (
                       <div className="w-full flex px-6 mt-3">
-                        <Steps
-                          size="small"
-                          current={currentStage}
-                          // onChange={changeStage}
-                          items={[
-                            {
-                              title: '生成大纲'
-                            },
-                            {
-                              title: '编辑大纲'
-                            },
-                            {
-                              title: '生成内容'
+                        <ConfigProvider
+                          theme={{
+                            components: {
+                              Steps: {
+                                fontSize: 12
+                              }
                             }
-                          ]}
-                        />
+                          }}
+                        >
+                          <Steps
+                            size="small"
+                            current={currentStage}
+                            // onChange={changeStage}
+                            items={[
+                              {
+                                title: '生成大纲'
+                              },
+                              {
+                                title: '编辑大纲/概述'
+                              },
+                              {
+                                title: '生成内容'
+                              }
+                            ]}
+                          />
+                        </ConfigProvider>
                       </div>
                     )}
                   </div>

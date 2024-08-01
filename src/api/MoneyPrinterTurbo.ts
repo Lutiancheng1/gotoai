@@ -1,4 +1,5 @@
 import Toast from '@/components/Toast'
+import { REACT_APP_BASE_URL_CONFIG } from '@/config'
 
 export interface TaskVideoRequest {
   video_subject: string
@@ -120,7 +121,7 @@ export interface VideoTermsResponse {
     video_terms: string[]
   }
 }
-export const baseUrl = process.env.REACT_APP_VIDEO_BASE_URL
+export const baseUrl = REACT_APP_BASE_URL_CONFIG.REACT_APP_VIDEO_BASE_URL
 // Generate a short video
 export const createVideo = async (requestBody: TaskVideoRequest): Promise<TaskResponse> => {
   const response = await fetch(`${baseUrl}/videos`, {

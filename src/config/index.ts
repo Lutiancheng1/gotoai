@@ -25,3 +25,17 @@ export const productMatrix = [
     url: 'https://resource.gotoai.world/upload/system/AskSales.pdf'
   }
 ]
+
+declare const __REACT_APP_BASE_URL: {
+  REACT_APP_BASE_URL: string
+  REACT_APP_VIDEO_BASE_URL: string
+  REACT_APP_FANYI_BASE_URL: string
+}
+export const REACT_APP_BASE_URL_CONFIG =
+  process.env.NODE_ENV === 'production'
+    ? __REACT_APP_BASE_URL
+    : {
+        REACT_APP_BASE_URL: 'http://47.121.24.110:8003/api',
+        REACT_APP_VIDEO_BASE_URL: 'https://video.cloud-pioneer.com/api/v1/',
+        REACT_APP_FANYI_BASE_URL: 'https://fanyi.cloud-pioneer.com'
+      }

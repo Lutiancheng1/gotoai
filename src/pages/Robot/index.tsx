@@ -34,6 +34,7 @@ import { getMessagesSuggested, sendChatMessage } from '@/api/knowledge'
 import { getQuesions } from '@/store/action/talkActions'
 import { renderMarkdown } from '@/components/MdRender/markdownRenderer'
 import { MessageInfo } from '@/store/types'
+import { REACT_APP_BASE_URL_CONFIG } from '@/config'
 let conversation_id = ''
 type Props = {
   right?: number
@@ -179,7 +180,7 @@ const Robot: React.FC<Props> = ({ right = 20, bottom = 45, isNewChat, conversiti
       setController(newController)
       const signal = newController.signal
       try {
-        const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+        const url = `${REACT_APP_BASE_URL_CONFIG.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
         fetchEventSource(url, {
           method: 'POST',
           signal: signal,

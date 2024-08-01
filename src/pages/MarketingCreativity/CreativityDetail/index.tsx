@@ -28,6 +28,7 @@ import Loading from '@/components/loading'
 import { transformObject } from '@/utils'
 import useForm from 'antd/es/form/hooks/useForm'
 import { renderMarkdown } from '@/components/MdRender/markdownRenderer'
+import { REACT_APP_BASE_URL_CONFIG } from '@/config'
 type CreativityDetailProps = {}
 let sse = true
 let currentMenuKey = 9
@@ -167,7 +168,7 @@ const CreativityDetail: React.FC<CreativityDetailProps> = () => {
       setController(newController)
       const signal = newController.signal
       try {
-        const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+        const url = `${REACT_APP_BASE_URL_CONFIG.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
         fetchEventSource(url, {
           method: 'POST',
           signal: signal,

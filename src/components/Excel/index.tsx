@@ -59,7 +59,7 @@ const ExcelPreview: React.FC<ExcelPreviewProps> = ({ url }) => {
   }, [url])
 
   return (
-    <div className="excel-preview-container relative  h-[500px]">
+    <div className="excel-preview-container relative ">
       <table>
         <tbody>
           {data.map((row, rowIndex) => (

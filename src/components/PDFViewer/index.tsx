@@ -11,21 +11,19 @@ import pageDownIcon from './images/pagedown.svg'
 import 'pdfjs-dist/web/pdf_viewer.css'
 import './index.css'
 import Toast from '../Toast'
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.1.392/pdf.worker.min.mjs'
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.3.136/pdf.worker.min.mjs'
 interface PDFViewerProps {
   url: string
   handleMouseUp?: (event: MouseEvent) => void
   hasTools?: boolean
+  targetViewContainer?: HTMLDivElement // 手动指定容器
 }
 const eventBus = new pdfjsViewer.EventBus()
 const linkService = new pdfjsViewer.PDFLinkService({
   eventBus: eventBus
 })
 let pdf = null as pdfjsLib.PDFDocumentProxy | null
-let viewContainer = null as HTMLDivElement | null
-let loadingTask = null as pdfjsLib.PDFDocumentLoadingTask | null
-let loadingBar = null as HTMLDivElement | null
-const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) => {
+const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools, targetViewContainer }) => {
   const [numPages, setNumPages] = useState<number>(1)
   // 当前页面
   const [pageNumber, setPageNumber] = useState(1)
@@ -33,6 +31,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
   // loading
   const [loading, setLoading] = useState<boolean>(true)
   const [scale, setScale] = useState(0.8) // 初始缩放比例为.8
+  const loadingBarRef = useRef<HTMLDivElement | null>(null)
+  const viewContainer = useRef<HTMLDivElement | null>(null)
+  const loadingTask = useRef<pdfjsLib.PDFDocumentLoadingTask | null>(null)
+  const pdf = useRef<pdfjsLib.PDFDocumentProxy | null>(null)
   const [pdfPageViews, setPdfPageViews] = useState<pdfjsViewer.PDFPageView[]>([]) // 存储PDFPageView实例的数组
   // 使用useScroll监听滚动
   const scroll = useScroll(viewContainer)!
@@ -101,39 +103,39 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
           setPageNumber(1)
           setNumPages(1)
           setScale(0.8)
-          loadingTask && loadingTask.destroy()
-          loadingBar && loadingBar.style.setProperty('--progressBar-percent', `0%`)
+          loadingTask.current && loadingTask.current.destroy()
+          loadingBarRef.current && loadingBarRef.current.style.setProperty('--progressBar-percent', `0%`)
         }
-        loadingTask = pdfjsLib.getDocument({
+        loadingTask.current = pdfjsLib.getDocument({
           url,
           rangeChunkSize: 65536 * 80, // 可以根据需要调整
           disableFontFace: true
         })
 
         // 进度条
-        loadingTask.onProgress = ({ loaded, total }: { loaded: number; total: number }) => {
+        loadingTask.current.onProgress = ({ loaded, total }: { loaded: number; total: number }) => {
           const progressPercent = (loaded / total) * 100
-          loadingBar = document.getElementById('loadingBar') as HTMLDivElement
-          if (loadingBar) {
-            loadingBar.style.setProperty('--progressBar-percent', `${progressPercent}%`)
-            if (loadingBar.classList.contains('hidden')) {
-              loadingBar.classList.remove('hidden') // 显示进度条
+
+          if (loadingBarRef.current) {
+            loadingBarRef.current.style.setProperty('--progressBar-percent', `${progressPercent}%`)
+            if (loadingBarRef.current.classList.contains('hidden')) {
+              loadingBarRef.current.classList.remove('hidden') // 显示进度条
             }
             if (progressPercent === 100) {
-              loadingBar.classList.add('hidden') // 隐藏进度条
+              loadingBarRef.current.classList.add('hidden') // 隐藏进度条
             }
           }
         }
-        pdf = await loadingTask.promise
-        setNumPages(pdf.numPages) // 设置总页数
+        pdf.current = await loadingTask.current.promise
+        setNumPages(pdf.current.numPages) // 设置总页数
 
         // 首先加载并渲染第一页
-        const firstPage = await pdf.getPage(1)
+        const firstPage = await pdf.current.getPage(1)
         await renderPage(firstPage, 1)
 
         // 在后台加载并渲染剩余页面
-        for (let pageNum = 2; pageNum <= pdf.numPages; pageNum++) {
-          await pdf.getPage(pageNum).then((page) => renderPage(page, pageNum))
+        for (let pageNum = 2; pageNum <= pdf.current.numPages; pageNum++) {
+          await pdf.current.getPage(pageNum).then((page) => renderPage(page, pageNum))
         }
       } catch (error) {
         console.error('Error loading PDF: ', error)
@@ -158,17 +160,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
 
   const scrollToPage = (pageNum: number) => {
     requestAnimationFrame(() => {
-      let pageContainer = document.querySelector(`.page[data-page-number="${pageNum}"]`) as HTMLDivElement | null
+      let pageContainer = (viewContainer.current ?? document).querySelector(`.page[data-page-number="${pageNum}"]`) as HTMLDivElement | null
       if (pageContainer && viewContainer) {
         const topPosition = pageContainer.getBoundingClientRect().top + window.pageYOffset - containerRef.current!.getBoundingClientRect().top
-        viewContainer!.scrollTo({ top: topPosition, behavior: 'smooth' })
+        viewContainer.current!.scrollTo({ top: topPosition, behavior: 'smooth' })
       }
     })
   }
 
   const handleScroll = () => {
     const containerTop = scroll && scroll.top
-    const containerCenter = viewContainer!.offsetHeight / 2 + containerTop!
+    const containerCenter = viewContainer.current!.offsetHeight / 2 + containerTop!
     let closestPageNum = 1
     let minDistance = Infinity
     let closestPageNumOnBoundary = 1
@@ -208,7 +210,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
 
   useMount(() => {
     handleMouseUp && containerRef.current?.addEventListener('mouseup', handleMouseUp)
-    viewContainer = document.querySelector('.preview-container')! as HTMLDivElement
+    viewContainer.current = targetViewContainer ?? (document.querySelector('.preview-container')! as HTMLDivElement)
   })
 
   useUnmount(() => {
@@ -310,7 +312,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, handleMouseUp, hasTools }) =
             </div>
           </div>
         )}
-        <div id="loadingBar">
+        <div ref={loadingBarRef} id="loadingBar">
           <div className="progress">
             <div className="glimmer"></div>
           </div>

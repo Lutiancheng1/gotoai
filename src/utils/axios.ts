@@ -1,7 +1,8 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
 import { getTokenInfo, removeTokenInfo } from './storage'
 import Toast from '@/components/Toast'
-export const httpBaseURL = process.env.REACT_APP_BASE_URL
+import { REACT_APP_BASE_URL_CONFIG } from '@/config'
+export const httpBaseURL = REACT_APP_BASE_URL_CONFIG.REACT_APP_BASE_URL
 export const http = axios.create({
   timeout: 1000000000,
   baseURL: httpBaseURL

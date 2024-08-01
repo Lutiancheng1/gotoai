@@ -22,7 +22,7 @@ p {
   text-indent: 4ch;
   line-height: 24px;
 }
-h1, h2, h3, h4 {
+h1, h2, h3, h4 ,h5{
   text-align: center;
 }  
 `
@@ -44,7 +44,7 @@ const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
       })
 
       // 为 h1, h2, h3, h4 标签添加样式
-      doc.querySelectorAll('h1, h2, h3, h4').forEach((header: any) => {
+      doc.querySelectorAll('h1, h2, h3, h4, h5').forEach((header: any) => {
         header.style.textAlign = 'center'
       })
 

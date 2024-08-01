@@ -13,14 +13,14 @@ interface WordPreviewProps {
   url: string // 仅支持 URL
   handleMouseUp?: (event: MouseEvent) => void
   hasTools?: boolean
+  targetViewContainer?: HTMLDivElement // 手动指定容器
 }
-let loadingBar = null as HTMLDivElement | null
-let viewContainer = null as HTMLDivElement | null
-
-const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools = true }) => {
+const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools = true, targetViewContainer }) => {
+  const viewContainer = useRef<HTMLDivElement | null>(null)
   const previewRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(true)
   const [scale, setScale] = useState(0.8) // 初始缩放比例为.8
+  const loadingBarRef = useRef<HTMLDivElement | null>(null)
   const [numPages, setNumPages] = useState<number>(1)
   // 当前页面
   const [pageNumber, setPageNumber] = useState(1)
@@ -63,11 +63,11 @@ const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools 
 
   const scrollToPage = (pageNum: number) => {
     requestAnimationFrame(() => {
-      let pageContainer = document.querySelector(`.docx[data-page-number="${pageNum}"]`) as HTMLDivElement | null
-      if (pageContainer && viewContainer) {
+      let pageContainer = (viewContainer.current ?? document).querySelector(`.docx[data-page-number="${pageNum}"]`) as HTMLDivElement | null
+      if (pageContainer && viewContainer.current) {
         const zoomFactor = parseFloat((pageContainer.style as any).zoom)
         const topPosition = pageContainer.getBoundingClientRect().top * zoomFactor + window.pageYOffset - previewRef.current!.getBoundingClientRect().top
-        viewContainer!.scrollTo({ top: topPosition, behavior: 'smooth' })
+        viewContainer.current.scrollTo({ top: topPosition, behavior: 'smooth' })
       }
     })
   }
@@ -80,14 +80,13 @@ const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools 
       xhr.onprogress = (event) => {
         if (event.lengthComputable) {
           const percentComplete = Math.round((event.loaded / event.total) * 100)
-          loadingBar = document.getElementById('loadingBar') as HTMLDivElement
-          if (loadingBar) {
-            loadingBar.style.setProperty('--progressBar-percent', `${percentComplete}%`)
-            if (loadingBar.classList.contains('hidden')) {
-              loadingBar.classList.remove('hidden') // 显示进度条
+          if (loadingBarRef.current) {
+            loadingBarRef.current.style.setProperty('--progressBar-percent', `${percentComplete}%`)
+            if (loadingBarRef.current.classList.contains('hidden')) {
+              loadingBarRef.current.classList.remove('hidden') // 显示进度条
             }
             if (percentComplete === 100) {
-              loadingBar.classList.add('hidden') // 隐藏进度条
+              loadingBarRef.current.classList.add('hidden') // 隐藏进度条
             }
           }
         }
@@ -145,7 +144,7 @@ const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools 
   // 创建 handleScroll 函数
   const handleScroll = () => {
     const containerTop = scroll && scroll.top
-    const containerCenter = viewContainer!.offsetHeight / 2 + containerTop!
+    const containerCenter = viewContainer.current!.offsetHeight / 2 + containerTop!
     let closestPageNum = 1
     let minDistance = Infinity
     let closestPageNumOnBoundary = 1
@@ -193,7 +192,7 @@ const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools 
 
   useMount(() => {
     handleMouseUp && previewRef.current?.addEventListener('mouseup', handleMouseUp)
-    viewContainer = document.querySelector('.preview-container')! as HTMLDivElement
+    viewContainer.current = targetViewContainer ?? (document.querySelector('.preview-container')! as HTMLDivElement)
   })
 
   useUnmount(() => {
@@ -301,6 +300,7 @@ const WordPreview: React.FC<WordPreviewProps> = ({ url, handleMouseUp, hasTools 
           style={{
             bottom: !hasTools ? '0' : ''
           }}
+          ref={loadingBarRef}
         >
           <div className="progress">
             <div className="glimmer"></div>

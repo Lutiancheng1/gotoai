@@ -21,7 +21,7 @@ const tabsWarp = [
   }
 ]
 const CreationWrapper: React.FC<CreationWrapperProps> = () => {
-  const [activeKey, setActiveKey] = useState('musicCreation')
+  const [activeKey, setActiveKey] = useState('videoCreation')
   return (
     <div className="creation_wrapper">
       {/* 上方tab切换*/}

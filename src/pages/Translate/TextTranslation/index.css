@@ -1,0 +1,33 @@
+.text-translation {
+  .no_outline {
+    .ant-select-selector {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .form_textarea {
+    >textarea::-webkit-scrollbar {
+      display: none !important
+    }
+
+    .ant-input-suffix {
+      .ant-input-data-count {
+        font-size: 14px !important;
+        margin-top: -10px;
+        position: absolute;
+        right: 10px;
+        bottom: 0;
+      }
+
+      .ant-input-clear-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        font-size: 18px;
+        transform: translateY(-50%);
+      }
+    }
+  }
+}

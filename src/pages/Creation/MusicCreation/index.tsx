@@ -73,7 +73,7 @@ const MusicCreation: React.FC<{}> = () => {
             <>
               <div className="mb-4">
                 <div className="mb-2 flex items-center text-sm">歌曲标题</div>
-                <Input value={musicName} placeholder="请输入20字以内的歌曲名称" />
+                <Input value={musicName} placeholder="请输入20字以内的歌曲名称" onChange={(e) => setMusicName(e.target.value)} />
               </div>
               <div className="mb-4">
                 <div className="mb-2 flex items-center text-sm">歌曲歌词</div>

@@ -36,6 +36,7 @@ import CSVPreview from '../Csv'
 import { formatFileSize, formatFileType } from '@/utils/format'
 import { renderMarkdown } from '../MdRender/markdownRenderer'
 import { MessageInfo } from '@/store/types'
+import { REACT_APP_BASE_URL_CONFIG } from '@/config'
 // 定义一个文件信息的类型
 export type FileInfo = {
   // 文件的 id
@@ -247,7 +248,7 @@ const Dialogue = forwardRef(({ isNewChat, conversitionDetailList, currentConvers
         setController(newController)
         const signal = newController.signal
         try {
-          const url = `${process.env.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
+          const url = `${REACT_APP_BASE_URL_CONFIG.REACT_APP_BASE_URL}/Chat/ChatMessagesEvent`
           fetchEventSource(url, {
             method: 'POST',
             signal: signal,

@@ -67,15 +67,15 @@ export const menuConfig = [
   //   icon: 'icon-AIsearch',
   //   label: 'AI 搜索'
   // },
-  // {
-  //   key: 'aiTranslation',
-  //   icon: 'icon-zimu',
-  //   label: 'AI 翻译'
-  // },
   {
     key: 'businessOpportunities',
     icon: 'icon-businessOpportunities',
     label: '商机获客'
+  },
+  {
+    key: 'translate',
+    icon: 'icon-fanyi',
+    label: 'AI 翻译'
   },
   {
     key: 'application',
