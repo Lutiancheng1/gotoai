@@ -46,6 +46,7 @@ const BusinessOpportunities = React.lazy(() => import('@/pages/BusinessOpportuni
 const CaseCenter = React.lazy(() => import('@/pages/CaseCenter'))
 const CaseDetail = React.lazy(() => import('@/pages/CaseCenter/CaseDetail'))
 const Translate = React.lazy(() => import('@/pages/Translate'))
+const WriteDoc = React.lazy(() => import('@/pages/WriteDoc'))
 
 type Props = {} & Partial<talkInitialState>
 const Index = ({ loading }: Props) => {
@@ -72,6 +73,9 @@ const Index = ({ loading }: Props) => {
   })
 
   const menuGo: MenuProps['onClick'] = async ({ key }) => {
+    if (key === 'writeDoc') {
+      return navagate('/writeDoc/createDoc')
+    }
     navagate(`/${key}`)
   }
   const logout = () => {
@@ -89,6 +93,8 @@ const Index = ({ loading }: Props) => {
       return setCurrentPath('writing')
     } else if (location.pathname.substr(1).startsWith('caseDetail')) {
       return setCurrentPath('caseCenter')
+    } else if (['writeDoc/createDoc', 'writeDoc/myDoc', 'writeDoc/knowledge', 'writeDoc/writeTopic'].includes(location.pathname.substr(1))) {
+      return setCurrentPath('writeDoc')
     }
     setCurrentPath(location.pathname.substr(1))
   }, [location])
@@ -300,6 +306,7 @@ const Index = ({ loading }: Props) => {
                 <Route path="/translate" element={<Translate />} />
                 <Route path="/caseCenter" element={<CaseCenter />} />
                 <Route path="/caseDetail" element={<CaseDetail />} />
+                <Route path="/writeDoc/*" element={<WriteDoc />} />
                 <Route path="/*" element={<NotFound />} />
               </Routes>
             </Suspense>

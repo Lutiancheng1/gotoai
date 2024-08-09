@@ -7,6 +7,7 @@ const NotFound = React.lazy(() => import('@/pages/NotFound'))
 const Loading = React.lazy(() => import('@/pages/Loading'))
 const Login = React.lazy(() => import('@/pages/Login'))
 const Layout = React.lazy(() => import('@/Layout'))
+const DocDetail = React.lazy(() => import('@/pages/WriteDoc/components/DocDetail'))
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -19,6 +20,7 @@ const router = createBrowserRouter(
             throw redirect('/talk')
           }}
         />
+        <Route path="/writeDoc/docDetail/:docId" element={<DocDetail />} />
         <Route
           path="/*"
           element={

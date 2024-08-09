@@ -1,0 +1,17 @@
+.doc-detail {
+  .split-pane .left {
+    min-width: 450px
+  }
+
+  .split-pane .react-split__sash {
+    width: 10px !important;
+    height: 100%;
+    cursor: ew-resize;
+    background: url('@/assets/images/dragger.svg') 100% 100% no-repeat;
+    background-position: 50%;
+  }
+
+  .tox-tinymce {
+    border-left: 0 !important;
+  }
+}

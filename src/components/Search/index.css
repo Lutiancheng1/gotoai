@@ -288,6 +288,7 @@
     caret-color: #2454ff;
     scrollbar-width: none;
     padding: 0;
+    box-shadow: none !important;
   }
 
   .input-box-inner textarea::-webkit-input-placeholder {

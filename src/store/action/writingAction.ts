@@ -73,6 +73,16 @@ export const getWritingCategoryList = createAsyncThunk('/WritingCategory/List', 
 })
 
 /**
+ * 获取营销创意种类列表
+ * @returns {Promise<void | WritingCategory[]>} - 返回一个promise，resolve的值为营销创意种类列表
+ */
+export const getFilterWritingCategoryList = createAsyncThunk('/FilterWritingCategory/List', async (): Promise<void | WritingCategory[]> => {
+  const res = (await http.get('/WritingCategory/List')) as WritingCategoryRes
+  if (!res.data) return Toast.notify({ type: 'error', message: res.msg })
+  return res.data
+})
+
+/**
  * 获取分类详情
  * @param {number} id - 分类的id
  * @returns {Promise<void | WritingChildrenList>} - 返回一个promise，resolve的值为分类详情

@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { getHistoryList, getWishList, getWritingCategoryList, getWritingDetail, WritingCategory, WritingChildrenList } from '../action/writingAction'
+import { getFilterWritingCategoryList, getHistoryList, getWishList, getWritingCategoryList, getWritingDetail, WritingCategory, WritingChildrenList } from '../action/writingAction'
 
 export interface WritingState {
   category: WritingCategory[]
+  filteredCategory: WritingCategory[]
   history: WritingCategory
   wish: WritingCategory
   currentCategory: WritingChildrenList
@@ -10,6 +11,7 @@ export interface WritingState {
 }
 export const initialState: WritingState = {
   category: [],
+  filteredCategory: [],
   history: {
     id: 0,
     sorts: 0,
@@ -145,6 +147,13 @@ const creativitySlice = createSlice({
           state.category = payload || []
           state.pureCategory = payload || []
         }
+      }
+    })
+
+    builder.addCase(getFilterWritingCategoryList.fulfilled, (state, { payload }: PayloadAction<void | WritingCategory[]>) => {
+      if (payload) {
+        payload = payload.filter((item) => item.name !== 'SystemWish' && item.name !== 'SystemHistory' && item.name !== 'SystemHot' && item.name !== 'C_000' && item.name !== 'C_001')
+        state.filteredCategory = payload || []
       }
     })
     builder.addCase(getWritingDetail.fulfilled, (state, { payload }: PayloadAction<void | WritingChildrenList>) => {

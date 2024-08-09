@@ -78,6 +78,11 @@ export const menuConfig = [
     label: 'AI 翻译'
   },
   {
+    key: 'writeDoc',
+    icon: 'icon-AIxiezuomoban',
+    label: 'AI 写作'
+  },
+  {
     key: 'application',
     icon: 'icon-yingyong',
     label: '应用'

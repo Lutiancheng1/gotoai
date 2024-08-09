@@ -1,0 +1,49 @@
+.required::before {
+  display: inline-block;
+  margin-inline-end: 4px;
+  color: #ff4d4f;
+  font-size: 14px;
+  font-family: SimSun, sans-serif;
+  line-height: 1;
+  content: "*";
+}
+
+.create_doc {
+
+  .doc-type .type-item.isActive,
+  .doc-type .type-item:hover {
+    background-color: #e8f0ff;
+    border-radius: 15px;
+    color: #4480ee
+  }
+
+  .templates-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .template-item {
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+    height: 150px;
+    cursor: pointer;
+    border-radius: 10px;
+
+    &:hover {
+      box-shadow: 0 2px 10px 0 rgba(51, 51, 51, .1)
+    }
+
+    .template-name {
+      font-size: 22px;
+      color: #001616;
+      font-weight: 700;
+      word-break: break-all;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+    }
+  }
+}

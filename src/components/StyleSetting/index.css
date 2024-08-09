@@ -1,0 +1,71 @@
+  .content-style-con,
+  .section-ol-con {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    padding: 10px 0 30px 0;
+  }
+
+  .content-style-con li {
+    width: 140px;
+    height: 74px;
+    padding: 14px 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+  }
+
+  .content-style-con li,
+  .section-ol-con li {
+    border: 1px solid #f3f4f8;
+    background-color: #f3f4f8;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .content-style-con li:hover,
+  .section-ol-con li:hover,
+  .section-ol-con li.active {
+    border-color: #409eff;
+  }
+
+  .content-style-con li span:nth-of-type(1) {
+    font-weight: bold;
+  }
+
+  .content-style-con li span:nth-of-type(2) {
+    font-size: 12px;
+  }
+
+  .section-ol-con {
+    display: block;
+  }
+
+  .section-ol-con li:not(:last-of-type) {
+    margin-right: 20px;
+  }
+
+  .section-ol-con li {
+    width: 206px;
+    height: 106px;
+    padding: 10px 20px;
+    display: inline-block;
+  }

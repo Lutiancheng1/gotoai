@@ -27,7 +27,7 @@ declare module '@reduxjs/toolkit' {
     rejectValue?: unknown
     serializedErrorType?: unknown
   }
-
+  // @ts-ignore
   function createAsyncThunk<
     Returned,
     ThunkArg = void,

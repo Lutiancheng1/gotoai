@@ -10,42 +10,63 @@ import { saveAs } from 'file-saver'
 import dayjs from 'dayjs'
 import Toast from '../Toast'
 import { fillContent } from '@/pages/Writing/WritingDetail'
+import StyleSetting, { MarginType, StyleKeys, StyleProperties, StyleType, targetDefaultStylesType } from '../StyleSetting'
 type TinyMCEEditorProps = {
   onChange?: (content: string) => void
+}
+/**
+ * Converts a given value in centimeters to twips.
+ *
+ * @param {number} cm - The value in centimeters to be converted.
+ * @return {number} The converted value in twips.
+ */
+export function cmToTwips(cm: number): number {
+  const twipsPerInch: number = 1440
+  const inchesPerCm: number = 2.54
+  return Math.round((cm / inchesPerCm) * twipsPerInch)
+}
+export function convertObjectValuesToTwips(obj: { [key: string]: number }): { [key: string]: number } {
+  const newObj: { [key: string]: number } = {}
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key]
+      newObj[key] = cmToTwips(value)
+    }
+  }
+
+  return newObj
 }
 const content_style = `
 body {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 14px;
 }
-p {
-  text-indent: 4ch;
-  line-height: 24px;
-}
-h1, h2, h3, h4 ,h5{
-  text-align: center;
-}  
 `
 
 const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
   const editorRef = useRef<TinyMCEEditorInstance | null>(null)
   const [loading, setLoading] = useState(true) // 加载状态
-
-  const getStyledHtml = () => {
+  // 格式化样式moal显示隐藏
+  const [modalVisible, setModalVisible] = useState(false)
+  const getStyledHtml = (styles: targetDefaultStylesType) => {
     if (editorRef.current) {
       let content = editorRef.current.getContent()
       const parser = new DOMParser()
       const doc = parser.parseFromString(content, 'text/html')
 
-      // 为 p 标签添加样式
-      doc.querySelectorAll('p').forEach((p) => {
-        p.style.textIndent = '4ch'
-        p.style.lineHeight = '24px'
-      })
-
-      // 为 h1, h2, h3, h4 标签添加样式
-      doc.querySelectorAll('h1, h2, h3, h4, h5').forEach((header: any) => {
-        header.style.textAlign = 'center'
+      Object.keys(styles).forEach((tag) => {
+        const style = styles[tag as StyleType]
+        doc.querySelectorAll<HTMLElement>(tag).forEach((element) => {
+          Object.keys(style).forEach((styleKey) => {
+            const key = styleKey as keyof StyleProperties
+            const styleValue = style[styleKey as StyleKeys]
+            if (key !== undefined && key !== 'title' && key !== 'previewText') {
+              // @ts-ignore
+              element.style[key] = styleValue
+            }
+          })
+        })
       })
 
       // 将修改后的 HTML 转换回字符串
@@ -87,8 +108,43 @@ const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
   const handleEditorChange = ({ content, editor }: { content: string; editor: TinyMCEEditorInstance }) => {
     onChange && onChange(content)
   }
+  const saveToWord = async (styles: targetDefaultStylesType, margin: MarginType) => {
+    console.log(styles, convertObjectValuesToTwips(margin))
+    const content = getStyledHtml(styles)
+    if (!content) return Toast.notify({ type: 'warning', message: '文档内容为空' })
+    try {
+      const docxBuffer = await asBlob(content, {
+        margins: {
+          ...convertObjectValuesToTwips(margin)
+        }
+      })
+      const docxBlob = new Blob([docxBuffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+      console.log(docxBlob)
+
+      const match = content.match(/<h1(.*?)>(.*?)<\/h1>/)?.[2]
+      const fileName = match ? match : 'document' // 如果没有匹配到，则使用 '默认文件名'
+      saveAs(docxBlob, `${fileName} _${dayjs().format('YYYY-MM-DD')}.docx`)
+      // 创建 File 对象
+      const docxFile = new File([docxBlob], `${fileName}_${dayjs().format('YYYY-MM-DD')}.docx`, { type: docxBlob.type })
+      console.log(docxFile, 'file')
+
+      Toast.notify({
+        type: 'success',
+        message: '文档保存成功'
+      })
+      setModalVisible(false)
+    } catch (error) {
+      Toast.notify({
+        type: 'error',
+        message: '文档保存失败'
+      })
+      setModalVisible(false)
+    }
+  }
+
   return (
     <div className="editor-container h-full relative">
+      <StyleSetting open={modalVisible} onClose={() => setModalVisible(false)} onSubmit={saveToWord} />
       {loading && (
         <div id="mask" className="w-full h-full" style={{ position: 'absolute' }}>
           <div className="absolute" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
@@ -164,26 +220,7 @@ const TinyMCEEditor = forwardRef(({ onChange }: TinyMCEEditorProps, ref) => {
               icon: 'save',
               tooltip: '保存文档',
               onAction: async function () {
-                const content = getStyledHtml()
-                console.log(content)
-
-                if (!content) return
-                try {
-                  const docxBuffer = await asBlob(content)
-                  const docxBlob = new Blob([docxBuffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
-                  const match = content.match(/<h1(.*?)>(.*?)<\/h1>/)?.[1]
-                  const fileName = match ? match : 'document' // 如果没有匹配到，则使用 '默认文件名'
-                  saveAs(docxBlob, `${fileName} _${dayjs().format('YYYY-MM-DD')}.docx`)
-                  Toast.notify({
-                    type: 'success',
-                    message: '文档保存成功'
-                  })
-                } catch (error) {
-                  Toast.notify({
-                    type: 'error',
-                    message: '文档保存失败'
-                  })
-                }
+                setModalVisible(true)
               }
             })
           },
